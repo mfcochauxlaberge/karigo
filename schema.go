@@ -1,6 +1,6 @@
 package karigo
 
-import "github.com/kkaribu/jsonapi"
+import "github.com/mfcochauxlaberge/jsonapi"
 
 // NewSchema ...
 func NewSchema() *Schema {

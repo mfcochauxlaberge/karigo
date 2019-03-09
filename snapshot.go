@@ -3,7 +3,7 @@ package karigo
 import (
 	"errors"
 
-	"github.com/kkaribu/jsonapi"
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 // Snapshot ...

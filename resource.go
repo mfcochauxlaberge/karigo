@@ -1,7 +1,7 @@
 package karigo
 
 import (
-	"github.com/kkaribu/jsonapi"
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 // NewResource ...

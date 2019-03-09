@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/kkaribu/jsonapi"
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 // NewNode ...

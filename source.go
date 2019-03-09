@@ -1,5 +1,9 @@
 package karigo
 
+import (
+	"math"
+)
+
 // Source ...
 type Source interface {
 	Reset() error
@@ -10,14 +14,25 @@ type Source interface {
 	Begin() (SourceTx, error)
 }
 
-// source ...
+// source is a thin convenient wrapper for a Source.
 type source struct {
-	name     string
 	src      Source
-	version  uint64
 	versions map[string]uint64
-	// availability [2]map[string]bool
-	node *Node
+	// node     *Node
+}
+
+// version returns the lowest version from all the sets.
+func (s *source) version() uint64 {
+	mv := uint64(math.MaxUint64)
+	for _, v := range s.versions {
+		if mv == 0 {
+			mv = v
+		}
+		if v < mv {
+			mv = v
+		}
+	}
+	return mv
 }
 
 // func (s *source) run() {

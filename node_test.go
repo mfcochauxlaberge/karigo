@@ -24,7 +24,6 @@ func TestNode(t *testing.T) {
 	}
 
 	err := node.Close()
-	// err = node.Close()
 	if err == nil {
 		t.Errorf("expected error, got nil")
 	}
