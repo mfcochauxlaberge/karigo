@@ -8,10 +8,12 @@ import (
 )
 
 // NewNode ...
-func NewNode() *Node {
+func NewNode(src Source) *Node {
 	node := &Node{
-		log:     []Commit{},
-		sources: []source{},
+		log: []Commit{},
+		main: source{
+			src: src,
+		},
 
 		currSchema: NewSchema(),
 		nextSchema: NewSchema(),
@@ -26,8 +28,8 @@ func NewNode() *Node {
 // Node ...
 type Node struct {
 	// Run
-	log     Log
-	sources []source
+	log  Log
+	main source
 
 	// Schema
 	currSchema *Schema
@@ -56,34 +58,34 @@ func (n *Node) Run() error {
 	return n.err
 }
 
-// AddSource ...
-func (n *Node) AddSource(name string, src Source) error {
-	n.Lock()
-	defer n.Unlock()
+// // AddSource ...
+// func (n *Node) AddSource(name string, src Source) error {
+// 	n.Lock()
+// 	defer n.Unlock()
 
-	if n.sources == nil {
-		n.sources = []source{}
-	}
+// 	if n.sources == nil {
+// 		n.sources = []source{}
+// 	}
 
-	if len(name) == 0 {
-		return errors.New("karigo: source name cannot be empty")
-	}
+// 	if len(name) == 0 {
+// 		return errors.New("karigo: source name cannot be empty")
+// 	}
 
-	for i := range n.sources {
-		if n.sources[i].name == name {
-			return errors.New("karigo: source name already used")
-		}
-	}
+// 	for i := range n.sources {
+// 		if n.sources[i].name == name {
+// 			return errors.New("karigo: source name already used")
+// 		}
+// 	}
 
-	n.sources = append(n.sources, source{
-		name: name,
-		src:  src,
-	})
+// 	n.sources = append(n.sources, source{
+// 		name: name,
+// 		src:  src,
+// 	})
 
-	// go n.sources[len(n.sources)-1].run()
+// 	// go n.sources[len(n.sources)-1].run()
 
-	return nil
-}
+// 	return nil
+// }
 
 // Handle ...
 func (n *Node) Handle(req *Request) *Response {
