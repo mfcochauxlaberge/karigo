@@ -21,9 +21,9 @@ type Snapshot struct {
 }
 
 // Resource ...
-func (s *Snapshot) Resource(qry QueryRes) map[string]interface{} {
+func (s *Snapshot) Resource(qry QueryRes) jsonapi.Resource {
 	if s.err != nil {
-		return map[string]interface{}{}
+		return nil
 	}
 
 	allowed := false
@@ -35,22 +35,22 @@ func (s *Snapshot) Resource(qry QueryRes) map[string]interface{} {
 	}
 	if !allowed {
 		s.Fail(errors.New("karigo: can't get resource fron unlocked set"))
-		return map[string]interface{}{}
+		return nil
 	}
 
 	res, err := s.node.Resource(qry)
 	if err != nil {
 		s.Fail(err)
-		return map[string]interface{}{}
+		return nil
 	}
 
 	return res
 }
 
 // Collection ...
-func (s *Snapshot) Collection(qry QueryCol) []map[string]interface{} {
+func (s *Snapshot) Collection(qry QueryCol) []jsonapi.Resource {
 	if s.err != nil {
-		return []map[string]interface{}{}
+		return nil
 	}
 
 	allowed := false
@@ -62,16 +62,16 @@ func (s *Snapshot) Collection(qry QueryCol) []map[string]interface{} {
 	}
 	if !allowed {
 		s.Fail(errors.New("karigo: can't get collection fron unlocked set"))
-		return []map[string]interface{}{}
+		return nil
 	}
 
-	res, err := s.node.Collection(qry)
+	col, err := s.node.Collection(qry)
 	if err != nil {
 		s.Fail(err)
-		return []map[string]interface{}{}
+		return nil
 	}
 
-	return res
+	return col
 }
 
 // RLock ...

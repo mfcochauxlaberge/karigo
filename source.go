@@ -2,14 +2,16 @@ package karigo
 
 import (
 	"math"
+
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 // Source ...
 type Source interface {
 	Reset() error
 
-	Resource(QueryRes) (map[string]interface{}, error)
-	Collection(QueryCol) ([]map[string]interface{}, error)
+	Resource(QueryRes) (jsonapi.Resource, error)
+	Collection(QueryCol) ([]jsonapi.Resource, error)
 
 	Begin() (SourceTx, error)
 }
@@ -25,9 +27,6 @@ type source struct {
 func (s *source) version() uint64 {
 	mv := uint64(math.MaxUint64)
 	for _, v := range s.versions {
-		if mv == 0 {
-			mv = v
-		}
 		if v < mv {
 			mv = v
 		}

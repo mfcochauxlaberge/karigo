@@ -168,7 +168,7 @@ func (n *Node) Shutdown() error {
 }
 
 // Resource ...
-func (n *Node) Resource(qry QueryRes) (map[string]interface{}, error) {
+func (n *Node) Resource(qry QueryRes) (jsonapi.Resource, error) {
 	// for i := range n.sources {
 	// 	if n.sources[i].versions[qry.Set] == version {
 	// 		_, err := n.sources[i].src.Resource(qry)
@@ -182,7 +182,7 @@ func (n *Node) Resource(qry QueryRes) (map[string]interface{}, error) {
 }
 
 // Collection ...
-func (n *Node) Collection(qry QueryCol) ([]map[string]interface{}, error) {
+func (n *Node) Collection(qry QueryCol) ([]jsonapi.Resource, error) {
 	// TODO Validate the query?
 	// TODO Complete the sorting rule
 
@@ -195,7 +195,7 @@ func (n *Node) Collection(qry QueryCol) ([]map[string]interface{}, error) {
 	// 	}
 	// }
 
-	return nil, errors.New("karigo: no source could handle the query")
+	return n.main.src.Collection(qry)
 }
 
 // RLock ...

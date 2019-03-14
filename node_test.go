@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	"github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/sources"
+	"github.com/mfcochauxlaberge/karigo/sources/memory"
 )
 
 func TestNode(t *testing.T) {
-	mem := &sources.Memory{
+	mem := &memory.Memory{
 		ID:       "memory",
 		Location: "local",
 	}
