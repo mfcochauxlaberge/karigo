@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -15,9 +14,7 @@ type Memory struct {
 	ID       string
 	Location string
 
-	schema jsonapi.Schema
-	data   map[string]*db
-	fields map[string][]string
+	data *db
 
 	oldData   map[string]map[string]map[string]interface{}
 	oldFields map[string][]string
@@ -32,404 +29,654 @@ func (m *Memory) Reset() error {
 
 	m.data = map[string]*db{}
 
-	m.data["0_meta"] = newDB().withAttrs(
-		jsonapi.Attr{
-			Name: "key",
-			Type: jsonapi.AttrTypeString,
-			Null: false,
-		},
-		jsonapi.Attr{
-			Name: "value",
-			Type: jsonapi.AttrTypeString,
-			Null: false,
-		},
-	)
-	// .withRels(
-	// 	jsonapi.Rel{
-	// 		Name:         "",
-	// 		Type:         "",
-	// 		ToOne:        true,
-	// 		InverseName:  "",
-	// 		InverseType:  "",
-	// 		InverseToOne: false,
-	// 	},
-	// )
+	m.data["0_meta"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "key",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "value",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+		)
 
-	// m.data["0_sets"] = newSet()
-	// m.data["0_sets"] = map[string]map[string]interface{}{
-	// 	"0_meta": map[string]interface{}{
-	// 		"name":    "0_meta",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_meta_value",
-	// 		},
-	// 	},
-	// 	"0_sets": map[string]interface{}{
-	// 		"name":    "0_sets",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_sets_name",
-	// 			"0_sets_version",
-	// 		},
-	// 		"rels": []string{
-	// 			"0_sets_fields",
-	// 		},
-	// 	},
-	// 	"0_attrs": map[string]interface{}{
-	// 		"name":    "0_attrs",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_attrs_name",
-	// 			"0_attrs_type",
-	// 			"0_attrs_null",
-	// 			"0_attrs_created",
-	// 		},
-	// 		"rels": []string{
-	// 			"0_attrs_set",
-	// 		},
-	// 	},
-	// 	"0_rels": map[string]interface{}{
-	// 		"name":    "0_rels",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_rels_name",
-	// 			"0_rels_to-one",
-	// 			"0_rels_created",
-	// 		},
-	// 		"rels": []string{
-	// 			"0_rels_set",
-	// 		},
-	// 	},
-	// 	"0_get-funcs": map[string]interface{}{
-	// 		"name":    "0_get-funcs",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_get-funcs_func",
-	// 		},
-	// 		"rels": []string{
-	// 			"0_get-funcs_set",
-	// 		},
-	// 	},
-	// 	"0_create-funcs": map[string]interface{}{
-	// 		"name":    "0_create-funcs",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_create-funcs_func",
-	// 		},
-	// 		"rels": []string{
-	// 			"0_create-funcs_set",
-	// 		},
-	// 	},
-	// 	"0_update-funcs": map[string]interface{}{
-	// 		"name":    "0_update-funcs",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_update-funcs_func",
-	// 		},
-	// 		"rels": []string{
-	// 			"0_update-funcs_set",
-	// 		},
-	// 	},
-	// 	"0_delete-funcs": map[string]interface{}{
-	// 		"name":    "0_delete-funcs",
-	// 		"version": 0,
-	// 		"created": true,
-	// 		"attrs": []string{
-	// 			"0_delete-funcs_func",
-	// 		},
-	// 		"rels": []string{
-	// 			"0_delete-funcs_set",
-	// 		},
-	// 	},
-	// }
+	m.data["0_sets"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "name",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "version",
+				Type: jsonapi.AttrTypeUint,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "created",
+				Type: jsonapi.AttrTypeBool,
+				Null: false,
+			},
+		).withRels(
+			jsonapi.Rel{
+				Name:         "attrs",
+				Type:         "0_attrs",
+				ToOne:        false,
+				InverseName:  "set",
+				InverseType:  "0_sets",
+				InverseToOne: true,
+			},
+		).withRecords(
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_meta",
+					"created": true,
+					"attrs": []string{
+						"0_meta_value",
+					},
+				},
+			},
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"name":    "0_sets",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_sets_name",
+						"0_sets_version",
+					},
+					"rels": []string{
+						"0_sets_fields",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_attrs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_attrs_name",
+						"0_attrs_type",
+						"0_attrs_null",
+						"0_attrs_created",
+					},
+					"rels": []string{
+						"0_attrs_set",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_rels",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_rels_name",
+						"0_rels_to-one",
+						"0_rels_created",
+					},
+					"rels": []string{
+						"0_rels_set",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_get-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_get-funcs_func",
+					},
+					"rels": []string{
+						"0_get-funcs_set",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_create-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_create-funcs_func",
+					},
+					"rels": []string{
+						"0_create-funcs_set",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_update-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_update-funcs_func",
+					},
+					"rels": []string{
+						"0_update-funcs_set",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_delete-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_delete-funcs_func",
+					},
+					"rels": []string{
+						"0_delete-funcs_set",
+					},
+				},
+			},
+		)
 
-	// 	m.data["0_attrs"] = map[string]map[string]interface{}{
-	// 		"0_meta_value": map[string]interface{}{
-	// 			"name":    "value",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_meta",
-	// 		},
-	// 		"0_sets_version": map[string]interface{}{
-	// 			"name":    "version",
-	// 			"type":    "int",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_sets",
-	// 		},
-	// 		"0_sets_created": map[string]interface{}{
-	// 			"name":    "created",
-	// 			"type":    "bool",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_sets",
-	// 		},
-	// 		"0_attrs_name": map[string]interface{}{
-	// 			"name":    "name",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_attrs",
-	// 		},
-	// 		"0_attrs_type": map[string]interface{}{
-	// 			"name":    "type",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_attrs",
-	// 		},
-	// 		"0_attrs_null": map[string]interface{}{
-	// 			"name":    "null",
-	// 			"type":    "bool",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_attrs",
-	// 		},
-	// 		"0_attrs_created": map[string]interface{}{
-	// 			"name":    "created",
-	// 			"type":    "bool",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_attrs",
-	// 		},
-	// 		"0_rels_name": map[string]interface{}{
-	// 			"name":    "name",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_rels",
-	// 		},
-	// 		"0_rels_to-one": map[string]interface{}{
-	// 			"name":    "to-one",
-	// 			"type":    "bool",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_rels",
-	// 		},
-	// 		"0_rels_created": map[string]interface{}{
-	// 			"name":    "created",
-	// 			"type":    "bool",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_rels",
-	// 		},
-	// 		"0_get-funcs_func": map[string]interface{}{
-	// 			"name":    "func",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_get-funcs",
-	// 		},
-	// 		"0_create-funcs_func": map[string]interface{}{
-	// 			"name":    "func",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_create-funcs",
-	// 		},
-	// 		"0_update-funcs_func": map[string]interface{}{
-	// 			"name":    "func",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_update-funcs",
-	// 		},
-	// 		"0_delete-funcs_func": map[string]interface{}{
-	// 			"name":    "func",
-	// 			"type":    "string",
-	// 			"null":    false,
-	// 			"created": true,
-	// 			"set":     "0_delete-funcs",
-	// 		},
-	// 	}
+	m.data["0_attrs"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "name",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "type",
+				Type: jsonapi.AttrTypeUint,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "null",
+				Type: jsonapi.AttrTypeBool,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "created",
+				Type: jsonapi.AttrTypeBool,
+				Null: false,
+			},
+		).withRels(
+			jsonapi.Rel{
+				Name:         "set",
+				Type:         "0_sets",
+				ToOne:        true,
+				InverseName:  "attrs",
+				InverseType:  "0_attrs",
+				InverseToOne: false,
+			},
+		).withRecords(
+			record{
+				id: "0_meta_value",
+				vals: map[string]interface{}{
+					"name":    "value",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_meta",
+				},
+			},
+			record{
+				id: "0_sets_version",
+				vals: map[string]interface{}{
+					"name":    "version",
+					"type":    "int",
+					"null":    false,
+					"created": true,
+					"set":     "0_sets",
+				},
+			},
+			record{
+				id: "0_sets_created",
+				vals: map[string]interface{}{
+					"name":    "created",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_sets",
+				},
+			},
+			record{
+				id: "0_attrs_name",
+				vals: map[string]interface{}{
+					"name":    "name",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
+			},
+			record{
+				id: "0_attrs_type",
+				vals: map[string]interface{}{
+					"name":    "type",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
+			},
+			record{
+				id: "0_attrs_null",
+				vals: map[string]interface{}{
+					"name":    "null",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
+			},
+			record{
+				id: "0_attrs_created",
+				vals: map[string]interface{}{
+					"name":    "created",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
+			},
+			record{
+				id: "0_rels_name",
+				vals: map[string]interface{}{
+					"name":    "name",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_rels",
+				},
+			},
+			record{
+				id: "0_rels_to-one",
+				vals: map[string]interface{}{
+					"name":    "to-one",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_rels",
+				},
+			},
+			record{
+				id: "0_rels_created",
+				vals: map[string]interface{}{
+					"name":    "created",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_rels",
+				},
+			},
+			record{
+				id: "0_get-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_get-funcs",
+				},
+			},
+			record{
+				id: "0_create-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_create-funcs",
+				},
+			},
+			record{
+				id: "0_update-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_update-funcs",
+				},
+			},
+			record{
+				id: "0_delete-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_delete-funcs",
+				},
+			},
+		)
 
-	// 	m.data["0_rels"] = map[string]map[string]interface{}{
-	// 		"0_sets_attrs": map[string]interface{}{
-	// 			"name":    "attrs",
-	// 			"to-one":  false,
-	// 			"created": true,
-	// 			"inverse": "0_attrs_set",
-	// 			"set":     "0_sets",
-	// 		},
-	// 		"0_sets_rels": map[string]interface{}{
-	// 			"name":    "rels",
-	// 			"to-one":  false,
-	// 			"created": true,
-	// 			"inverse": "0_rels_set",
-	// 			"set":     "0_sets",
-	// 		},
-	// 		"0_attrs_set": map[string]interface{}{
-	// 			"name":    "set",
-	// 			"to-one":  true,
-	// 			"created": true,
-	// 			"inverse": "0_sets_attrs",
-	// 			"set":     "0_attrs",
-	// 		},
-	// 		"0_rels_inverse": map[string]interface{}{
-	// 			"name":    "inverse",
-	// 			"to-one":  true,
-	// 			"created": true,
-	// 			"inverse": "0_rels_inverse",
-	// 			"set":     "0_rels",
-	// 		},
-	// 		"0_rels_set": map[string]interface{}{
-	// 			"name":    "set",
-	// 			"to-one":  true,
-	// 			"created": true,
-	// 			"inverse": "0_sets_rels",
-	// 			"set":     "0_rels",
-	// 		},
-	// 	}
+	m.data["0_rels"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "name",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "to-one",
+				Type: jsonapi.AttrTypeBool,
+				Null: false,
+			},
+			jsonapi.Attr{
+				Name: "created",
+				Type: jsonapi.AttrTypeBool,
+				Null: false,
+			},
+		).withRels(
+			jsonapi.Rel{
+				Name:         "inverse",
+				Type:         "0_rels",
+				ToOne:        true,
+				InverseName:  "inverse",
+				InverseType:  "0_rels",
+				InverseToOne: true,
+			},
+			jsonapi.Rel{
+				Name:         "set",
+				Type:         "0_sets",
+				ToOne:        true,
+				InverseName:  "rels",
+				InverseType:  "0_rels",
+				InverseToOne: false,
+			},
+		).withRecords(
+			record{
+				id: "0_sets_attrs",
+				vals: map[string]interface{}{
+					"name":    "attrs",
+					"to-one":  false,
+					"created": true,
+					"inverse": "0_attrs_set",
+					"set":     "0_sets",
+				},
+			},
+			record{
+				id: "0_sets_rels",
+				vals: map[string]interface{}{
+					"name":    "rels",
+					"to-one":  false,
+					"created": true,
+					"inverse": "0_rels_set",
+					"set":     "0_sets",
+				},
+			},
+			record{
+				id: "0_attrs_set",
+				vals: map[string]interface{}{
+					"name":    "set",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_attrs",
+					"set":     "0_attrs",
+				},
+			},
+			record{
+				id: "0_rels_inverse",
+				vals: map[string]interface{}{
+					"name":    "inverse",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_rels_inverse",
+					"set":     "0_rels",
+				},
+			},
+			record{
+				id: "0_rels_set",
+				vals: map[string]interface{}{
+					"name":    "set",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_rels",
+					"set":     "0_rels",
+				},
+			},
+		)
 
-	// 	m.data["0_get-funcs"] = map[string]map[string]interface{}{}
+	m.data["0_get-funcs"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "func",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+		)
 
-	// 	m.data["0_create-funcs"] = map[string]map[string]interface{}{
-	// 		"0_meta": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_sets": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_attrs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_rels": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_get-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_create-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_update-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_delete-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		}}
+	m.data["0_create-funcs"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "func",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+		).withRecords(
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_attrs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_rels",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_get-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_create-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_update-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_delete-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+		)
 
-	// 	m.data["0_update-funcs"] = map[string]map[string]interface{}{
-	// 		"0_meta": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_sets": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_attrs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_rels": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_get-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_create-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_update-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_delete-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		}}
+	m.data["0_update-funcs"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "func",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+		).withRecords(
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_attrs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_rels",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_get-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_create-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_update-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_delete-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+		)
 
-	// 	m.data["0_delete-funcs"] = map[string]map[string]interface{}{
-	// 		"0_meta": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_sets": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_attrs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_rels": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_get-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_create-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_update-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		},
-	// 		"0_delete-funcs": map[string]interface{}{
-	// 			"func": `func(snap *Snapshot) error {
-	// 	snap.Fail(ErrNotImplemented)
-	// }`,
-	// 		}}
-
-	// Fields
-	m.fields = map[string][]string{}
-	m.fields["0_meta"] = []string{"id"}
-	m.fields["0_sets"] = []string{"id", "version", "fields"}
-	m.fields["0_attrs"] = []string{"id", "name", "type", "null", "set"}
-	m.fields["0_get-funcs"] = []string{"id", "func"}
-	m.fields["0_create-funcs"] = []string{"id", "func"}
-	m.fields["0_update-funcs"] = []string{"id", "func"}
-	m.fields["0_delete-funcs"] = []string{"id", "func"}
-	// Make sure the fields are sorted
-	for k := range m.fields {
-		sort.Strings(m.fields[k])
-	}
+	m.data["0_delete-funcs"] =
+		newDB().withAttrs(
+			jsonapi.Attr{
+				Name: "func",
+				Type: jsonapi.AttrTypeString,
+				Null: false,
+			},
+		).withRecords(
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_attrs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_rels",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_get-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_create-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_update-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+			record{
+				id: "0_delete-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
+	snap.Fail(ErrNotImplemented)
+}`,
+				},
+			},
+		)
 
 	return nil
 }
@@ -439,6 +686,8 @@ func (m *Memory) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
 	// m.Lock()
 
 	// var ok bool
+
+	// if rec,ok:=m.data
 
 	// // Get set
 	// var set map[string]map[string]interface{}

@@ -5,7 +5,7 @@ import (
 )
 
 type db struct {
-	schema jsonapi.Schema
+	schema *jsonapi.Schema
 	recs   map[string]record
 }
 
@@ -29,32 +29,39 @@ func (d *db) withRels(rels ...jsonapi.Rel) *db {
 	return d
 }
 
-// func (d *db) withRels(rec record) {
-
-// }
+func (d *db) withRecords(recs ...record) *db {
+	for _, rec := range recs {
+		rec.schema = d.schema
+		d.insert(rec)
+	}
+	return d
+}
 
 func (d *db) insert(rec record) {
-
+	if rec.id != "" {
+		d.recs[rec.id] = rec
+	}
 }
 
 type record struct {
 	schema *jsonapi.Schema
-	vals   map[string]val
+	id     string
+	vals   map[string]interface{}
 }
 
-func newRecord() *db {
-	return &db{
-		recs: map[string]record{},
-	}
-}
+// func newRecord() *db {
+// 	return &db{
+// 		recs: map[string]record{},
+// 	}
+// }
 
-type val struct {
-	typ int
-	val []byte
-}
+// type val struct {
+// 	typ int
+// 	val []byte
+// }
 
-func newVal() *db {
-	return &db{
-		recs: map[string]record{},
-	}
-}
+// func newVal() *db {
+// 	return &db{
+// 		recs: map[string]record{},
+// 	}
+// }
