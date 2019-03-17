@@ -1105,3 +1105,9 @@ func zeroVal(typ string) interface{} {
 		return nil
 	}
 }
+
+type record struct {
+	schema *jsonapi.Schema
+	id     string
+	vals   map[string]interface{}
+}
