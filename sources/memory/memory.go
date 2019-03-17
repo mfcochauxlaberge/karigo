@@ -486,64 +486,64 @@ func (m *Memory) Reset() error {
 			id: "0_meta",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_sets",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_attrs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_rels",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_get-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_create-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_update-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_delete-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 	}
@@ -564,64 +564,64 @@ func (m *Memory) Reset() error {
 			id: "0_meta",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_sets",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_attrs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_rels",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_get-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_create-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_update-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_delete-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 	}
@@ -642,66 +642,71 @@ func (m *Memory) Reset() error {
 			id: "0_meta",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_sets",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_attrs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_rels",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_get-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_create-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_update-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
 		record{
 			id: "0_delete-funcs",
 			vals: map[string]interface{}{
 				"func": `func(snap *Snapshot) error {
-		snap.Fail(ErrNotImplemented)
-	}`,
+					snap.Fail(ErrNotImplemented)
+				}`,
 			},
 		},
+	}
+
+	errs := m.schema.Check()
+	if len(errs) > 0 {
+		return errs[0]
 	}
 
 	return nil
