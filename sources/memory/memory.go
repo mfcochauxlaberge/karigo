@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -15,10 +16,10 @@ type Memory struct {
 	Location string
 
 	schema *jsonapi.Schema
-	data   map[string][]record
+	data   map[string]set
 
 	oldSchema *jsonapi.Schema
-	oldData   map[string]map[string]map[string]interface{}
+	oldData   map[string]set
 
 	sync.Mutex
 }
@@ -75,118 +76,120 @@ func (m *Memory) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	m.data["0_sets"] = []record{
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"name":    "0_meta",
-				"created": true,
-				"attrs": []string{
-					"0_meta_value",
+	m.data["0_sets"] = set{
+		data: []record{
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_meta",
+					"created": true,
+					"attrs": []string{
+						"0_meta_value",
+					},
 				},
 			},
-		},
-		record{
-			id: "0_sets",
-			vals: map[string]interface{}{
-				"name":    "0_sets",
-				"version": 0,
-				"created": true,
-				"attrs": []string{
-					"0_sets_name",
-					"0_sets_version",
-				},
-				"rels": []string{
-					"0_sets_fields",
-				},
-			},
-		},
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"name":    "0_attrs",
-				"version": 0,
-				"created": true,
-				"attrs": []string{
-					"0_attrs_name",
-					"0_attrs_type",
-					"0_attrs_null",
-					"0_attrs_created",
-				},
-				"rels": []string{
-					"0_attrs_set",
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"name":    "0_sets",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_sets_name",
+						"0_sets_version",
+					},
+					"rels": []string{
+						"0_sets_fields",
+					},
 				},
 			},
-		},
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"name":    "0_rels",
-				"version": 0,
-				"created": true,
-				"attrs": []string{
-					"0_rels_name",
-					"0_rels_to-one",
-					"0_rels_created",
-				},
-				"rels": []string{
-					"0_rels_set",
-				},
-			},
-		},
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"name":    "0_get-funcs",
-				"version": 0,
-				"created": true,
-				"attrs": []string{
-					"0_get-funcs_func",
-				},
-				"rels": []string{
-					"0_get-funcs_set",
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_attrs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_attrs_name",
+						"0_attrs_type",
+						"0_attrs_null",
+						"0_attrs_created",
+					},
+					"rels": []string{
+						"0_attrs_set",
+					},
 				},
 			},
-		},
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"name":    "0_create-funcs",
-				"version": 0,
-				"created": true,
-				"attrs": []string{
-					"0_create-funcs_func",
-				},
-				"rels": []string{
-					"0_create-funcs_set",
-				},
-			},
-		},
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"name":    "0_update-funcs",
-				"version": 0,
-				"created": true,
-				"attrs": []string{
-					"0_update-funcs_func",
-				},
-				"rels": []string{
-					"0_update-funcs_set",
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_rels",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_rels_name",
+						"0_rels_to-one",
+						"0_rels_created",
+					},
+					"rels": []string{
+						"0_rels_set",
+					},
 				},
 			},
-		},
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"name":    "0_delete-funcs",
-				"version": 0,
-				"created": true,
-				"attrs": []string{
-					"0_delete-funcs_func",
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_get-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_get-funcs_func",
+					},
+					"rels": []string{
+						"0_get-funcs_set",
+					},
 				},
-				"rels": []string{
-					"0_delete-funcs_set",
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_create-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_create-funcs_func",
+					},
+					"rels": []string{
+						"0_create-funcs_set",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_update-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_update-funcs_func",
+					},
+					"rels": []string{
+						"0_update-funcs_set",
+					},
+				},
+			},
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"name":    "0_delete-funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_delete-funcs_func",
+					},
+					"rels": []string{
+						"0_delete-funcs_set",
+					},
 				},
 			},
 		},
@@ -226,145 +229,147 @@ func (m *Memory) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	m.data["0_attrs"] = []record{
-		record{
-			id: "0_meta_value",
-			vals: map[string]interface{}{
-				"name":    "value",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_meta",
+	m.data["0_attrs"] = set{
+		data: []record{
+			record{
+				id: "0_meta_value",
+				vals: map[string]interface{}{
+					"name":    "value",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_meta",
+				},
 			},
-		},
-		record{
-			id: "0_sets_version",
-			vals: map[string]interface{}{
-				"name":    "version",
-				"type":    "int",
-				"null":    false,
-				"created": true,
-				"set":     "0_sets",
+			record{
+				id: "0_sets_version",
+				vals: map[string]interface{}{
+					"name":    "version",
+					"type":    "int",
+					"null":    false,
+					"created": true,
+					"set":     "0_sets",
+				},
 			},
-		},
-		record{
-			id: "0_sets_created",
-			vals: map[string]interface{}{
-				"name":    "created",
-				"type":    "bool",
-				"null":    false,
-				"created": true,
-				"set":     "0_sets",
+			record{
+				id: "0_sets_created",
+				vals: map[string]interface{}{
+					"name":    "created",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_sets",
+				},
 			},
-		},
-		record{
-			id: "0_attrs_name",
-			vals: map[string]interface{}{
-				"name":    "name",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_attrs",
+			record{
+				id: "0_attrs_name",
+				vals: map[string]interface{}{
+					"name":    "name",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
 			},
-		},
-		record{
-			id: "0_attrs_type",
-			vals: map[string]interface{}{
-				"name":    "type",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_attrs",
+			record{
+				id: "0_attrs_type",
+				vals: map[string]interface{}{
+					"name":    "type",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
 			},
-		},
-		record{
-			id: "0_attrs_null",
-			vals: map[string]interface{}{
-				"name":    "null",
-				"type":    "bool",
-				"null":    false,
-				"created": true,
-				"set":     "0_attrs",
+			record{
+				id: "0_attrs_null",
+				vals: map[string]interface{}{
+					"name":    "null",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
 			},
-		},
-		record{
-			id: "0_attrs_created",
-			vals: map[string]interface{}{
-				"name":    "created",
-				"type":    "bool",
-				"null":    false,
-				"created": true,
-				"set":     "0_attrs",
+			record{
+				id: "0_attrs_created",
+				vals: map[string]interface{}{
+					"name":    "created",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_attrs",
+				},
 			},
-		},
-		record{
-			id: "0_rels_name",
-			vals: map[string]interface{}{
-				"name":    "name",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_rels",
+			record{
+				id: "0_rels_name",
+				vals: map[string]interface{}{
+					"name":    "name",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_rels",
+				},
 			},
-		},
-		record{
-			id: "0_rels_to-one",
-			vals: map[string]interface{}{
-				"name":    "to-one",
-				"type":    "bool",
-				"null":    false,
-				"created": true,
-				"set":     "0_rels",
+			record{
+				id: "0_rels_to-one",
+				vals: map[string]interface{}{
+					"name":    "to-one",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_rels",
+				},
 			},
-		},
-		record{
-			id: "0_rels_created",
-			vals: map[string]interface{}{
-				"name":    "created",
-				"type":    "bool",
-				"null":    false,
-				"created": true,
-				"set":     "0_rels",
+			record{
+				id: "0_rels_created",
+				vals: map[string]interface{}{
+					"name":    "created",
+					"type":    "bool",
+					"null":    false,
+					"created": true,
+					"set":     "0_rels",
+				},
 			},
-		},
-		record{
-			id: "0_get-funcs_func",
-			vals: map[string]interface{}{
-				"name":    "func",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_get-funcs",
+			record{
+				id: "0_get-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_get-funcs",
+				},
 			},
-		},
-		record{
-			id: "0_create-funcs_func",
-			vals: map[string]interface{}{
-				"name":    "func",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_create-funcs",
+			record{
+				id: "0_create-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_create-funcs",
+				},
 			},
-		},
-		record{
-			id: "0_update-funcs_func",
-			vals: map[string]interface{}{
-				"name":    "func",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_update-funcs",
+			record{
+				id: "0_update-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_update-funcs",
+				},
 			},
-		},
-		record{
-			id: "0_delete-funcs_func",
-			vals: map[string]interface{}{
-				"name":    "func",
-				"type":    "string",
-				"null":    false,
-				"created": true,
-				"set":     "0_delete-funcs",
+			record{
+				id: "0_delete-funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_delete-funcs",
+				},
 			},
 		},
 	}
@@ -406,55 +411,57 @@ func (m *Memory) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	m.data["0_rels"] = []record{
-		record{
-			id: "0_sets_attrs",
-			vals: map[string]interface{}{
-				"name":    "attrs",
-				"to-one":  false,
-				"created": true,
-				"inverse": "0_attrs_set",
-				"set":     "0_sets",
+	m.data["0_rels"] = set{
+		data: []record{
+			record{
+				id: "0_sets_attrs",
+				vals: map[string]interface{}{
+					"name":    "attrs",
+					"to-one":  false,
+					"created": true,
+					"inverse": "0_attrs_set",
+					"set":     "0_sets",
+				},
 			},
-		},
-		record{
-			id: "0_sets_rels",
-			vals: map[string]interface{}{
-				"name":    "rels",
-				"to-one":  false,
-				"created": true,
-				"inverse": "0_rels_set",
-				"set":     "0_sets",
+			record{
+				id: "0_sets_rels",
+				vals: map[string]interface{}{
+					"name":    "rels",
+					"to-one":  false,
+					"created": true,
+					"inverse": "0_rels_set",
+					"set":     "0_sets",
+				},
 			},
-		},
-		record{
-			id: "0_attrs_set",
-			vals: map[string]interface{}{
-				"name":    "set",
-				"to-one":  true,
-				"created": true,
-				"inverse": "0_sets_attrs",
-				"set":     "0_attrs",
+			record{
+				id: "0_attrs_set",
+				vals: map[string]interface{}{
+					"name":    "set",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_attrs",
+					"set":     "0_attrs",
+				},
 			},
-		},
-		record{
-			id: "0_rels_inverse",
-			vals: map[string]interface{}{
-				"name":    "inverse",
-				"to-one":  true,
-				"created": true,
-				"inverse": "0_rels_inverse",
-				"set":     "0_rels",
+			record{
+				id: "0_rels_inverse",
+				vals: map[string]interface{}{
+					"name":    "inverse",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_rels_inverse",
+					"set":     "0_rels",
+				},
 			},
-		},
-		record{
-			id: "0_rels_set",
-			vals: map[string]interface{}{
-				"name":    "set",
-				"to-one":  true,
-				"created": true,
-				"inverse": "0_sets_rels",
-				"set":     "0_rels",
+			record{
+				id: "0_rels_set",
+				vals: map[string]interface{}{
+					"name":    "set",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_rels",
+					"set":     "0_rels",
+				},
 			},
 		},
 	}
@@ -481,69 +488,71 @@ func (m *Memory) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	m.data["0_create-funcs"] = []record{
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+	m.data["0_create-funcs"] = set{
+		data: []record{
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_sets",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_attrs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_attrs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_rels",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_rels",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_get-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_get-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_create-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_create-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_update-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_update-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_delete-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_delete-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
 		},
 	}
@@ -559,69 +568,71 @@ func (m *Memory) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	m.data["0_update-funcs"] = []record{
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+	m.data["0_update-funcs"] = set{
+		data: []record{
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_sets",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_attrs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_attrs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_rels",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_rels",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_get-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_get-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_create-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_create-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_update-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_update-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_delete-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_delete-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
 		},
 	}
@@ -637,69 +648,71 @@ func (m *Memory) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	m.data["0_delete-funcs"] = []record{
-		record{
-			id: "0_meta",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+	m.data["0_delete-funcs"] = set{
+		data: []record{
+			record{
+				id: "0_meta",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_sets",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_sets",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_attrs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_attrs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_rels",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_rels",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_get-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_get-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_create-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_create-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_update-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_update-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
-		},
-		record{
-			id: "0_delete-funcs",
-			vals: map[string]interface{}{
-				"func": `func(snap *Snapshot) error {
+			record{
+				id: "0_delete-funcs",
+				vals: map[string]interface{}{
+					"func": `func(snap *Snapshot) error {
 					snap.Fail(ErrNotImplemented)
 				}`,
+				},
 			},
 		},
 	}
@@ -714,131 +727,106 @@ func (m *Memory) Reset() error {
 
 // Resource ...
 func (m *Memory) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
-	// m.Lock()
+	m.Lock()
+	defer m.Unlock()
 
-	// var ok bool
+	// Get resource
+	var rec record
+	for i := range m.data[qry.Set].data {
+		if m.data[qry.Set].data[i].id == qry.ID {
+			rec = m.data[qry.Set].data[i]
+		}
+	}
 
-	// if rec,ok:=m.data
+	typ, _ := m.schema.GetType(qry.Set)
+	res := jsonapi.NewSoftResource(typ, rec.vals)
 
-	// // Get set
-	// var set map[string]map[string]interface{}
-	// if set, ok = m.data[qry.Set]; !ok {
-	// 	return nil, karigo.ErrUnexpected
-	// }
+	// Filter fields
+	for field := range rec.vals {
+		for _, f := range qry.Fields {
+			if field == f {
+				res.Set(field, rec.vals[field])
+				break
+			}
+		}
+	}
 
-	// // Get resource
-	// var res map[string]interface{}
-	// if res, ok = set[qry.ID]; !ok {
-	// 	return nil, karigo.ErrNotFound
-	// }
-
-	// // Filter fields
-	// for field := range res {
-	// 	found := false
-	// 	for _, f := range qry.Fields {
-	// 		if field == f {
-	// 			found = true
-	// 		}
-	// 	}
-	// 	if !found {
-	// 		delete(res, field)
-	// 	}
-	// }
-
-	// m.Unlock()
-	// return res, nil
-	return nil, nil
+	return res, nil
 }
 
 // Collection ...
 func (m *Memory) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
-	// m.Lock()
-	// defer m.Unlock()
+	m.Lock()
+	defer m.Unlock()
 
-	// // Get all records from the given set
-	// var recs []map[string]interface{}
-	// if _, ok := m.data[qry.Set]; ok {
-	// 	recs = make([]map[string]interface{}, 0, len(m.data[qry.Set]))
-	// 	for id := range m.data[qry.Set] {
-	// 		recs = append(recs, m.data[qry.Set][id])
-	// 	}
-	// }
+	// Get all records from the given set
+	recs := m.data[qry.Set]
 
-	// // BelongsToFilter
-	// if qry.BelongsToFilter.ID != "" {
-	// 	resqry := karigo.QueryRes{
-	// 		Set:    qry.BelongsToFilter.Type,
-	// 		ID:     qry.BelongsToFilter.ID,
-	// 		Fields: []string{qry.BelongsToFilter.Name},
-	// 	}
-	// 	res, err := m.Resource(resqry)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	kept := make([]map[string]interface{}, 0, len(recs))
-	// 	if ids, ok := res[qry.BelongsToFilter.Name].([]string); ok {
-	// 		for i := range recs {
-	// 			if id, ok := recs[i]["id"].(string); ok {
-	// 				keep := false
-	// 				for i := range ids {
-	// 					if id == ids[i] {
-	// 						keep = true
-	// 						break
-	// 					}
-	// 				}
-	// 				if keep {
-	// 					kept = append(kept)
-	// 				}
-	// 			} else {
-	// 				return nil, errors.New("karigo: field id is not a string")
-	// 			}
-	// 		}
-	// 		recs = kept
-	// 	}
-	// }
+	// BelongsToFilter
+	if qry.BelongsToFilter.ID != "" {
+		resqry := karigo.QueryRes{
+			Set:    qry.BelongsToFilter.Type,
+			ID:     qry.BelongsToFilter.ID,
+			Fields: []string{qry.BelongsToFilter.Name},
+		}
+		res, err := m.Resource(resqry)
+		if err != nil {
+			return nil, err
+		}
+		kept := set{}
+		ids := res.GetToMany(qry.BelongsToFilter.Name)
+		for i := range recs.data {
+			keep := false
+			for i := range ids {
+				if recs.data[i].id == ids[i] {
+					keep = true
+					break
+				}
+			}
+			if keep {
+				kept.data = append(kept.data, recs.data[i])
+			}
+		}
+		recs = kept
+	}
 
-	// // TODO Filter
+	// TODO Filter
 
-	// // Sort
-	// ss := &sortableSet{
-	// 	recs:  recs,
-	// 	sorts: qry.Sort,
-	// }
-	// for id := range m.data[qry.Set] {
-	// 	ss.recs = append(ss.recs, m.data[qry.Set][id])
-	// }
-	// sort.Sort(ss)
+	// Sort
+	recs.sort = qry.Sort
+	sort.Sort(&recs)
 
-	// // Pagination
-	// if qry.PageSize == 0 {
-	// 	recs = []map[string]interface{}{}
-	// } else {
-	// 	skip := qry.PageNumber * qry.PageSize
-	// 	if skip >= len(recs) {
-	// 		recs = []map[string]interface{}{}
-	// 	} else {
-	// 		page := make([]map[string]interface{}, 0, qry.PageSize)
-	// 		for i := skip; i < len(recs) || i < qry.PageSize; i++ {
-	// 			page = append(page, recs[i])
-	// 		}
-	// 		recs = page
-	// 	}
-	// }
+	// Pagination
+	if qry.PageSize == 0 {
+		recs = set{}
+	} else {
+		skip := qry.PageNumber * qry.PageSize
+		if skip >= len(recs.data) {
+			recs = set{}
+		} else {
+			page := set{}
+			for i := skip; i < len(recs.data) || i < qry.PageSize; i++ {
+				page.data = append(page.data, recs.data[i])
+			}
+			recs = page
+		}
+	}
 
-	// // Fields
-	// for i := range ss.recs {
-	// 	for k := range ss.recs[i] {
-	// 		found := false
-	// 		for _, f := range qry.Fields {
-	// 			if k == f {
-	// 				found = true
-	// 			}
-	// 		}
-	// 		if !found {
-	// 			delete(ss.recs[i], k)
-	// 		}
-	// 	}
-	// }
+	// Fields
+	for i := range recs.data {
+		for k := range recs.data[i].vals {
+			found := false
+			for _, f := range qry.Fields {
+				if k == f {
+					found = true
+					break
+				}
+			}
+			if !found {
+				delete(recs.data[i].vals, k)
+			}
+		}
+	}
 
 	return nil, nil
 }
@@ -978,68 +966,6 @@ func (m *mtx) opSet(set, id, field string, v interface{}) {
 	// }
 }
 
-// sortableSet ...
-type sortableSet struct {
-	recs  []map[string]interface{}
-	sorts []string
-}
-
-// Len ...
-func (s *sortableSet) Len() int { return len(s.recs) }
-
-// Swap ...
-func (s *sortableSet) Swap(i, j int) { s.recs[i], s.recs[j] = s.recs[j], s.recs[i] }
-
-// Less ...
-func (s *sortableSet) Less(i, j int) bool {
-	less := false
-
-	for _, r := range s.sorts {
-		inverse := false
-		if strings.HasPrefix(r, "-") {
-			r = r[1:]
-			inverse = true
-		}
-
-		switch v := s.recs[i][r].(type) {
-		case string:
-			if v == s.recs[j][r].(string) {
-				continue
-			}
-			if inverse {
-				return v > s.recs[j][r].(string)
-			}
-			return v < s.recs[j][r].(string)
-		case int:
-			if v == s.recs[j][r].(int) {
-				continue
-			}
-			if inverse {
-				return v > s.recs[j][r].(int)
-			}
-			return v < s.recs[j][r].(int)
-		case bool:
-			if v == s.recs[j][r].(bool) {
-				continue
-			}
-			if inverse {
-				return v
-			}
-			return !v
-		case time.Time:
-			if v.Equal(s.recs[j][r].(time.Time)) {
-				continue
-			}
-			if inverse {
-				return v.After(s.recs[j][r].(time.Time))
-			}
-			return v.Before(s.recs[j][r].(time.Time))
-		}
-	}
-
-	return less
-}
-
 func zeroVal(typ string) interface{} {
 	switch typ {
 	case "string":
@@ -1110,4 +1036,225 @@ type record struct {
 	schema *jsonapi.Schema
 	id     string
 	vals   map[string]interface{}
+}
+
+type set struct {
+	data []record
+	sort []string
+}
+
+// Len ...
+func (s *set) Len() int { return len(s.data) }
+
+// Swap ...
+func (s *set) Swap(i, j int) { s.data[i], s.data[j] = s.data[j], s.data[i] }
+
+// Less ...
+func (s *set) Less(i, j int) bool {
+	less := false
+
+	for _, r := range s.sort {
+		inverse := false
+		if strings.HasPrefix(r, "-") {
+			r = r[1:]
+			inverse = true
+		}
+
+		switch v := s.data[i].vals[r].(type) {
+		case string:
+			if v == s.data[j].vals[r].(string) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(string)
+			}
+			return v < s.data[j].vals[r].(string)
+		case int:
+			if v == s.data[j].vals[r].(int) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(int)
+			}
+			return v < s.data[j].vals[r].(int)
+		case int8:
+			if v == s.data[j].vals[r].(int8) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(int8)
+			}
+			return v < s.data[j].vals[r].(int8)
+		case int16:
+			if v == s.data[j].vals[r].(int16) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(int16)
+			}
+			return v < s.data[j].vals[r].(int16)
+		case int32:
+			if v == s.data[j].vals[r].(int32) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(int32)
+			}
+			return v < s.data[j].vals[r].(int32)
+		case int64:
+			if v == s.data[j].vals[r].(int64) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(int64)
+			}
+			return v < s.data[j].vals[r].(int64)
+		case uint:
+			if v == s.data[j].vals[r].(uint) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(uint)
+			}
+			return v < s.data[j].vals[r].(uint)
+		case uint8:
+			if v == s.data[j].vals[r].(uint8) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(uint8)
+			}
+			return v < s.data[j].vals[r].(uint8)
+		case uint16:
+			if v == s.data[j].vals[r].(uint16) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(uint16)
+			}
+			return v < s.data[j].vals[r].(uint16)
+		case uint32:
+			if v == s.data[j].vals[r].(uint32) {
+				continue
+			}
+			if inverse {
+				return v > s.data[j].vals[r].(uint32)
+			}
+			return v < s.data[j].vals[r].(uint32)
+		case bool:
+			if v == s.data[j].vals[r].(bool) {
+				continue
+			}
+			if inverse {
+				return v
+			}
+			return !v
+		case time.Time:
+			if v.Equal(s.data[j].vals[r].(time.Time)) {
+				continue
+			}
+			if inverse {
+				return v.After(s.data[j].vals[r].(time.Time))
+			}
+			return v.Before(s.data[j].vals[r].(time.Time))
+		case *string:
+			if *v == *(s.data[j].vals[r].(*string)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*string))
+			}
+			return *v < *(s.data[j].vals[r].(*string))
+		case *int:
+			if *v == *(s.data[j].vals[r].(*int)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*int))
+			}
+			return *v < *(s.data[j].vals[r].(*int))
+		case *int8:
+			if *v == *(s.data[j].vals[r].(*int8)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*int8))
+			}
+			return *v < *(s.data[j].vals[r].(*int8))
+		case *int16:
+			if *v == *(s.data[j].vals[r].(*int16)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*int16))
+			}
+			return *v < *(s.data[j].vals[r].(*int16))
+		case *int32:
+			if *v == *(s.data[j].vals[r].(*int32)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*int32))
+			}
+			return *v < *(s.data[j].vals[r].(*int32))
+		case *int64:
+			if *v == *(s.data[j].vals[r].(*int64)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*int64))
+			}
+			return *v < *(s.data[j].vals[r].(*int64))
+		case *uint:
+			if *v == *(s.data[j].vals[r].(*uint)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*uint))
+			}
+			return *v < *(s.data[j].vals[r].(*uint))
+		case *uint8:
+			if *v == *(s.data[j].vals[r].(*uint8)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*uint8))
+			}
+			return *v < *(s.data[j].vals[r].(*uint8))
+		case *uint16:
+			if *v == *(s.data[j].vals[r].(*uint16)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*uint16))
+			}
+			return *v < *(s.data[j].vals[r].(*uint16))
+		case *uint32:
+			if *v == *(s.data[j].vals[r].(*uint32)) {
+				continue
+			}
+			if inverse {
+				return *v > *(s.data[j].vals[r].(*uint32))
+			}
+			return *v < *(s.data[j].vals[r].(*uint32))
+		case *bool:
+			if *v == *(s.data[j].vals[r].(*bool)) {
+				continue
+			}
+			if inverse {
+				return *v
+			}
+			return !*v
+		case *time.Time:
+			if v.Equal(*(s.data[j].vals[r].(*time.Time))) {
+				continue
+			}
+			if inverse {
+				return v.After(*(s.data[j].vals[r].(*time.Time)))
+			}
+			return v.Before(*(s.data[j].vals[r].(*time.Time)))
+		}
+	}
+
+	return less
 }
