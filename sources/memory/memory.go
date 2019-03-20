@@ -843,20 +843,20 @@ func (m *Memory) Apply(ops []karigo.Op) error {
 
 // Begin ...
 func (m *Memory) Begin() (karigo.SourceTx, error) {
-	// m.Lock()
-	// defer m.Unlock()
+	m.Lock()
+	defer m.Unlock()
+
+	// oldSchema, err := copystructure.Copy(m.schema)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// m.oldSchema = oldSchema.(*jsonapi.Schema)
 
 	// oldData, err := copystructure.Copy(m.data)
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// m.oldData = oldData.(map[string]map[string]map[string]interface{})
-
-	// oldFields, err := copystructure.Copy(m.fields)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// m.oldFields = oldFields.(map[string][]string)
+	// m.oldData = oldData.(map[string]set)
 
 	// return &mtx{
 	// 	ms: m,
@@ -865,7 +865,7 @@ func (m *Memory) Begin() (karigo.SourceTx, error) {
 }
 
 type mtx struct {
-	ms   *Memory
+	// ms   *Memory
 	undo []karigo.Op
 
 	sync.Mutex
@@ -876,14 +876,14 @@ func (m *mtx) Apply(ops []karigo.Op) error {
 	m.Lock()
 	defer m.Unlock()
 
-	// for _, op := range ops {
-	// 	switch op.Op {
-	// 	case karigo.OpSet:
-	// 		m.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
-	// 	default:
-	// 		return karigo.ErrUnexpected
-	// 	}
-	// }
+	for _, op := range ops {
+		switch op.Op {
+		case karigo.OpSet:
+			m.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
+		default:
+			return karigo.ErrUnexpected
+		}
+	}
 
 	return nil
 }
@@ -893,10 +893,9 @@ func (m *mtx) Rollback() error {
 	m.Lock()
 	defer m.Unlock()
 
-	// m.ms.data = m.ms.oldData
-	// m.ms.fields = m.ms.oldFields
-	// m.ms.oldData = map[string]map[string]map[string]interface{}{}
-	// m.ms.oldFields = map[string][]string{}
+	// for i := range m.undo {
+
+	// }
 
 	return nil
 }
@@ -906,8 +905,8 @@ func (m *mtx) Commit() error {
 	m.Lock()
 	defer m.Unlock()
 
-	// m.ms.oldData = map[string]map[string]map[string]interface{}{}
-	// m.ms.oldFields = map[string][]string{}
+	// m.ms.oldSchema = &jsonapi.Schema{}
+	// m.ms.oldData = map[string]set{}
 
 	return nil
 }
