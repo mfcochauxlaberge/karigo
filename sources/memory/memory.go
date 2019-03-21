@@ -831,6 +831,14 @@ func (m *Memory) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
 	return nil, nil
 }
 
+// Begin ...
+func (m *Memory) Begin() (karigo.SourceTx, error) {
+	// m.Lock()
+	// defer m.sUnlock()
+
+	return nil, nil
+}
+
 // Apply ...
 func (m *Memory) Apply(ops []karigo.Op) error {
 	m.Lock()
@@ -841,85 +849,15 @@ func (m *Memory) Apply(ops []karigo.Op) error {
 	return nil
 }
 
-// Begin ...
-func (m *Memory) Begin() (karigo.SourceTx, error) {
-	m.Lock()
-	defer m.Unlock()
-
-	// oldSchema, err := copystructure.Copy(m.schema)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// m.oldSchema = oldSchema.(*jsonapi.Schema)
-
-	// oldData, err := copystructure.Copy(m.data)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// m.oldData = oldData.(map[string]set)
-
-	// return &mtx{
-	// 	ms: m,
-	// }, nil
-	return nil, nil
-}
-
-type mtx struct {
-	// ms   *Memory
-	undo []karigo.Op
-
-	sync.Mutex
-}
-
-// Apply ...
-func (m *mtx) Apply(ops []karigo.Op) error {
-	m.Lock()
-	defer m.Unlock()
-
-	for _, op := range ops {
-		switch op.Op {
-		case karigo.OpSet:
-			m.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
-		default:
-			return karigo.ErrUnexpected
-		}
-	}
-
-	return nil
-}
-
-// Rollback ...
-func (m *mtx) Rollback() error {
-	m.Lock()
-	defer m.Unlock()
-
-	// for i := range m.undo {
-
-	// }
-
-	return nil
-}
-
-// Commit ...
-func (m *mtx) Commit() error {
-	m.Lock()
-	defer m.Unlock()
-
-	// m.ms.oldSchema = &jsonapi.Schema{}
-	// m.ms.oldData = map[string]set{}
-
-	return nil
-}
-
-func (m *mtx) opSet(set, id, field string, v interface{}) {
+func (m *Memory) opSet(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s (%v)\n", set, id, field, v)
 
 	// if id != "" && field != "id" {
-	// 	m.ms.data[set][id][field] = v
+	// 	m.data[set][id][field] = v
 	// }
 
 	// if id == "" && field == "id" {
-	// 	m.ms.data[set][v.(string)] = map[string]interface{}{}
+	// 	m.data[set][v.(string)] = map[string]interface{}{}
 	// 	// fmt.Printf("New entry inserted.\n")
 	// } else if strings.HasPrefix(set, "0_") && field == "created" {
 	// 	// If a set, attribute, or relationship is marked as created, create it.
@@ -927,108 +865,42 @@ func (m *mtx) opSet(set, id, field string, v interface{}) {
 	// 	case "created":
 	// 		switch set {
 	// 		case "0_sets":
-	// 			name := m.ms.data["0_sets"][id]["name"].(string)
-	// 			m.ms.data[name] = map[string]map[string]interface{}{}
+	// 			name := m.data["0_sets"][id]["name"].(string)
+	// 			m.data[name] = map[string]map[string]interface{}{}
 	// 		case "0_attrs":
-	// 			name := m.ms.data["0_attrs"][id]["name"].(string)
-	// 			typ := m.ms.data["0_attrs"][id]["type"].(string)
-	// 			set := m.ms.data["0_attrs"][id]["set"].(string)
-	// 			for id2 := range m.ms.data[set] {
+	// 			name := m.data["0_attrs"][id]["name"].(string)
+	// 			typ := m.data["0_attrs"][id]["type"].(string)
+	// 			set := m.data["0_attrs"][id]["set"].(string)
+	// 			for id2 := range m.data[set] {
 	// 				fmt.Printf("Created: %s %s %s\n", set, id2, name)
-	// 				m.ms.data[set][id2][name] = zeroVal(typ)
+	// 				m.data[set][id2][name] = zeroVal(typ)
 	// 			}
 	// 		case "0_rels":
-	// 			name := m.ms.data["0_rels"][id]["name"].(string)
-	// 			toOne := m.ms.data["0_rels"][id]["to-one"].(bool)
-	// 			set := m.ms.data["0_rels"][id]["set"].(string)
-	// 			for id2 := range m.ms.data[set] {
+	// 			name := m.data["0_rels"][id]["name"].(string)
+	// 			toOne := m.data["0_rels"][id]["to-one"].(bool)
+	// 			set := m.data["0_rels"][id]["set"].(string)
+	// 			for id2 := range m.data[set] {
 	// 				if toOne {
-	// 					m.ms.data[set][id2][name] = ""
+	// 					m.data[set][id2][name] = ""
 	// 				} else {
-	// 					m.ms.data[set][id2][name] = []string{}
+	// 					m.data[set][id2][name] = []string{}
 	// 				}
 	// 			}
 	// 		}
 	// 	}
 	// 	// fmt.Printf("created=true, new thing created.\n")
 	// } else {
-	// 	// if _, ok := m.ms.data[set]; !ok {
+	// 	// if _, ok := m.data[set]; !ok {
 	// 	// 	fmt.Printf("Set %s does not exist.\n", set)
 	// 	// }
-	// 	// if _, ok := m.ms.data[set][id]; !ok {
+	// 	// if _, ok := m.data[set][id]; !ok {
 	// 	// 	fmt.Printf("ID %s does not exist.\n", id)
 	// 	// }
-	// 	// if _, ok := m.ms.data[set][id][field]; !ok {
+	// 	// if _, ok := m.data[set][id][field]; !ok {
 	// 	// 	fmt.Printf("Field %s does not exist.\n", field)
 	// 	// }
-	// 	m.ms.data[set][id][field] = v
+	// 	m.data[set][id][field] = v
 	// }
-}
-
-func zeroVal(typ string) interface{} {
-	switch typ {
-	case "string":
-		return string("")
-	case "int":
-		return int(0)
-	case "int8":
-		return int8(0)
-	case "int16":
-		return int16(0)
-	case "int32":
-		return int32(0)
-	case "int64":
-		return int64(0)
-	case "uint":
-		return uint(0)
-	case "uint8":
-		return uint8(0)
-	case "uint16":
-		return uint16(0)
-	case "uint32":
-		return uint32(0)
-	case "bool":
-		return bool(false)
-	case "time":
-		return time.Time{}
-	case "*string":
-		v := string("")
-		return &v
-	case "*int":
-		v := int(0)
-		return &v
-	case "*int8":
-		v := int8(0)
-		return &v
-	case "*int16":
-		v := int16(0)
-		return &v
-	case "*int32":
-		v := int32(0)
-		return &v
-	case "*int64":
-		v := int64(0)
-		return &v
-	case "*uint":
-		v := uint(0)
-		return &v
-	case "*uint8":
-		v := uint8(0)
-		return &v
-	case "*uint16":
-		v := uint16(0)
-		return &v
-	case "*uint32":
-		v := uint32(0)
-		return &v
-	case "*bool":
-		v := bool(false)
-		return &v
-	case "*time":
-		return &time.Time{}
-	default:
-		return nil
-	}
 }
 
 type record struct {

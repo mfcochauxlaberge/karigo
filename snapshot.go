@@ -13,9 +13,12 @@ type Snapshot struct {
 
 	node *Node
 
-	ready bool
-	locks map[string]bool // true means write lock
-	ops   []Op
+	version uint
+	locks   map[string]bool // false for read, true for write
+	tx      SourceTx
+	ops     []Op
+	undo    []Op
+	ready   bool
 
 	err error
 }

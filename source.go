@@ -16,6 +16,13 @@ type Source interface {
 	Begin() (SourceTx, error)
 }
 
+// DirectSource ...
+type DirectSource interface {
+	Source
+
+	Apply(ops []Op) error
+}
+
 // source is a thin convenient wrapper for a Source.
 type source struct {
 	src      Source
