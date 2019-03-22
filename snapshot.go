@@ -41,7 +41,7 @@ func (s *Snapshot) Resource(qry QueryRes) jsonapi.Resource {
 		return nil
 	}
 
-	res, err := s.node.Resource(qry)
+	res, err := s.node.resource(qry)
 	if err != nil {
 		s.Fail(err)
 		return nil
@@ -68,7 +68,7 @@ func (s *Snapshot) Collection(qry QueryCol) []jsonapi.Resource {
 		return nil
 	}
 
-	col, err := s.node.Collection(qry)
+	col, err := s.node.collection(qry)
 	if err != nil {
 		s.Fail(err)
 		return nil
@@ -92,11 +92,11 @@ func (s *Snapshot) RLock(set string) {
 		return
 	}
 
-	err := s.node.RLock(set)
-	if err != nil {
-		s.Fail(err)
-		return
-	}
+	// err := s.node.RLock(set)
+	// if err != nil {
+	// 	s.Fail(err)
+	// 	return
+	// }
 	s.locks[set] = false
 }
 
@@ -115,11 +115,11 @@ func (s *Snapshot) WLock(set string) {
 		return
 	}
 
-	err := s.node.WLock(set)
-	if err != nil {
-		s.Fail(err)
-		return
-	}
+	// err := s.node.WLock(set)
+	// if err != nil {
+	// 	s.Fail(err)
+	// 	return
+	// }
 	s.locks[set] = true
 }
 
@@ -137,13 +137,14 @@ func (s *Snapshot) Unlock(set string) {
 	}
 
 	var err error
-	if w, ok := s.locks[set]; ok {
-		if !w {
-			err = s.node.RUnlock(set)
-		} else {
-			err = s.node.WUnlock(set)
-		}
-	}
+	// TODO Unlock with node or something
+	// if w, ok := s.locks[set]; ok {
+	// 	if !w {
+	// 		err = s.node.RUnlock(set)
+	// 	} else {
+	// 		err = s.node.WUnlock(set)
+	// 	}
+	// }
 	if err != nil {
 		s.Fail(err)
 		return
@@ -158,7 +159,7 @@ func (s *Snapshot) Ready() {
 	}
 
 	if !s.ready {
-		s.node.snapLock.Unlock()
+		// s.node.snapLock.Unlock()
 	}
 	s.ready = true
 }

@@ -8,6 +8,10 @@ func TxNotImplemented(snap *Snapshot) {
 	snap.Fail(ErrNotImplemented)
 }
 
+// tx ...
+type tx struct {
+}
+
 // // TxUpdatePlayer ...
 // func TxUpdatePlayer(snap *Snapshot) {
 // 	id := snap.Res.GetID()

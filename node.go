@@ -18,8 +18,10 @@ func NewNode(src Source) *Node {
 		currSchema: NewSchema(),
 		nextSchema: NewSchema(),
 
-		snapLock: &sync.Mutex{},
-		locks:    map[string]*sync.RWMutex{},
+		ongoing: []Tx{},
+
+		// snapLock: &sync.Mutex{},
+		// locks: map[string]*sync.RWMutex{},
 	}
 
 	return node
@@ -36,8 +38,9 @@ type Node struct {
 	nextSchema *Schema
 
 	// Requests
-	snapLock *sync.Mutex
-	locks    map[string]*sync.RWMutex
+	// snapLock *sync.Mutex
+	// locks    map[string]*sync.RWMutex
+	ongoing []Tx
 
 	// Error
 	err error
@@ -107,21 +110,22 @@ func (n *Node) Handle(req *Request) *Response {
 		tx = TxNotImplemented
 	}
 
-	snap := &Snapshot{
-		node:  n,
-		locks: map[string]bool{},
-		ops:   []Op{},
-	}
+	// snap := &Snapshot{
+	// 	node:  n,
+	// 	locks: map[string]bool{},
+	// 	ops:   []Op{},
+	// }
 
-	n.snapLock.Lock()
-	tx(snap)
-	snap.Commit()
+	// n.snapLock.Lock()
+	// tx(snap)
+	// snap.Commit()
 
 	res := &Response{}
 
-	if snap.err != nil {
+	err := n.Execute(tx)
+	if err != nil {
 		var jaErr jsonapi.Error
-		switch snap.err {
+		switch err {
 		case ErrNotImplemented:
 			jaErr = jsonapi.NewErrNotImplemented()
 		default:
@@ -143,6 +147,21 @@ func (n *Node) Handle(req *Request) *Response {
 	}
 
 	return res
+}
+
+// Execute ...
+func (n *Node) Execute(tx Tx) error {
+	snap := &Snapshot{
+		node:  n,
+		locks: map[string]bool{},
+		ops:   []Op{},
+	}
+
+	tx(snap)
+
+	snap.Commit()
+
+	return snap.err
 }
 
 // Close ...
@@ -167,8 +186,8 @@ func (n *Node) Shutdown() error {
 	return n.err
 }
 
-// Resource ...
-func (n *Node) Resource(qry QueryRes) (jsonapi.Resource, error) {
+// resource ...
+func (n *Node) resource(qry QueryRes) (jsonapi.Resource, error) {
 	// for i := range n.sources {
 	// 	if n.sources[i].versions[qry.Set] == version {
 	// 		_, err := n.sources[i].src.Resource(qry)
@@ -181,8 +200,8 @@ func (n *Node) Resource(qry QueryRes) (jsonapi.Resource, error) {
 	return nil, errors.New("karigo: no source could handle the query")
 }
 
-// Collection ...
-func (n *Node) Collection(qry QueryCol) ([]jsonapi.Resource, error) {
+// collection ...
+func (n *Node) collection(qry QueryCol) ([]jsonapi.Resource, error) {
 	// TODO Validate the query?
 	// TODO Complete the sorting rule
 
@@ -198,41 +217,41 @@ func (n *Node) Collection(qry QueryCol) ([]jsonapi.Resource, error) {
 	return n.main.src.Collection(qry)
 }
 
-// RLock ...
-func (n *Node) RLock(set string) error {
-	if _, ok := n.locks[set]; !ok {
-		return errors.New("karigo: cannot read-lock inexistent set")
-	}
-	n.locks[set].RLock()
-	return nil
-}
+// // RLock ...
+// func (n *Node) RLock(set string) error {
+// 	if _, ok := n.locks[set]; !ok {
+// 		return errors.New("karigo: cannot read-lock inexistent set")
+// 	}
+// 	n.locks[set].RLock()
+// 	return nil
+// }
 
-// WLock ...
-func (n *Node) WLock(set string) error {
-	if _, ok := n.locks[set]; !ok {
-		return errors.New("karigo: cannot write-lock inexistent set")
-	}
-	n.locks[set].Lock()
-	return nil
-}
+// // WLock ...
+// func (n *Node) WLock(set string) error {
+// 	if _, ok := n.locks[set]; !ok {
+// 		return errors.New("karigo: cannot write-lock inexistent set")
+// 	}
+// 	n.locks[set].Lock()
+// 	return nil
+// }
 
-// RUnlock ...
-func (n *Node) RUnlock(set string) error {
-	if _, ok := n.locks[set]; !ok {
-		return errors.New("karigo: cannot read-unlock inexistent set")
-	}
-	n.locks[set].Unlock()
-	return nil
-}
+// // RUnlock ...
+// func (n *Node) RUnlock(set string) error {
+// 	if _, ok := n.locks[set]; !ok {
+// 		return errors.New("karigo: cannot read-unlock inexistent set")
+// 	}
+// 	n.locks[set].Unlock()
+// 	return nil
+// }
 
-// WUnlock ...
-func (n *Node) WUnlock(set string) error {
-	if _, ok := n.locks[set]; !ok {
-		return errors.New("karigo: cannot write-unlock inexistent set")
-	}
-	n.locks[set].Unlock()
-	return nil
-}
+// // WUnlock ...
+// func (n *Node) WUnlock(set string) error {
+// 	if _, ok := n.locks[set]; !ok {
+// 		return errors.New("karigo: cannot write-unlock inexistent set")
+// 	}
+// 	n.locks[set].Unlock()
+// 	return nil
+// }
 
 // // Commit ...
 // func (n *Node) Commit(version uint64) error {
