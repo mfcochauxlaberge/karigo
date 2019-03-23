@@ -187,7 +187,7 @@ func (n *Node) Shutdown() error {
 }
 
 // resource ...
-func (n *Node) resource(qry QueryRes) (jsonapi.Resource, error) {
+func (n *Node) resource(v uint64, qry QueryRes) (jsonapi.Resource, error) {
 	// for i := range n.sources {
 	// 	if n.sources[i].versions[qry.Set] == version {
 	// 		_, err := n.sources[i].src.Resource(qry)
@@ -201,7 +201,7 @@ func (n *Node) resource(qry QueryRes) (jsonapi.Resource, error) {
 }
 
 // collection ...
-func (n *Node) collection(qry QueryCol) ([]jsonapi.Resource, error) {
+func (n *Node) collection(v uint64, qry QueryCol) ([]jsonapi.Resource, error) {
 	// TODO Validate the query?
 	// TODO Complete the sorting rule
 
@@ -215,6 +215,18 @@ func (n *Node) collection(qry QueryCol) ([]jsonapi.Resource, error) {
 	// }
 
 	return n.main.src.Collection(qry)
+}
+
+// do ...
+func (n *Node) do(ops []Op) error {
+	for i := range n.sources {
+		err := n.sources[i].src.Apply(ops)
+		if err != nil {
+			return err
+		}
+	}
+
+	return errors.New("karigo: an operation could not be executed")
 }
 
 // // RLock ...
@@ -262,18 +274,6 @@ func (n *Node) collection(qry QueryCol) ([]jsonapi.Resource, error) {
 // 	}
 
 // 	return nil
-// }
-
-// Apply ...
-// func (n *Node) Apply(ops []Op) error {
-// 	for i := range n.sources {
-// 		err := n.sources[i].src.Apply(ops)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	return errors.New("karigo: an operation could not be executed")
 // }
 
 // func (n *Node) handleRequest(in chan *Request) error {
