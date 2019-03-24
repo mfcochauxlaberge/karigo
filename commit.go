@@ -3,40 +3,17 @@ package karigo
 // Commit ...
 type Commit struct {
 	Version uint64 `json:"ver"`
-	Unique  string `json:"uni"`
-	User    string `json:"usr"`
+	ID      string `json:"id"`
+	User    string `json:"user"`
+	Method  string `json:"method"`
+	URL     string `json:"url"`
+	Body    []byte `json:"body"`
 	Ops     []Op   `json:"ops"`
 }
 
-// Log ...
-type Log []Commit
-
-// // Append ...
-// func (l *Log) Append(c Commit) error {
-// 	return nil
-// }
-
-// // Get ...
-// func (l *Log) Get(id string) (Commit, error) {
-// 	return Commit{}, nil
-// }
-
-// // Last ...
-// func (l *Log) Last() (Commit, error) {
-// 	return Commit{}, nil
-// }
-
-// // At ...
-// func (l *Log) At(v uint64) (Commit, error) {
-// 	return Commit{}, nil
-// }
-
-// // Tail ...
-// func (l *Log) Tail(n uint) ([]Commit, error) {
-// 	return []Commit{}, nil
-// }
-
-// // Range ...
-// func (l *Log) Range(n uint) ([]Commit, error) {
-// 	return []Commit{}, nil
-// }
+// Entry ...
+type Entry struct {
+	Version uint64 `json:"ver"`
+	ID      string `json:"id"`
+	Ops     []Op   `json:"ops"`
+}

@@ -9,8 +9,7 @@ func TxNotImplemented(snap *Snapshot) {
 }
 
 // tx ...
-type tx struct {
-}
+type tx struct{}
 
 // // TxUpdatePlayer ...
 // func TxUpdatePlayer(snap *Snapshot) {

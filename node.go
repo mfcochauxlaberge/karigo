@@ -10,7 +10,7 @@ import (
 // NewNode ...
 func NewNode(src Source) *Node {
 	node := &Node{
-		log: []Commit{},
+		log: Journal{},
 		main: source{
 			src: src,
 		},
@@ -30,7 +30,7 @@ func NewNode(src Source) *Node {
 // Node ...
 type Node struct {
 	// Run
-	log  Log
+	log  Journal
 	main source
 
 	// Schema
