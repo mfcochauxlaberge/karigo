@@ -14,21 +14,16 @@ func (j *Journal) Get(id string) ([]byte, error) {
 }
 
 // Last ...
-func (j *Journal) Last() ([]byte, error) {
-	return []byte{}, nil
+func (j *Journal) Last() (uint, []byte, error) {
+	return 0, []byte{}, nil
 }
 
 // At ...
-func (j *Journal) At(v uint64) ([]byte, error) {
+func (j *Journal) At(i uint64) ([]byte, error) {
 	return []byte{}, nil
 }
 
-// Tail ...
-func (j *Journal) Tail(n uint) ([][]byte, error) {
-	return [][]byte{}, nil
-}
-
 // Range ...
-func (j *Journal) Range(n uint) ([][]byte, error) {
+func (j *Journal) Range(n uint, s uint) ([][]byte, error) {
 	return [][]byte{}, nil
 }
