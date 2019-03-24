@@ -1,5 +1,8 @@
 github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/mfcochauxlaberge/jsonapi v0.6.1-0.20190310040613-85a1d3a48572/go.mod h1:DCVvdoTCWr5zv6cexqp8kU9Y6ET/T5u0YZZww2WsWgA=
+github.com/mfcochauxlaberge/jsonapi v0.7.0 h1:hrG8h7SyYjotyI2qDpzGma48hKAzZZ8Nz7RH7ouFWqg=
+github.com/mfcochauxlaberge/jsonapi v0.7.0/go.mod h1:fcYw2NvgD4DmwWzZABpmW1f2jL4bakrodVFTAo69z9o=
 github.com/mfcochauxlaberge/tchek v0.3.0 h1:SFmqbnfjxMbP7yV/FuHioIwYI9tmDtmO9Jd5smGu0KQ=
 github.com/mfcochauxlaberge/tchek v0.3.0/go.mod h1:e8jX6VID1Ku1XAZq8lkxRuGfSKIFL9sL7w4E3WDkx7o=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=
