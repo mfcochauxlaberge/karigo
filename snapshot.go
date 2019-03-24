@@ -41,7 +41,7 @@ func (s *Snapshot) Resource(qry QueryRes) jsonapi.Resource {
 		return nil
 	}
 
-	res, err := s.node.resource(qry)
+	res, err := s.node.resource(s.version, qry)
 	if err != nil {
 		s.Fail(err)
 		return nil
@@ -68,7 +68,7 @@ func (s *Snapshot) Collection(qry QueryCol) []jsonapi.Resource {
 		return nil
 	}
 
-	col, err := s.node.collection(qry)
+	col, err := s.node.collection(s.version, qry)
 	if err != nil {
 		s.Fail(err)
 		return nil
