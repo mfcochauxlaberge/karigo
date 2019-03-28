@@ -8,11 +8,6 @@ func (j *Journal) Append(c []byte) error {
 	return nil
 }
 
-// Get ...
-func (j *Journal) Get(id string) ([]byte, error) {
-	return []byte{}, nil
-}
-
 // Last ...
 func (j *Journal) Last() (uint, []byte, error) {
 	return 0, []byte{}, nil
@@ -21,6 +16,11 @@ func (j *Journal) Last() (uint, []byte, error) {
 // At ...
 func (j *Journal) At(i uint64) ([]byte, error) {
 	return []byte{}, nil
+}
+
+// Cut ...
+func (j *Journal) Cut(i uint64) error {
+	return nil
 }
 
 // Range ...
