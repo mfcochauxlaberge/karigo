@@ -91,7 +91,10 @@ func (n *Node) Run() error {
 // }
 
 // Handle ...
-func (n *Node) Handle(req *Request) *Response {
+func (n *Node) Handle(rawreq *RawRequest) *Response {
+	req, _ := NewRequest(rawreq)
+	// TODO Handle error
+
 	n.Lock()
 	defer n.Unlock()
 
@@ -107,25 +110,22 @@ func (n *Node) Handle(req *Request) *Response {
 		tx = n.currSchema.deleteFuncs[req.URL.ResType]
 	}
 	if tx == nil {
-		tx = TxNotImplemented
+		tx = TxNotFound
 	}
-
-	// snap := &Snapshot{
-	// 	node:  n,
-	// 	locks: map[string]bool{},
-	// 	ops:   []Op{},
-	// }
-
-	// n.snapLock.Lock()
-	// tx(snap)
-	// snap.Commit()
 
 	res := &Response{}
 
-	err := n.Execute(tx)
-	if err != nil {
+	snap := &Snapshot{
+		node:  n,
+		locks: map[string]bool{},
+		ops:   []Op{},
+	}
+	tx(snap)
+	snap.Commit()
+
+	if snap.err != nil {
 		var jaErr jsonapi.Error
-		switch err {
+		switch snap.err {
 		case ErrNotImplemented:
 			jaErr = jsonapi.NewErrNotImplemented()
 		default:
@@ -149,20 +149,20 @@ func (n *Node) Handle(req *Request) *Response {
 	return res
 }
 
-// Execute ...
-func (n *Node) Execute(tx Tx) error {
-	snap := &Snapshot{
-		node:  n,
-		locks: map[string]bool{},
-		ops:   []Op{},
-	}
+// // Execute ...
+// func (n *Node) Execute(tx Tx) error {
+// 	snap := &Snapshot{
+// 		node:  n,
+// 		locks: map[string]bool{},
+// 		ops:   []Op{},
+// 	}
 
-	tx(snap)
+// 	tx(snap)
 
-	snap.Commit()
+// 	snap.Commit()
 
-	return snap.err
-}
+// 	return snap.err
+// }
 
 // Close ...
 func (n *Node) Close() error {

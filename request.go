@@ -13,19 +13,19 @@ const (
 )
 
 // NewRequest ...
-func NewRequest(method, url string, body *jsonapi.Document) (*Request, error) {
-	jurl, err := jsonapi.ParseRawURL(nil, url)
-	if err != nil {
-		return nil, err
-	}
+func NewRequest(rr *RawRequest) (*Request, error) {
+	jurl, err := jsonapi.ParseRawURL(&jsonapi.Registry{}, rr.URL)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	req := &Request{
-		Method: method,
+		Method: rr.Method,
 		URL:    jurl,
-		Body:   body,
+		Body:   &jsonapi.Document{},
 	}
 
-	return req, nil
+	return req, err
 }
 
 // Request ...

@@ -8,6 +8,11 @@ func TxNotImplemented(snap *Snapshot) {
 	snap.Fail(ErrNotImplemented)
 }
 
+// TxNotFound ...
+func TxNotFound(snap *Snapshot) {
+	snap.Fail(ErrNotFound)
+}
+
 // tx ...
 type tx struct{}
 
