@@ -2,6 +2,7 @@ package karigo
 
 import (
 	"errors"
+	"net/http"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -10,7 +11,9 @@ import (
 // NewNode ...
 func NewNode(src Source) *Node {
 	node := &Node{
-		log: Journal{},
+		prelog:  Journal{},
+		log:     Journal{},
+		limiter: Limiter{},
 		main: source{
 			src: src,
 		},
@@ -30,8 +33,10 @@ func NewNode(src Source) *Node {
 // Node ...
 type Node struct {
 	// Run
-	log  Journal
-	main source
+	prelog  Journal
+	log     Journal
+	limiter Limiter
+	main    source
 
 	// Schema
 	currSchema *Schema
@@ -91,9 +96,23 @@ func (n *Node) Run() error {
 // }
 
 // Handle ...
-func (n *Node) Handle(rawreq *RawRequest) *Response {
-	req, _ := NewRequest(rawreq)
+func (n *Node) Handle(r *http.Request) *Response {
+	// req, _ := NewRequest(rawreq)
 	// TODO Handle error
+
+	// Prelog
+	plSave := make(chan error)
+	encr := encodeRawRequest(r)
+	go func() {
+		err := n.prelog.Append(encr)
+		plSave <- err
+	}()
+
+	// Execution
+	req, err := NewRequest(RawRe)
+	if err != nil {
+		panic(err)
+	}
 
 	n.Lock()
 	defer n.Unlock()

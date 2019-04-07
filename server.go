@@ -19,17 +19,17 @@ func (s *Server) Run() {
 
 // ServeHTTP ...
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	domain := "example.com"
+	domain := r.URL.Host
 
 	if _, ok := s.Nodes[domain]; !ok {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	node := s.Nodes[domain]
+	// node := s.Nodes[domain]
 
-	rawreq := &RawRequest{}
-	rawreq.URL = r.URL.RawPath
+	// rawreq := &RawRequest{}
+	// rawreq.URL = r.URL.RawPath
 
-	node.Handle(rawreq)
+	res := s.Nodes[domain].Handle(r)
 }

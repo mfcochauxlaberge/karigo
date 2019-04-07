@@ -1,6 +1,8 @@
 package karigo
 
 import (
+	"net/http"
+
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -13,14 +15,14 @@ const (
 )
 
 // NewRequest ...
-func NewRequest(rr *RawRequest) (*Request, error) {
-	jurl, err := jsonapi.ParseRawURL(&jsonapi.Registry{}, rr.URL)
+func NewRequest(r *http.Request) (*Request, error) {
+	jurl, err := jsonapi.ParseRawURL(&jsonapi.Registry{}, r)
 	// if err != nil {
 	// 	return nil, err
 	// }
 
 	req := &Request{
-		Method: rr.Method,
+		Method: r.Method,
 		URL:    jurl,
 		Body:   &jsonapi.Document{},
 	}
