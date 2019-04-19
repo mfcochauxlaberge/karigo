@@ -109,7 +109,7 @@ func (n *Node) Handle(r *http.Request) *Response {
 	}()
 
 	// Execution
-	req, err := NewRequest(RawRe)
+	req, err := NewRequest(r)
 	if err != nil {
 		panic(err)
 	}

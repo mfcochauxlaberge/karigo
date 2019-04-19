@@ -31,5 +31,5 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// rawreq := &RawRequest{}
 	// rawreq.URL = r.URL.RawPath
 
-	res := s.Nodes[domain].Handle(r)
+	_ = s.Nodes[domain].Handle(r)
 }

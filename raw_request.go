@@ -1,6 +1,9 @@
 package karigo
 
-import "net/http"
+import (
+	"io/ioutil"
+	"net/http"
+)
 
 // NewRawRequest ...
 func NewRawRequest(r *http.Request) *RawRequest {
@@ -18,5 +21,7 @@ type RawRequest struct {
 
 func encodeRawRequest(r *http.Request) []byte {
 	rr := []byte{}
+	body, _ := ioutil.ReadAll(r.Body)
+	rr = body
 	return rr
 }
