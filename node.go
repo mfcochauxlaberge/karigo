@@ -9,10 +9,9 @@ import (
 )
 
 // NewNode ...
-func NewNode(src Source) *Node {
+func NewNode(src Source, journal Journal) *Node {
 	node := &Node{
-		prelog:  Journal{},
-		log:     Journal{},
+		log:     journal,
 		limiter: Limiter{},
 		main: source{
 			src: src,
