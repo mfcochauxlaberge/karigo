@@ -32,7 +32,6 @@ func NewNode(src Source, journal Journal) *Node {
 // Node ...
 type Node struct {
 	// Run
-	prelog  Journal
 	log     Journal
 	limiter Limiter
 	main    source
@@ -99,16 +98,8 @@ func (n *Node) Handle(r *http.Request) *Response {
 	// req, _ := NewRequest(rawreq)
 	// TODO Handle error
 
-	// Prelog
-	plSave := make(chan error)
-	encr := encodeRawRequest(r)
-	go func() {
-		err := n.prelog.Append(encr)
-		plSave <- err
-	}()
-
 	// Execution
-	req, err := NewRequest(r)
+	req, err := jsonapi.NewRequest(r, n.currSchema.jaSchema)
 	if err != nil {
 		panic(err)
 	}
