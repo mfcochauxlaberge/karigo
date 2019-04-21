@@ -11,8 +11,7 @@ import (
 // NewNode ...
 func NewNode(src Source, journal Journal) *Node {
 	node := &Node{
-		log:     journal,
-		limiter: Limiter{},
+		log: journal,
 		main: source{
 			src: src,
 		},
@@ -32,9 +31,8 @@ func NewNode(src Source, journal Journal) *Node {
 // Node ...
 type Node struct {
 	// Run
-	log     Journal
-	limiter Limiter
-	main    source
+	log  Journal
+	main source
 
 	// Schema
 	currSchema *Schema
