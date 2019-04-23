@@ -16,8 +16,7 @@ func NewNode(src Source, journal Journal) *Node {
 			src: src,
 		},
 
-		currSchema: NewSchema(),
-		nextSchema: NewSchema(),
+		schema: NewSchema(),
 
 		ongoing: []Tx{},
 
@@ -35,8 +34,7 @@ type Node struct {
 	main source
 
 	// Schema
-	currSchema *Schema
-	nextSchema *Schema
+	schema *Schema
 
 	// Requests
 	// snapLock *sync.Mutex
@@ -97,7 +95,7 @@ func (n *Node) Handle(r *http.Request) *Response {
 	// TODO Handle error
 
 	// Execution
-	req, err := jsonapi.NewRequest(r, n.currSchema.jaSchema)
+	req, err := jsonapi.NewRequest(r, n.schema.jaSchema)
 	if err != nil {
 		panic(err)
 	}
@@ -108,13 +106,13 @@ func (n *Node) Handle(r *http.Request) *Response {
 	var tx Tx
 	switch req.Method {
 	case GET:
-		tx = n.currSchema.getFuncs[req.URL.ResType]
+		tx = n.schema.getFuncs[req.URL.ResType]
 	case POST:
-		tx = n.currSchema.createFuncs[req.URL.ResType]
+		tx = n.schema.createFuncs[req.URL.ResType]
 	case PATCH:
-		tx = n.currSchema.updateFuncs[req.URL.ResType]
+		tx = n.schema.updateFuncs[req.URL.ResType]
 	case DELETE:
-		tx = n.currSchema.deleteFuncs[req.URL.ResType]
+		tx = n.schema.deleteFuncs[req.URL.ResType]
 	}
 	if tx == nil {
 		tx = TxNotFound
