@@ -74,6 +74,14 @@ func (m *Source) Reset() error {
 		InverseType:  "0_sets",
 		InverseToOne: true,
 	})
+	typ.AddRel(jsonapi.Rel{
+		Name:         "rels",
+		Type:         "0_rels",
+		ToOne:        false,
+		InverseName:  "set",
+		InverseType:  "0_sets",
+		InverseToOne: true,
+	})
 	m.schema.AddType(typ)
 
 	m.data["0_sets"] = set{
@@ -104,7 +112,7 @@ func (m *Source) Reset() error {
 				},
 			},
 			record{
-				id: "0_meta",
+				id: "0_attrs",
 				vals: map[string]interface{}{
 					"name":    "0_attrs",
 					"version": 0,
@@ -121,7 +129,7 @@ func (m *Source) Reset() error {
 				},
 			},
 			record{
-				id: "0_meta",
+				id: "0_rels",
 				vals: map[string]interface{}{
 					"name":    "0_rels",
 					"version": 0,
@@ -137,7 +145,21 @@ func (m *Source) Reset() error {
 				},
 			},
 			record{
-				id: "0_meta",
+				id: "0_funcs",
+				vals: map[string]interface{}{
+					"name":    "0_funcs",
+					"version": 0,
+					"created": true,
+					"attrs": []string{
+						"0_funcs_func",
+					},
+					"rels": []string{
+						"0_funcs_set",
+					},
+				},
+			},
+			record{
+				id: "0_get-funcs",
 				vals: map[string]interface{}{
 					"name":    "0_get-funcs",
 					"version": 0,
@@ -151,7 +173,7 @@ func (m *Source) Reset() error {
 				},
 			},
 			record{
-				id: "0_meta",
+				id: "0_create-funcs",
 				vals: map[string]interface{}{
 					"name":    "0_create-funcs",
 					"version": 0,
@@ -165,7 +187,7 @@ func (m *Source) Reset() error {
 				},
 			},
 			record{
-				id: "0_meta",
+				id: "0_update-funcs",
 				vals: map[string]interface{}{
 					"name":    "0_update-funcs",
 					"version": 0,
@@ -179,7 +201,7 @@ func (m *Source) Reset() error {
 				},
 			},
 			record{
-				id: "0_meta",
+				id: "0_delete-funcs",
 				vals: map[string]interface{}{
 					"name":    "0_delete-funcs",
 					"version": 0,
@@ -329,6 +351,16 @@ func (m *Source) Reset() error {
 					"null":    false,
 					"created": true,
 					"set":     "0_rels",
+				},
+			},
+			record{
+				id: "0_funcs_func",
+				vals: map[string]interface{}{
+					"name":    "func",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_funcs",
 				},
 			},
 			record{
