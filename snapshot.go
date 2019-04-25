@@ -6,8 +6,8 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
-// Snapshot ...
-type Snapshot struct {
+// Checkpoint ...
+type Checkpoint struct {
 	Res jsonapi.Resource
 	Inc map[string]jsonapi.Resource
 
@@ -24,7 +24,7 @@ type Snapshot struct {
 }
 
 // Resource ...
-func (s *Snapshot) Resource(qry QueryRes) jsonapi.Resource {
+func (s *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
 	if s.err != nil {
 		return nil
 	}
@@ -51,7 +51,7 @@ func (s *Snapshot) Resource(qry QueryRes) jsonapi.Resource {
 }
 
 // Collection ...
-func (s *Snapshot) Collection(qry QueryCol) []jsonapi.Resource {
+func (s *Checkpoint) Collection(qry QueryCol) []jsonapi.Resource {
 	if s.err != nil {
 		return nil
 	}
@@ -78,13 +78,13 @@ func (s *Snapshot) Collection(qry QueryCol) []jsonapi.Resource {
 }
 
 // RLock ...
-func (s *Snapshot) RLock(set string) {
+func (s *Checkpoint) RLock(set string) {
 	if s.err != nil {
 		return
 	}
 
 	if s.ready {
-		s.Fail(errors.New("karigo: snapshot is ready and cannot lock anymore"))
+		s.Fail(errors.New("karigo: checkpoint is ready and cannot lock anymore"))
 		return
 	}
 	if _, ok := s.locks[set]; ok {
@@ -101,13 +101,13 @@ func (s *Snapshot) RLock(set string) {
 }
 
 // WLock ...
-func (s *Snapshot) WLock(set string) {
+func (s *Checkpoint) WLock(set string) {
 	if s.err != nil {
 		return
 	}
 
 	if s.ready {
-		s.Fail(errors.New("karigo: snapshot is ready and cannot lock anymore"))
+		s.Fail(errors.New("karigo: checkpoint is ready and cannot lock anymore"))
 		return
 	}
 	if _, ok := s.locks[set]; ok {
@@ -124,7 +124,7 @@ func (s *Snapshot) WLock(set string) {
 }
 
 // Unlock ...
-func (s *Snapshot) Unlock(set string) {
+func (s *Checkpoint) Unlock(set string) {
 	if s.err != nil {
 		return
 	}
@@ -153,7 +153,7 @@ func (s *Snapshot) Unlock(set string) {
 }
 
 // Ready ...
-func (s *Snapshot) Ready() {
+func (s *Checkpoint) Ready() {
 	if s.err != nil {
 		return
 	}
@@ -165,7 +165,7 @@ func (s *Snapshot) Ready() {
 }
 
 // Add ...
-func (s *Snapshot) Add(op Op) {
+func (s *Checkpoint) Add(op Op) {
 	if s.err != nil {
 		return
 	}
@@ -183,7 +183,7 @@ func (s *Snapshot) Add(op Op) {
 }
 
 // Flush ...
-func (s *Snapshot) Flush() {
+func (s *Checkpoint) Flush() {
 	if s.err != nil {
 		return
 	}
@@ -196,7 +196,7 @@ func (s *Snapshot) Flush() {
 }
 
 // Commit ...
-func (s *Snapshot) Commit() {
+func (s *Checkpoint) Commit() {
 	if s.err != nil {
 		return
 	}
@@ -210,7 +210,7 @@ func (s *Snapshot) Commit() {
 }
 
 // Fail ...
-func (s *Snapshot) Fail(err error) {
+func (s *Checkpoint) Fail(err error) {
 	if !s.ready {
 		s.Ready()
 	}

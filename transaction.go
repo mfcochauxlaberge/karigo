@@ -1,16 +1,16 @@
 package karigo
 
 // Tx ...
-type Tx func(*Snapshot)
+type Tx func(*Checkpoint)
 
 // TxNotImplemented ...
-func TxNotImplemented(snap *Snapshot) {
-	snap.Fail(ErrNotImplemented)
+func TxNotImplemented(cp *Checkpoint) {
+	cp.Fail(ErrNotImplemented)
 }
 
 // TxNotFound ...
-func TxNotFound(snap *Snapshot) {
-	snap.Fail(ErrNotFound)
+func TxNotFound(cp *Checkpoint) {
+	cp.Fail(ErrNotFound)
 }
 
 // tx ...

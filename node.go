@@ -120,17 +120,17 @@ func (n *Node) Handle(r *http.Request) *Response {
 
 	res := &Response{}
 
-	snap := &Snapshot{
+	cp := &Checkpoint{
 		node:  n,
 		locks: map[string]bool{},
 		ops:   []Op{},
 	}
-	tx(snap)
-	snap.Commit()
+	tx(cp)
+	cp.Commit()
 
-	if snap.err != nil {
+	if cp.err != nil {
 		var jaErr jsonapi.Error
-		switch snap.err {
+		switch cp.err {
 		case ErrNotImplemented:
 			jaErr = jsonapi.NewErrNotImplemented()
 		default:
