@@ -121,9 +121,8 @@ func (n *Node) Handle(r *http.Request) *Response {
 	res := &Response{}
 
 	cp := &Checkpoint{
-		node:  n,
-		locks: map[string]bool{},
-		ops:   []Op{},
+		node: n,
+		ops:  []Op{},
 	}
 	tx(cp)
 	cp.Commit()
