@@ -36,16 +36,15 @@ func (m *Source) Reset() error {
 		Name: "0_meta",
 	}
 	typ.AddAttr(jsonapi.Attr{
-		Name: "key",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
 		Name: "value",
 		Type: jsonapi.AttrTypeString,
 		Null: false,
 	})
 	m.schema.AddType(typ)
+
+	m.data["0_meta"] = set{
+		data: []record{},
+	}
 
 	// 0_sets
 	typ = jsonapi.Type{
@@ -90,6 +89,7 @@ func (m *Source) Reset() error {
 				id: "0_meta",
 				vals: map[string]interface{}{
 					"name":    "0_meta",
+					"version": 0,
 					"created": true,
 					"attrs": []string{
 						"0_meta_value",
@@ -105,9 +105,15 @@ func (m *Source) Reset() error {
 					"attrs": []string{
 						"0_sets_name",
 						"0_sets_version",
+						"0_sets_created",
 					},
 					"rels": []string{
-						"0_sets_fields",
+						"0_sets_attrs",
+						"0_sets_rels",
+						"0_funcs_get_func",
+						"0_funcs_create_func",
+						"0_funcs_update_func",
+						"0_funcs_delete_func",
 					},
 				},
 			},
@@ -158,62 +164,6 @@ func (m *Source) Reset() error {
 					},
 				},
 			},
-			record{
-				id: "0_get-funcs",
-				vals: map[string]interface{}{
-					"name":    "0_get-funcs",
-					"version": 0,
-					"created": true,
-					"attrs": []string{
-						"0_get-funcs_func",
-					},
-					"rels": []string{
-						"0_get-funcs_set",
-					},
-				},
-			},
-			record{
-				id: "0_create-funcs",
-				vals: map[string]interface{}{
-					"name":    "0_create-funcs",
-					"version": 0,
-					"created": true,
-					"attrs": []string{
-						"0_create-funcs_func",
-					},
-					"rels": []string{
-						"0_create-funcs_set",
-					},
-				},
-			},
-			record{
-				id: "0_update-funcs",
-				vals: map[string]interface{}{
-					"name":    "0_update-funcs",
-					"version": 0,
-					"created": true,
-					"attrs": []string{
-						"0_update-funcs_func",
-					},
-					"rels": []string{
-						"0_update-funcs_set",
-					},
-				},
-			},
-			record{
-				id: "0_delete-funcs",
-				vals: map[string]interface{}{
-					"name":    "0_delete-funcs",
-					"version": 0,
-					"created": true,
-					"attrs": []string{
-						"0_delete-funcs_func",
-					},
-					"rels": []string{
-						"0_delete-funcs_set",
-					},
-				},
-			},
 		},
 	}
 
@@ -261,6 +211,16 @@ func (m *Source) Reset() error {
 					"null":    false,
 					"created": true,
 					"set":     "0_meta",
+				},
+			},
+			record{
+				id: "0_sets_name",
+				vals: map[string]interface{}{
+					"name":    "name",
+					"type":    "string",
+					"null":    false,
+					"created": true,
+					"set":     "0_sets",
 				},
 			},
 			record{
@@ -363,46 +323,6 @@ func (m *Source) Reset() error {
 					"set":     "0_funcs",
 				},
 			},
-			record{
-				id: "0_get-funcs_func",
-				vals: map[string]interface{}{
-					"name":    "func",
-					"type":    "string",
-					"null":    false,
-					"created": true,
-					"set":     "0_get-funcs",
-				},
-			},
-			record{
-				id: "0_create-funcs_func",
-				vals: map[string]interface{}{
-					"name":    "func",
-					"type":    "string",
-					"null":    false,
-					"created": true,
-					"set":     "0_create-funcs",
-				},
-			},
-			record{
-				id: "0_update-funcs_func",
-				vals: map[string]interface{}{
-					"name":    "func",
-					"type":    "string",
-					"null":    false,
-					"created": true,
-					"set":     "0_update-funcs",
-				},
-			},
-			record{
-				id: "0_delete-funcs_func",
-				vals: map[string]interface{}{
-					"name":    "func",
-					"type":    "string",
-					"null":    false,
-					"created": true,
-					"set":     "0_delete-funcs",
-				},
-			},
 		},
 	}
 
@@ -466,6 +386,46 @@ func (m *Source) Reset() error {
 				},
 			},
 			record{
+				id: "0_sets_get_func",
+				vals: map[string]interface{}{
+					"name":    "get_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "", // Inverse?
+					"set":     "0_funcs",
+				},
+			},
+			record{
+				id: "0_sets_create_func",
+				vals: map[string]interface{}{
+					"name":    "create_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "", // Inverse?
+					"set":     "0_funcs",
+				},
+			},
+			record{
+				id: "0_sets_update_func",
+				vals: map[string]interface{}{
+					"name":    "update_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "", // Inverse?
+					"set":     "0_funcs",
+				},
+			},
+			record{
+				id: "0_sets_delete_func",
+				vals: map[string]interface{}{
+					"name":    "delete_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "", // Inverse?
+					"set":     "0_funcs",
+				},
+			},
+			record{
 				id: "0_attrs_set",
 				vals: map[string]interface{}{
 					"name":    "set",
@@ -495,10 +455,50 @@ func (m *Source) Reset() error {
 					"set":     "0_rels",
 				},
 			},
+			record{
+				id: "0_funcs_get_func",
+				vals: map[string]interface{}{
+					"name":    "get_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_rels",
+					"set":     "0_funcs",
+				},
+			},
+			record{
+				id: "0_funcs_create_func",
+				vals: map[string]interface{}{
+					"name":    "create_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_rels",
+					"set":     "0_funcs",
+				},
+			},
+			record{
+				id: "0_funcs_update_func",
+				vals: map[string]interface{}{
+					"name":    "update_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_rels",
+					"set":     "0_funcs",
+				},
+			},
+			record{
+				id: "0_funcs_delete_func",
+				vals: map[string]interface{}{
+					"name":    "delete_func",
+					"to-one":  true,
+					"created": true,
+					"inverse": "0_sets_rels",
+					"set":     "0_funcs",
+				},
+			},
 		},
 	}
 
-	// 0_get-funcs
+	// 0_funcs
 	typ = jsonapi.Type{
 		Name: "funcs",
 	}
@@ -509,241 +509,71 @@ func (m *Source) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	// 0_create-funcs
-	typ = jsonapi.Type{
-		Name: "funcs",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "func",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	m.schema.AddType(typ)
-
-	m.data["0_create-funcs"] = set{
+	// TODO Add missing functions
+	m.data["0_funcs"] = set{
 		data: []record{
 			record{
 				id: "0_meta",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 			record{
 				id: "0_sets",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 			record{
 				id: "0_attrs",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 			record{
 				id: "0_rels",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 			record{
 				id: "0_get-funcs",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 			record{
 				id: "0_create-funcs",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 			record{
 				id: "0_update-funcs",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 			record{
 				id: "0_delete-funcs",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-		},
-	}
-
-	// 0_update-funcs
-	typ = jsonapi.Type{
-		Name: "funcs",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "func",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	m.schema.AddType(typ)
-
-	m.data["0_update-funcs"] = set{
-		data: []record{
-			record{
-				id: "0_meta",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_sets",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_attrs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_rels",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_get-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_create-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_update-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_delete-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-		},
-	}
-
-	// 0_delete-funcs
-	typ = jsonapi.Type{
-		Name: "funcs",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "value",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	m.schema.AddType(typ)
-
-	m.data["0_delete-funcs"] = set{
-		data: []record{
-			record{
-				id: "0_meta",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_sets",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_attrs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_rels",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_get-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_create-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_update-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
-				},
-			},
-			record{
-				id: "0_delete-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-					snap.Fail(ErrNotImplemented)
-				}`,
+						snap.Fail(ErrNotImplemented)
+					}`,
 				},
 			},
 		},
