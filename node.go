@@ -9,7 +9,7 @@ import (
 )
 
 // NewNode ...
-func NewNode(src Source, journal Journal) *Node {
+func NewNode(journal Journal, src Source) *Node {
 	node := &Node{
 		log: journal,
 		main: source{
@@ -53,6 +53,9 @@ func (n *Node) Run() error {
 	n.Lock()
 	n.Unlock()
 
+	// TODO Prepare the node
+
+	// Wait for an error or a shutdown
 	for n.err == nil {
 		select {}
 	}
@@ -60,60 +63,26 @@ func (n *Node) Run() error {
 	return n.err
 }
 
-// // AddSource ...
-// func (n *Node) AddSource(name string, src Source) error {
-// 	n.Lock()
-// 	defer n.Unlock()
-
-// 	if n.sources == nil {
-// 		n.sources = []source{}
-// 	}
-
-// 	if len(name) == 0 {
-// 		return errors.New("karigo: source name cannot be empty")
-// 	}
-
-// 	for i := range n.sources {
-// 		if n.sources[i].name == name {
-// 			return errors.New("karigo: source name already used")
-// 		}
-// 	}
-
-// 	n.sources = append(n.sources, source{
-// 		name: name,
-// 		src:  src,
-// 	})
-
-// 	// go n.sources[len(n.sources)-1].run()
-
-// 	return nil
-// }
-
 // Handle ...
 func (n *Node) Handle(r *http.Request) *Response {
 	// req, _ := NewRequest(rawreq)
 	// TODO Handle error
 
 	// Execution
-	req, err := jsonapi.NewRequest(r, n.schema.jaSchema)
-	if err != nil {
-		panic(err)
-	}
+	// req, err := jsonapi.NewRequest(r, n.schema.jaSchema)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// Request
+	// req := jsonapi.Request{Method: r.Method}
 
 	n.Lock()
 	defer n.Unlock()
 
+	// Tx
 	var tx Tx
-	switch req.Method {
-	case GET:
-		tx = n.schema.getFuncs[req.URL.ResType]
-	case POST:
-		tx = n.schema.createFuncs[req.URL.ResType]
-	case PATCH:
-		tx = n.schema.updateFuncs[req.URL.ResType]
-	case DELETE:
-		tx = n.schema.deleteFuncs[req.URL.ResType]
-	}
+	// tx := n.schema.funcs[req.URL.ResType]
 	if tx == nil {
 		tx = TxNotFound
 	}
@@ -138,35 +107,10 @@ func (n *Node) Handle(r *http.Request) *Response {
 		res.Errors = []jsonapi.Error{jaErr}
 	} else {
 		res.Data = nil
-
-		// Aggregate operations
-		// Commit to log
-		// If success:
-		//   * Commit sources
-		//   * Return success
-		// If failure:
-		//   * Rollback sources
-		//   * Try to transfer request to master node
-		//   * Return response
 	}
 
 	return res
 }
-
-// // Execute ...
-// func (n *Node) Execute(tx Tx) error {
-// 	snap := &Snapshot{
-// 		node:  n,
-// 		locks: map[string]bool{},
-// 		ops:   []Op{},
-// 	}
-
-// 	tx(snap)
-
-// 	snap.Commit()
-
-// 	return snap.err
-// }
 
 // Close ...
 func (n *Node) Close() error {

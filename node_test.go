@@ -1,30 +1,53 @@
 package karigo_test
 
 import (
+	"net/http/httptest"
 	"testing"
+
+	"github.com/mfcochauxlaberge/jsonapi"
+	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/memory"
 )
 
 func TestNode(t *testing.T) {
-	// mem := &memory.Memory{
-	// 	ID:       "memory",
-	// 	Location: "local",
-	// }
+	// Fake type
+	typ := jsonapi.Type{}
+	typ.Name = "things"
+	typ.AddAttr(jsonapi.Attr{
+		Name: "name",
+		Type: jsonapi.AttrTypeString,
+		Null: false,
+	})
 
-	// node := karigo.NewNode(mem)
+	// Schema
+	schema := jsonapi.Schema{}
+	schema.AddType(typ)
 
-	// go node.Run()
+	// Source
+	src := &memory.Source{
+		ID:       "memory",
+		Location: "local",
+	}
+
+	// Journal
+	journal := &memory.Journal{}
+
+	// Node
+	node := karigo.NewNode(journal, src)
+	go node.Run()
 
 	// req := &karigo.RawRequest{
 	// 	Method: karigo.GET,
 	// 	URL:    "http://example.com/test",
 	// }
-	// res := node.Handle(req)
-	// if len(res.Errors) == 0 {
-	// 	t.Errorf("No errors occured.\n")
-	// }
+	req := httptest.NewRequest("GET", "/things", nil)
+	res := node.Handle(req)
+	if len(res.Errors) == 0 {
+		t.Errorf("No errors occured.\n")
+	}
 
-	// err := node.Close()
-	// if err == nil {
-	// 	t.Errorf("expected error, got nil")
-	// }
+	err := node.Close()
+	if err == nil {
+		t.Errorf("expected error, got nil")
+	}
 }

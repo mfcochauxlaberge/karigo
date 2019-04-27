@@ -509,67 +509,10 @@ func (m *Source) Reset() error {
 	})
 	m.schema.AddType(typ)
 
-	// TODO Add missing functions
 	m.data["0_funcs"] = set{
 		data: []record{
 			record{
-				id: "0_meta",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-						snap.Fail(ErrNotImplemented)
-					}`,
-				},
-			},
-			record{
-				id: "0_sets",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-						snap.Fail(ErrNotImplemented)
-					}`,
-				},
-			},
-			record{
-				id: "0_attrs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-						snap.Fail(ErrNotImplemented)
-					}`,
-				},
-			},
-			record{
-				id: "0_rels",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-						snap.Fail(ErrNotImplemented)
-					}`,
-				},
-			},
-			record{
-				id: "0_get-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-						snap.Fail(ErrNotImplemented)
-					}`,
-				},
-			},
-			record{
-				id: "0_create-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-						snap.Fail(ErrNotImplemented)
-					}`,
-				},
-			},
-			record{
-				id: "0_update-funcs",
-				vals: map[string]interface{}{
-					"func": `func(snap *Snapshot) error {
-						snap.Fail(ErrNotImplemented)
-					}`,
-				},
-			},
-			record{
-				id: "0_delete-funcs",
+				id: "_not_implemented",
 				vals: map[string]interface{}{
 					"func": `func(snap *Snapshot) error {
 						snap.Fail(ErrNotImplemented)

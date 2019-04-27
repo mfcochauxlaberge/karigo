@@ -216,9 +216,8 @@ func (s *Checkpoint) Commit() {
 
 // Fail ...
 func (s *Checkpoint) Fail(err error) {
-	// TODO
-	// if !s.ready {
-	// 	s.Ready()
-	// }
-	// s.err = err
+	if !s.ready {
+		s.Ready()
+	}
+	s.err = err
 }
