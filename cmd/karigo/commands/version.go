@@ -2,27 +2,39 @@ package commands
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"github.com/spf13/cobra"
 )
 
 var (
-	pretty *bool
+	beSimple *bool
+	showDeps *bool
 )
 
 var cmdVersion = &cobra.Command{
 	Use:   "version",
 	Short: "Show the version number",
-	// Args:  cobra.MinimumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		if *pretty {
-			fmt.Printf("Karigo v0.0.0\n")
-		} else {
-			fmt.Printf("v0.0.0\n")
+		bi, _ := debug.ReadBuildInfo()
+
+		if *beSimple {
+			fmt.Printf("%s \n", bi.Main.Version)
+			return
+		}
+
+		fmt.Printf("%s %s\n", bi.Main.Path, bi.Main.Version)
+
+		if *showDeps {
+			fmt.Printf("\n")
+			for _, mod := range bi.Deps {
+				fmt.Printf("%s %s\n", mod.Path, mod.Version)
+			}
 		}
 	},
 }
 
 func init() {
-	pretty = cmdVersion.Flags().BoolP("pretty", "p", false, "show prettier output")
+	beSimple = cmdVersion.Flags().BoolP("simple", "", false, "simply print the version")
+	showDeps = cmdVersion.Flags().BoolP("deps", "", false, "show dependencies")
 }

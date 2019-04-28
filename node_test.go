@@ -36,10 +36,8 @@ func TestNode(t *testing.T) {
 	node := karigo.NewNode(journal, src)
 	go node.Run()
 
-	// req := &karigo.RawRequest{
-	// 	Method: karigo.GET,
-	// 	URL:    "http://example.com/test",
-	// }
+	//
+
 	req := httptest.NewRequest("GET", "/things", nil)
 	res := node.Handle(req)
 	if len(res.Errors) == 0 {
