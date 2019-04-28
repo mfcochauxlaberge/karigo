@@ -36,6 +36,3 @@ type Request struct {
 	URL    *jsonapi.URL
 	Body   *jsonapi.Document
 }
-
-// Response ...
-type Response jsonapi.Document

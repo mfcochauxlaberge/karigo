@@ -41,12 +41,6 @@ func (s *source) version() uint64 {
 	return mv
 }
 
-// func (s *source) run() {
-// 	for {
-// 		time.Sleep(2 * time.Second)
-// 	}
-// }
-
 // SourceTx ...
 type SourceTx interface {
 	Apply([]Op) error

@@ -36,16 +36,9 @@ func TestNode(t *testing.T) {
 	node := karigo.NewNode(journal, src)
 	go node.Run()
 
-	//
-
 	req := httptest.NewRequest("GET", "/things", nil)
 	res := node.Handle(req)
 	if len(res.Errors) == 0 {
 		t.Errorf("No errors occured.\n")
-	}
-
-	err := node.Close()
-	if err == nil {
-		t.Errorf("expected error, got nil")
 	}
 }

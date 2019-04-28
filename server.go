@@ -2,6 +2,8 @@ package karigo
 
 import (
 	"net/http"
+
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 // Server ...
@@ -26,10 +28,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// node := s.Nodes[domain]
+	doc := s.Nodes[domain].Handle(r)
 
-	// rawreq := &RawRequest{}
-	// rawreq.URL = r.URL.RawPath
+	pl, err := jsonapi.Marshal(doc, nil)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 Internal Server Error"))
+	}
 
-	_ = s.Nodes[domain].Handle(r)
+	w.Write(pl)
 }

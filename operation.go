@@ -3,11 +3,6 @@ package karigo
 // Operations
 const (
 	OpSet = iota
-	// OpRem
-	// OpAdd
-	// OpReset
-	// OpInc
-	// OpDec
 )
 
 // Op ...
