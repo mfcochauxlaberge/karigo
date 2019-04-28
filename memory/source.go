@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"sync"
@@ -15,11 +16,11 @@ type Source struct {
 	ID       string
 	Location string
 
-	schema *jsonapi.Schema
-	data   map[string]set
+	// schema *jsonapi.Schema
+	data map[string]set
 
-	oldSchema *jsonapi.Schema
-	oldData   map[string]set
+	// oldSchema *jsonapi.Schema
+	oldData map[string]set
 
 	sync.Mutex
 }
@@ -29,59 +30,59 @@ func (m *Source) Reset() error {
 	m.Lock()
 	defer m.Unlock()
 
-	m.schema = &jsonapi.Schema{}
+	// m.schema = &jsonapi.Schema{}
 
 	// 0_meta
-	typ := jsonapi.Type{
-		Name: "0_meta",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "value",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	m.schema.AddType(typ)
+	// typ := jsonapi.Type{
+	// 	Name: "0_meta",
+	// }
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "value",
+	// 	Type: jsonapi.AttrTypeString,
+	// 	Null: false,
+	// })
+	// m.schema.AddType(typ)
 
 	m.data["0_meta"] = set{
 		data: []record{},
 	}
 
 	// 0_sets
-	typ = jsonapi.Type{
-		Name: "0_sets",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "name",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "version",
-		Type: jsonapi.AttrTypeUint,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "created",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "attrs",
-		Type:         "0_attrs",
-		ToOne:        false,
-		InverseName:  "set",
-		InverseType:  "0_sets",
-		InverseToOne: true,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "rels",
-		Type:         "0_rels",
-		ToOne:        false,
-		InverseName:  "set",
-		InverseType:  "0_sets",
-		InverseToOne: true,
-	})
-	m.schema.AddType(typ)
+	// typ = jsonapi.Type{
+	// 	Name: "0_sets",
+	// }
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "name",
+	// 	Type: jsonapi.AttrTypeString,
+	// 	Null: false,
+	// })
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "version",
+	// 	Type: jsonapi.AttrTypeUint,
+	// 	Null: false,
+	// })
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "created",
+	// 	Type: jsonapi.AttrTypeBool,
+	// 	Null: false,
+	// })
+	// typ.AddRel(jsonapi.Rel{
+	// 	Name:         "attrs",
+	// 	Type:         "0_attrs",
+	// 	ToOne:        false,
+	// 	InverseName:  "set",
+	// 	InverseType:  "0_sets",
+	// 	InverseToOne: true,
+	// })
+	// typ.AddRel(jsonapi.Rel{
+	// 	Name:         "rels",
+	// 	Type:         "0_rels",
+	// 	ToOne:        false,
+	// 	InverseName:  "set",
+	// 	InverseType:  "0_sets",
+	// 	InverseToOne: true,
+	// })
+	// m.schema.AddType(typ)
 
 	m.data["0_sets"] = set{
 		data: []record{
@@ -167,39 +168,39 @@ func (m *Source) Reset() error {
 		},
 	}
 
-	// 0_attrs
-	typ = jsonapi.Type{
-		Name: "0_attrs",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "name",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "type",
-		Type: jsonapi.AttrTypeUint,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "null",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "created",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "set",
-		Type:         "0_sets",
-		ToOne:        true,
-		InverseName:  "attrs",
-		InverseType:  "0_attrs",
-		InverseToOne: false,
-	})
-	m.schema.AddType(typ)
+	// // 0_attrs
+	// typ = jsonapi.Type{
+	// 	Name: "0_attrs",
+	// }
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "name",
+	// 	Type: jsonapi.AttrTypeString,
+	// 	Null: false,
+	// })
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "type",
+	// 	Type: jsonapi.AttrTypeUint,
+	// 	Null: false,
+	// })
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "null",
+	// 	Type: jsonapi.AttrTypeBool,
+	// 	Null: false,
+	// })
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "created",
+	// 	Type: jsonapi.AttrTypeBool,
+	// 	Null: false,
+	// })
+	// typ.AddRel(jsonapi.Rel{
+	// 	Name:         "set",
+	// 	Type:         "0_sets",
+	// 	ToOne:        true,
+	// 	InverseName:  "attrs",
+	// 	InverseType:  "0_attrs",
+	// 	InverseToOne: false,
+	// })
+	// m.schema.AddType(typ)
 
 	m.data["0_attrs"] = set{
 		data: []record{
@@ -326,42 +327,42 @@ func (m *Source) Reset() error {
 		},
 	}
 
-	// 0_rels
-	typ = jsonapi.Type{
-		Name: "0_rels",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "name",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "to-one",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "created",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "inverse",
-		Type:         "0_rels",
-		ToOne:        true,
-		InverseName:  "inverse",
-		InverseType:  "0_rels",
-		InverseToOne: true,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "set",
-		Type:         "0_sets",
-		ToOne:        true,
-		InverseName:  "rels",
-		InverseType:  "0_rels",
-		InverseToOne: false,
-	})
-	m.schema.AddType(typ)
+	// // 0_rels
+	// typ = jsonapi.Type{
+	// 	Name: "0_rels",
+	// }
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "name",
+	// 	Type: jsonapi.AttrTypeString,
+	// 	Null: false,
+	// })
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "to-one",
+	// 	Type: jsonapi.AttrTypeBool,
+	// 	Null: false,
+	// })
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "created",
+	// 	Type: jsonapi.AttrTypeBool,
+	// 	Null: false,
+	// })
+	// typ.AddRel(jsonapi.Rel{
+	// 	Name:         "inverse",
+	// 	Type:         "0_rels",
+	// 	ToOne:        true,
+	// 	InverseName:  "inverse",
+	// 	InverseType:  "0_rels",
+	// 	InverseToOne: true,
+	// })
+	// typ.AddRel(jsonapi.Rel{
+	// 	Name:         "set",
+	// 	Type:         "0_sets",
+	// 	ToOne:        true,
+	// 	InverseName:  "rels",
+	// 	InverseType:  "0_rels",
+	// 	InverseToOne: false,
+	// })
+	// m.schema.AddType(typ)
 
 	m.data["0_rels"] = set{
 		data: []record{
@@ -498,16 +499,16 @@ func (m *Source) Reset() error {
 		},
 	}
 
-	// 0_funcs
-	typ = jsonapi.Type{
-		Name: "funcs",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "func",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	m.schema.AddType(typ)
+	// // 0_funcs
+	// typ = jsonapi.Type{
+	// 	Name: "funcs",
+	// }
+	// typ.AddAttr(jsonapi.Attr{
+	// 	Name: "func",
+	// 	Type: jsonapi.AttrTypeString,
+	// 	Null: false,
+	// })
+	// m.schema.AddType(typ)
 
 	m.data["0_funcs"] = set{
 		data: []record{
@@ -522,10 +523,10 @@ func (m *Source) Reset() error {
 		},
 	}
 
-	errs := m.schema.Check()
-	if len(errs) > 0 {
-		return errs[0]
-	}
+	// errs := m.schema.Check()
+	// if len(errs) > 0 {
+	// 	return errs[0]
+	// }
 
 	return nil
 }
@@ -543,8 +544,8 @@ func (m *Source) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
 		}
 	}
 
-	typ, _ := m.schema.GetType(qry.Set)
-	res := jsonapi.NewSoftResource(typ, rec.vals)
+	// typ, _ := m.schema.GetType(qry.Set)
+	res := jsonapi.NewSoftResource(jsonapi.Type{}, rec.vals)
 
 	// Filter fields
 	for field := range rec.vals {
@@ -655,68 +656,91 @@ func (m *Source) Apply(ops []karigo.Op) error {
 }
 
 func (m *Source) opSet(set, id, field string, v interface{}) {
-	// fmt.Printf("set, id, field = %s, %s, %s (%v)\n", set, id, field, v)
+	fmt.Printf("set, id, field = %s, %s, %s (%v)\n", set, id, field, v)
 
-	// if id != "" && field != "id" {
-	// 	m.data[set][id][field] = v
-	// }
+	if id != "" && field != "id" {
+		m.data[set].data[id][field] = v
+		m.data[set].set(id, field, v)
+	}
 
-	// if id == "" && field == "id" {
-	// 	m.data[set][v.(string)] = map[string]interface{}{}
-	// 	// fmt.Printf("New entry inserted.\n")
-	// } else if strings.HasPrefix(set, "0_") && field == "created" {
-	// 	// If a set, attribute, or relationship is marked as created, create it.
-	// 	switch field {
-	// 	case "created":
-	// 		switch set {
-	// 		case "0_sets":
-	// 			name := m.data["0_sets"][id]["name"].(string)
-	// 			m.data[name] = map[string]map[string]interface{}{}
-	// 		case "0_attrs":
-	// 			name := m.data["0_attrs"][id]["name"].(string)
-	// 			typ := m.data["0_attrs"][id]["type"].(string)
-	// 			set := m.data["0_attrs"][id]["set"].(string)
-	// 			for id2 := range m.data[set] {
-	// 				fmt.Printf("Created: %s %s %s\n", set, id2, name)
-	// 				m.data[set][id2][name] = zeroVal(typ)
-	// 			}
-	// 		case "0_rels":
-	// 			name := m.data["0_rels"][id]["name"].(string)
-	// 			toOne := m.data["0_rels"][id]["to-one"].(bool)
-	// 			set := m.data["0_rels"][id]["set"].(string)
-	// 			for id2 := range m.data[set] {
-	// 				if toOne {
-	// 					m.data[set][id2][name] = ""
-	// 				} else {
-	// 					m.data[set][id2][name] = []string{}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	// fmt.Printf("created=true, new thing created.\n")
-	// } else {
-	// 	// if _, ok := m.data[set]; !ok {
-	// 	// 	fmt.Printf("Set %s does not exist.\n", set)
-	// 	// }
-	// 	// if _, ok := m.data[set][id]; !ok {
-	// 	// 	fmt.Printf("ID %s does not exist.\n", id)
-	// 	// }
-	// 	// if _, ok := m.data[set][id][field]; !ok {
-	// 	// 	fmt.Printf("Field %s does not exist.\n", field)
-	// 	// }
-	// 	m.data[set][id][field] = v
-	// }
-}
-
-type record struct {
-	schema *jsonapi.Schema
-	id     string
-	vals   map[string]interface{}
+	if id == "" && field == "id" {
+		m.data[set][v.(string)] = map[string]interface{}{}
+		// fmt.Printf("New entry inserted.\n")
+	} else if strings.HasPrefix(set, "0_") && field == "created" {
+		// If a set, attribute, or relationship is marked as created, create it.
+		switch field {
+		case "created":
+			switch set {
+			case "0_sets":
+				name := m.data["0_sets"][id]["name"].(string)
+				m.data[name] = map[string]map[string]interface{}{}
+			case "0_attrs":
+				name := m.data["0_attrs"][id]["name"].(string)
+				typ := m.data["0_attrs"][id]["type"].(string)
+				set := m.data["0_attrs"][id]["set"].(string)
+				for id2 := range m.data[set] {
+					fmt.Printf("Created: %s %s %s\n", set, id2, name)
+					m.data[set][id2][name] = zeroVal(typ)
+				}
+			case "0_rels":
+				name := m.data["0_rels"][id]["name"].(string)
+				toOne := m.data["0_rels"][id]["to-one"].(bool)
+				set := m.data["0_rels"][id]["set"].(string)
+				for id2 := range m.data[set] {
+					if toOne {
+						m.data[set][id2][name] = ""
+					} else {
+						m.data[set][id2][name] = []string{}
+					}
+				}
+			}
+		}
+		// fmt.Printf("created=true, new thing created.\n")
+	} else {
+		// if _, ok := m.data[set]; !ok {
+		// 	fmt.Printf("Set %s does not exist.\n", set)
+		// }
+		// if _, ok := m.data[set][id]; !ok {
+		// 	fmt.Printf("ID %s does not exist.\n", id)
+		// }
+		// if _, ok := m.data[set][id][field]; !ok {
+		// 	fmt.Printf("Field %s does not exist.\n", field)
+		// }
+		m.data[set][id][field] = v
+	}
 }
 
 type set struct {
-	data []record
-	sort []string
+	data       map[string]*record
+	sortedData []*record
+	sort       []string
+}
+
+func (s *set) add(rec *record) {
+	s.data[rec.id] = rec
+
+	// rec already exists
+	if _, ok := s.data[rec.id]; ok {
+		for i := range s.sortedData {
+			if s.sortedData[i].id == rec.id {
+				s.sortedData[i] = rec
+			}
+		}
+	}
+
+	// rec does not exist
+	s.sortedData = append(s.data, rec)
+}
+
+func (s *set) set(id string, field string, v interface{}) {
+	// id should already exist
+	if _, ok := s.data[rec.id]; ok {
+		for i := range s.data {
+			if s.data[i].id == rec.id {
+				s.data[i] = rec
+			}
+		}
+	}
 }
 
 // Len ...
@@ -933,4 +957,9 @@ func (s *set) Less(i, j int) bool {
 	}
 
 	return less
+}
+
+type record struct {
+	id   string
+	vals map[string]interface{}
 }
