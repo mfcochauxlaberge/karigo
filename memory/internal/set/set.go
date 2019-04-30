@@ -26,8 +26,8 @@ func (s *Set) Resource(id string, fields []string) jsonapi.Resource {
 	return s.data[id].Resource(fields)
 }
 
-// GetMany ...
-func (s *Set) GetMany(ids []string, _ *jsonapi.Condition, sort []string, fields []string, pageSize uint, pageNumber uint) []jsonapi.Resource {
+// Collection ...
+func (s *Set) Collection(ids []string, _ *jsonapi.Condition, sort []string, fields []string, pageSize uint, pageNumber uint) []jsonapi.Resource {
 	s.Lock()
 	defer s.Unlock()
 	s.check()
