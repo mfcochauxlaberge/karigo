@@ -538,7 +538,7 @@ func (m *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
 	}
 
 	// Get all records from the given set
-	recs := m.data[qry.Set].GetMany(
+	recs := m.data[qry.Set].Collection(
 		ids,
 		nil,
 		qry.Sort,
