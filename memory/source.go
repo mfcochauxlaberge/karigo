@@ -1,6 +1,8 @@
 package memory
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -552,14 +554,6 @@ func (m *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
 	return recs, nil
 }
 
-// Begin ...
-func (m *Source) Begin() (karigo.SourceTx, error) {
-	// m.Lock()
-	// defer m.sUnlock()
-
-	return nil, nil
-}
-
 // Apply ...
 func (m *Source) Apply(ops []karigo.Op) error {
 	m.Lock()
@@ -570,57 +564,45 @@ func (m *Source) Apply(ops []karigo.Op) error {
 	return nil
 }
 
-func (m *Source) opSet(set, id, field string, v interface{}) {
-	// fmt.Printf("set, id, field = %s, %s, %s (%v)\n", set, id, field, v)
+func (m *Source) opSet(typ, id, field string, v interface{}) {
+	fmt.Printf("set, id, field = %s, %s, %s (%v)\n", typ, id, field, v)
 
-	// if id != "" && field != "id" {
-	// 	m.data[set].data[id][field] = v
-	// 	m.data[set].set(id, field, v)
-	// }
+	if id != "" && field != "id" {
+		m.data[typ].Set(id, field, v)
+	}
 
-	// if id == "" && field == "id" {
-	// 	m.data[set][v.(string)] = map[string]interface{}{}
-	// 	// fmt.Printf("New entry inserted.\n")
-	// } else if strings.HasPrefix(set, "0_") && field == "created" {
-	// 	// If a set, attribute, or relationship is marked as created, create it.
-	// 	switch field {
-	// 	case "created":
-	// 		switch set {
-	// 		case "0_sets":
-	// 			name := m.data["0_sets"][id]["name"].(string)
-	// 			m.data[name] = map[string]map[string]interface{}{}
-	// 		case "0_attrs":
-	// 			name := m.data["0_attrs"][id]["name"].(string)
-	// 			typ := m.data["0_attrs"][id]["type"].(string)
-	// 			set := m.data["0_attrs"][id]["set"].(string)
-	// 			for id2 := range m.data[set] {
-	// 				fmt.Printf("Created: %s %s %s\n", set, id2, name)
-	// 				m.data[set][id2][name] = zeroVal(typ)
-	// 			}
-	// 		case "0_rels":
-	// 			name := m.data["0_rels"][id]["name"].(string)
-	// 			toOne := m.data["0_rels"][id]["to-one"].(bool)
-	// 			set := m.data["0_rels"][id]["set"].(string)
-	// 			for id2 := range m.data[set] {
-	// 				if toOne {
-	// 					m.data[set][id2][name] = ""
-	// 				} else {
-	// 					m.data[set][id2][name] = []string{}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	// fmt.Printf("created=true, new thing created.\n")
-	// } else {
-	// 	// if _, ok := m.data[set]; !ok {
-	// 	// 	fmt.Printf("Set %s does not exist.\n", set)
-	// 	// }
-	// 	// if _, ok := m.data[set][id]; !ok {
-	// 	// 	fmt.Printf("ID %s does not exist.\n", id)
-	// 	// }
-	// 	// if _, ok := m.data[set][id][field]; !ok {
-	// 	// 	fmt.Printf("Field %s does not exist.\n", field)
-	// 	// }
-	// 	m.data[set][id][field] = v
-	// }
+	if id == "" && field == "id" {
+		m.data[typ].Add(set.NewRecord(v.(string), map[string]interface{}{}))
+	} else if strings.HasPrefix(typ, "0_") && field == "created" {
+		// If a set, attribute, or relationship is marked as created, create it.
+		switch field {
+		case "created":
+			switch typ {
+			case "0_sets":
+				name := m.data["0_sets"][id]["name"].(string)
+				m.data[name] = map[string]map[string]interface{}{}
+			case "0_attrs":
+				name := m.data["0_attrs"][id]["name"].(string)
+				typ := m.data["0_attrs"][id]["type"].(string)
+				set := m.data["0_attrs"][id]["set"].(string)
+				for id2 := range m.data[set] {
+					fmt.Printf("Created: %s %s %s\n", set, id2, name)
+					m.data[set][id2][name] = zeroVal(typ)
+				}
+			case "0_rels":
+				name := m.data["0_rels"][id]["name"].(string)
+				toOne := m.data["0_rels"][id]["to-one"].(bool)
+				set := m.data["0_rels"][id]["set"].(string)
+				for id2 := range m.data[set] {
+					if toOne {
+						m.data[set][id2][name] = ""
+					} else {
+						m.data[set][id2][name] = []string{}
+					}
+				}
+			}
+		}
+	} else {
+		m.data[set][id][field] = v
+	}
 }
