@@ -60,6 +60,7 @@ Each request that modifies at least one resource needs to append a transaction t
  - [ ] GET request
  - [ ] POST/PATCH/DELETE requests
  - [ ] SQL generator
+ - [ ] Transactions
  - [ ] CLI application
 
 ## Documentation
