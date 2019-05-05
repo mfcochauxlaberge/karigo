@@ -27,6 +27,8 @@ func (m *Source) Reset() error {
 	m.Lock()
 	defer m.Unlock()
 
+	m.data = map[string]*set.Set{}
+
 	// m.schema = &jsonapi.Schema{}
 
 	// 0_meta
