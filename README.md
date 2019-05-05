@@ -57,6 +57,7 @@ Each request that modifies at least one resource needs to append a transaction t
 
  - [ ] Basic log and operations
  - [ ] In-memory source and log
+ - [ ] Logging and tracing
  - [ ] GET request
  - [ ] POST/PATCH/DELETE requests
  - [ ] SQL generator
