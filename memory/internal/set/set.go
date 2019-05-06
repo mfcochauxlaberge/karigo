@@ -17,6 +17,15 @@ type Set struct {
 	sync.Mutex
 }
 
+// Key ...
+func (s *Set) Key(id string, field string) interface{} {
+	s.Lock()
+	defer s.Unlock()
+	s.check()
+
+	return s.data[id].vals[field]
+}
+
 // Resource ...
 func (s *Set) Resource(id string, fields []string) jsonapi.Resource {
 	s.Lock()

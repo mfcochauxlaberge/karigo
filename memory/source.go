@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 
@@ -384,7 +383,7 @@ func (m *Source) Reset() error {
 			"name":    "get_func",
 			"to-one":  true,
 			"created": true,
-			"inverse": "", // Inverse?
+			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
 	))
@@ -394,7 +393,7 @@ func (m *Source) Reset() error {
 			"name":    "create_func",
 			"to-one":  true,
 			"created": true,
-			"inverse": "", // Inverse?
+			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
 	))
@@ -404,7 +403,7 @@ func (m *Source) Reset() error {
 			"name":    "update_func",
 			"to-one":  true,
 			"created": true,
-			"inverse": "", // Inverse?
+			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
 	))
@@ -414,7 +413,7 @@ func (m *Source) Reset() error {
 			"name":    "delete_func",
 			"to-one":  true,
 			"created": true,
-			"inverse": "", // Inverse?
+			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
 	))
@@ -564,30 +563,30 @@ func (m *Source) Apply(ops []karigo.Op) error {
 	return nil
 }
 
-func (m *Source) opSet(typ, id, field string, v interface{}) {
-	fmt.Printf("set, id, field = %s, %s, %s (%v)\n", typ, id, field, v)
+func (m *Source) opSet(setname, id, field string, v interface{}) {
+	// fmt.Printf("set, id, field = %s, %s, %s (%v)\n", setname, id, field, v)
 
 	if id != "" && field != "id" {
-		m.data[typ].Set(id, field, v)
+		m.data[setname].Set(id, field, v)
 	}
 
 	if id == "" && field == "id" {
-		m.data[typ].Add(set.NewRecord(v.(string), map[string]interface{}{}))
-	} else if strings.HasPrefix(typ, "0_") && field == "created" {
+		m.data[setname].Add(set.NewRecord(v.(string), map[string]interface{}{}))
+	} else if strings.HasPrefix(setname, "0_") && field == "created" {
 		// If a set, attribute, or relationship is marked as created, create it.
 		switch field {
 		case "created":
-			switch typ {
+			switch setname {
 			case "0_sets":
-				name := m.data["0_sets"][id]["name"].(string)
-				m.data[name] = map[string]map[string]interface{}{}
+				name := m.data["0_sets"].Key(id, "name").(string)
+				m.data[name] = &set.Set{}
 			case "0_attrs":
-				name := m.data["0_attrs"][id]["name"].(string)
-				typ := m.data["0_attrs"][id]["type"].(string)
-				set := m.data["0_attrs"][id]["set"].(string)
+				name := m.data["0_attrs"].Key(id, "name").(string)
+				fieldType := m.data["0_attrs"].Key(id, "type").(string)
+				set := m.data["0_attrs"].Key(id, "set").(string)
 				for id2 := range m.data[set] {
-					fmt.Printf("Created: %s %s %s\n", set, id2, name)
-					m.data[set][id2][name] = zeroVal(typ)
+					// fmt.Printf("Created: %s %s %s\n", set, id2, name)
+					m.data[set][id2][name] = jsonapi.GetZeroValue(fieldType)
 				}
 			case "0_rels":
 				name := m.data["0_rels"][id]["name"].(string)
