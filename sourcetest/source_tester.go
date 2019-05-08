@@ -20,12 +20,6 @@ func Test(src karigo.Source) error {
 			return err
 		}
 
-		// Begin transaction
-		// tx, err := src.Begin()
-		// if err != nil {
-		// 	return err
-		// }
-
 		// Run each step
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {

@@ -557,7 +557,12 @@ func (m *Source) Apply(ops []karigo.Op) error {
 	m.Lock()
 	defer m.Unlock()
 
-	// TODO Create a mtx, apply the ops, commit it
+	for _, op := range ops {
+		switch op.Op {
+		case karigo.OpSet:
+			m.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
+		}
+	}
 
 	return nil
 }
@@ -569,9 +574,18 @@ func (m *Source) opSet(setname, id, field string, v interface{}) {
 		// Set a field
 		m.data[setname].Set(id, field, v)
 	} else if id == "" && field == "id" {
-		// New resource
+		// Create a resource
+
+		// Before, check whether it's a new set because then it
+		// requires a new entry in m.data.
+		if setname == "0_sets" {
+			m.data[v.(string)] = &set.Set{}
+		}
+
 		m.data[setname].Add(set.NewRecord(v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" {
+		// Delete a resource
+
 		if v.(string) == "" {
 			m.data[setname].Del(id)
 		}
