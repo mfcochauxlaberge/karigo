@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"strings"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -60,7 +59,7 @@ func (m *Source) Reset() error {
 	// 	Null: false,
 	// })
 	// typ.AddAttr(jsonapi.Attr{
-	// 	Name: "created",
+	// 	Name: "active",
 	// 	Type: jsonapi.AttrTypeBool,
 	// 	Null: false,
 	// })
@@ -88,7 +87,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "0_meta",
 			"version": 0,
-			"created": true,
+			"active":  true,
 			"attrs": []string{
 				"0_meta_value",
 			},
@@ -99,11 +98,11 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "0_sets",
 			"version": 0,
-			"created": true,
+			"active":  true,
 			"attrs": []string{
 				"0_sets_name",
 				"0_sets_version",
-				"0_sets_created",
+				"0_sets_active",
 			},
 			"rels": []string{
 				"0_sets_attrs",
@@ -120,12 +119,12 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "0_attrs",
 			"version": 0,
-			"created": true,
+			"active":  true,
 			"attrs": []string{
 				"0_attrs_name",
 				"0_attrs_type",
 				"0_attrs_null",
-				"0_attrs_created",
+				"0_attrs_active",
 			},
 			"rels": []string{
 				"0_attrs_set",
@@ -137,11 +136,11 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "0_rels",
 			"version": 0,
-			"created": true,
+			"active":  true,
 			"attrs": []string{
 				"0_rels_name",
 				"0_rels_to-one",
-				"0_rels_created",
+				"0_rels_active",
 			},
 			"rels": []string{
 				"0_rels_set",
@@ -153,7 +152,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "0_funcs",
 			"version": 0,
-			"created": true,
+			"active":  true,
 			"attrs": []string{
 				"0_funcs_func",
 			},
@@ -183,7 +182,7 @@ func (m *Source) Reset() error {
 	// 	Null: false,
 	// })
 	// typ.AddAttr(jsonapi.Attr{
-	// 	Name: "created",
+	// 	Name: "active",
 	// 	Type: jsonapi.AttrTypeBool,
 	// 	Null: false,
 	// })
@@ -201,121 +200,121 @@ func (m *Source) Reset() error {
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_meta_value",
 		map[string]interface{}{
-			"name":    "value",
-			"type":    "string",
-			"null":    false,
-			"created": true,
-			"set":     "0_meta",
+			"name":   "value",
+			"type":   "string",
+			"null":   false,
+			"active": true,
+			"set":    "0_meta",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_sets_name",
 		map[string]interface{}{
-			"name":    "name",
-			"type":    "string",
-			"null":    false,
-			"created": true,
-			"set":     "0_sets",
+			"name":   "name",
+			"type":   "string",
+			"null":   false,
+			"active": true,
+			"set":    "0_sets",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_sets_version",
 		map[string]interface{}{
-			"name":    "version",
-			"type":    "int",
-			"null":    false,
-			"created": true,
-			"set":     "0_sets",
+			"name":   "version",
+			"type":   "int",
+			"null":   false,
+			"active": true,
+			"set":    "0_sets",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
-		"0_sets_created",
+		"0_sets_active",
 		map[string]interface{}{
-			"name":    "created",
-			"type":    "bool",
-			"null":    false,
-			"created": true,
-			"set":     "0_sets",
+			"name":   "active",
+			"type":   "bool",
+			"null":   false,
+			"active": true,
+			"set":    "0_sets",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_name",
 		map[string]interface{}{
-			"name":    "name",
-			"type":    "string",
-			"null":    false,
-			"created": true,
-			"set":     "0_attrs",
+			"name":   "name",
+			"type":   "string",
+			"null":   false,
+			"active": true,
+			"set":    "0_attrs",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_type",
 		map[string]interface{}{
-			"name":    "type",
-			"type":    "string",
-			"null":    false,
-			"created": true,
-			"set":     "0_attrs",
+			"name":   "type",
+			"type":   "string",
+			"null":   false,
+			"active": true,
+			"set":    "0_attrs",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_null",
 		map[string]interface{}{
-			"name":    "null",
-			"type":    "bool",
-			"null":    false,
-			"created": true,
-			"set":     "0_attrs",
+			"name":   "null",
+			"type":   "bool",
+			"null":   false,
+			"active": true,
+			"set":    "0_attrs",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
-		"0_attrs_created",
+		"0_attrs_active",
 		map[string]interface{}{
-			"name":    "created",
-			"type":    "bool",
-			"null":    false,
-			"created": true,
-			"set":     "0_attrs",
+			"name":   "active",
+			"type":   "bool",
+			"null":   false,
+			"active": true,
+			"set":    "0_attrs",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_rels_name",
 		map[string]interface{}{
-			"name":    "name",
-			"type":    "string",
-			"null":    false,
-			"created": true,
-			"set":     "0_rels",
+			"name":   "name",
+			"type":   "string",
+			"null":   false,
+			"active": true,
+			"set":    "0_rels",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_rels_to-one",
 		map[string]interface{}{
-			"name":    "to-one",
-			"type":    "bool",
-			"null":    false,
-			"created": true,
-			"set":     "0_rels",
+			"name":   "to-one",
+			"type":   "bool",
+			"null":   false,
+			"active": true,
+			"set":    "0_rels",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
-		"0_rels_created",
+		"0_rels_active",
 		map[string]interface{}{
-			"name":    "created",
-			"type":    "bool",
-			"null":    false,
-			"created": true,
-			"set":     "0_rels",
+			"name":   "active",
+			"type":   "bool",
+			"null":   false,
+			"active": true,
+			"set":    "0_rels",
 		},
 	))
 	m.data["0_sets"].Add(set.NewRecord(
 		"0_funcs_func",
 		map[string]interface{}{
-			"name":    "func",
-			"type":    "string",
-			"null":    false,
-			"created": true,
-			"set":     "0_funcs",
+			"name":   "func",
+			"type":   "string",
+			"null":   false,
+			"active": true,
+			"set":    "0_funcs",
 		},
 	))
 
@@ -334,7 +333,7 @@ func (m *Source) Reset() error {
 	// 	Null: false,
 	// })
 	// typ.AddAttr(jsonapi.Attr{
-	// 	Name: "created",
+	// 	Name: "active",
 	// 	Type: jsonapi.AttrTypeBool,
 	// 	Null: false,
 	// })
@@ -362,7 +361,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "attrs",
 			"to-one":  false,
-			"created": true,
+			"active":  true,
 			"inverse": "0_attrs_set",
 			"set":     "0_sets",
 		},
@@ -372,7 +371,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "rels",
 			"to-one":  false,
-			"created": true,
+			"active":  true,
 			"inverse": "0_rels_set",
 			"set":     "0_sets",
 		},
@@ -382,7 +381,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "get_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
@@ -392,7 +391,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "create_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
@@ -402,7 +401,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "update_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
@@ -412,7 +411,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "delete_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "", // TODO Inverse?
 			"set":     "0_funcs",
 		},
@@ -422,7 +421,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "set",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "0_sets_attrs",
 			"set":     "0_attrs",
 		},
@@ -432,7 +431,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "inverse",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "0_rels_inverse",
 			"set":     "0_rels",
 		},
@@ -442,7 +441,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "set",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "0_sets_rels",
 			"set":     "0_rels",
 		},
@@ -452,7 +451,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "get_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "0_sets_rels",
 			"set":     "0_funcs",
 		},
@@ -462,7 +461,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "create_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "0_sets_rels",
 			"set":     "0_funcs",
 		},
@@ -472,7 +471,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "update_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "0_sets_rels",
 			"set":     "0_funcs",
 		},
@@ -482,7 +481,7 @@ func (m *Source) Reset() error {
 		map[string]interface{}{
 			"name":    "delete_func",
 			"to-one":  true,
-			"created": true,
+			"active":  true,
 			"inverse": "0_sets_rels",
 			"set":     "0_funcs",
 		},
@@ -567,41 +566,17 @@ func (m *Source) opSet(setname, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s (%v)\n", setname, id, field, v)
 
 	if id != "" && field != "id" {
+		// Set a field
 		m.data[setname].Set(id, field, v)
-	}
-
-	if id == "" && field == "id" {
+	} else if id == "" && field == "id" {
+		// New resource
 		m.data[setname].Add(set.NewRecord(v.(string), map[string]interface{}{}))
-	} else if strings.HasPrefix(setname, "0_") && field == "created" {
-		// If a set, attribute, or relationship is marked as created, create it.
-		switch field {
-		case "created":
-			switch setname {
-			case "0_sets":
-				name := m.data["0_sets"].Key(id, "name").(string)
-				m.data[name] = &set.Set{}
-			case "0_attrs":
-				name := m.data["0_attrs"].Key(id, "name").(string)
-				fieldType := m.data["0_attrs"].Key(id, "type").(string)
-				set := m.data["0_attrs"].Key(id, "set").(string)
-				for id2 := range m.data[set] {
-					// fmt.Printf("Created: %s %s %s\n", set, id2, name)
-					m.data[set][id2][name] = jsonapi.GetZeroValue(fieldType)
-				}
-			case "0_rels":
-				name := m.data["0_rels"][id]["name"].(string)
-				toOne := m.data["0_rels"][id]["to-one"].(bool)
-				set := m.data["0_rels"][id]["set"].(string)
-				for id2 := range m.data[set] {
-					if toOne {
-						m.data[set][id2][name] = ""
-					} else {
-						m.data[set][id2][name] = []string{}
-					}
-				}
-			}
+	} else if id != "" && field == "id" {
+		if v.(string) == "" {
+			m.data[setname].Del(id)
 		}
 	} else {
-		m.data[set][id][field] = v
+		// Should not happen
+		// TODO Should this code path be reported?
 	}
 }

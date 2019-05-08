@@ -21,37 +21,37 @@ func Test(src karigo.Source) error {
 		}
 
 		// Begin transaction
-		tx, err := src.Begin()
-		if err != nil {
-			return err
-		}
+		// tx, err := src.Begin()
+		// if err != nil {
+		// 	return err
+		// }
 
 		// Run each step
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
 			case karigo.Op:
-				err := tx.Apply([]karigo.Op{s})
+				err := src.Apply([]karigo.Op{s})
 				if err != nil {
 					return err
 				}
 			case []karigo.Op:
-				err := tx.Apply(s)
+				err := src.Apply(s)
 				if err != nil {
 					return err
 				}
-			case string:
-				switch s {
-				case "rollback":
-					err = tx.Rollback()
-					if err != nil {
-						return err
-					}
-				case "commit":
-					err = tx.Commit()
-					if err != nil {
-						return err
-					}
-				}
+			// case string:
+			// 	switch s {
+			// 	case "rollback":
+			// 		err = srcRollback()
+			// 		if err != nil {
+			// 			return err
+			// 		}
+			// 	case "commit":
+			// 		err = srcCommit()
+			// 		if err != nil {
+			// 			return err
+			// 		}
+			// 	}
 			default:
 				return errors.New("karigo: unknown step")
 			}

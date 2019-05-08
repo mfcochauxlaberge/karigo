@@ -117,6 +117,15 @@ func (s *Set) Set(id string, field string, v interface{}) {
 	}
 }
 
+// Del ...
+func (s *Set) Del(id string) {
+	s.Lock()
+	defer s.Unlock()
+	s.check()
+
+	delete(s.data, id)
+}
+
 // Sort ...
 func (s *Set) Sort(sort []string) {
 

@@ -12,16 +12,15 @@ type Source interface {
 
 	Resource(QueryRes) (jsonapi.Resource, error)
 	Collection(QueryCol) ([]jsonapi.Resource, error)
-
-	Begin() (SourceTx, error)
+	Apply([]Op) error
 }
 
 // DirectSource ...
-type DirectSource interface {
-	Source
+// type DirectSource interface {
+// 	Source
 
-	Apply(ops []Op) error
-}
+// 	Apply(ops []Op) error
+// }
 
 // source is a thin convenient wrapper for a Source.
 type source struct {
