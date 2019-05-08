@@ -585,7 +585,6 @@ func (m *Source) opSet(setname, id, field string, v interface{}) {
 		m.data[setname].Add(set.NewRecord(v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" {
 		// Delete a resource
-
 		if v.(string) == "" {
 			m.data[setname].Del(id)
 		}
