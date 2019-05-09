@@ -23,13 +23,13 @@ type Source struct {
 }
 
 // Reset ...
-func (m *Source) Reset() error {
-	m.Lock()
-	defer m.Unlock()
+func (s *Source) Reset() error {
+	s.Lock()
+	defer s.Unlock()
 
-	m.data = map[string]*set.Set{}
+	s.data = map[string]*set.Set{}
 
-	// m.schema = &jsonapi.Schema{}
+	// s.schema = &jsonapi.Schema{}
 
 	// 0_meta
 	// typ := jsonapi.Type{
@@ -40,9 +40,9 @@ func (m *Source) Reset() error {
 	// 	Type: jsonapi.AttrTypeString,
 	// 	Null: false,
 	// })
-	// m.schema.AddType(typ)
+	// s.schema.AddType(typ)
 
-	m.data["0_meta"] = &set.Set{}
+	s.data["0_meta"] = &set.Set{}
 
 	// 0_sets
 	// typ = jsonapi.Type{
@@ -79,10 +79,10 @@ func (m *Source) Reset() error {
 	// 	InverseType:  "0_sets",
 	// 	InverseToOne: true,
 	// })
-	// m.schema.AddType(typ)
+	// s.schema.AddType(typ)
 
-	m.data["0_sets"] = &set.Set{}
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"] = &set.Set{}
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_meta",
 		map[string]interface{}{
 			"name":    "0_meta",
@@ -93,7 +93,7 @@ func (m *Source) Reset() error {
 			},
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets",
 		map[string]interface{}{
 			"name":    "0_sets",
@@ -114,7 +114,7 @@ func (m *Source) Reset() error {
 			},
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_attrs",
 		map[string]interface{}{
 			"name":    "0_attrs",
@@ -131,7 +131,7 @@ func (m *Source) Reset() error {
 			},
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_rels",
 		map[string]interface{}{
 			"name":    "0_rels",
@@ -147,7 +147,7 @@ func (m *Source) Reset() error {
 			},
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_funcs",
 		map[string]interface{}{
 			"name":    "0_funcs",
@@ -194,10 +194,10 @@ func (m *Source) Reset() error {
 	// 	InverseType:  "0_attrs",
 	// 	InverseToOne: false,
 	// })
-	// m.schema.AddType(typ)
+	// s.schema.AddType(typ)
 
-	m.data["0_attrs"] = &set.Set{}
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_attrs"] = &set.Set{}
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_meta_value",
 		map[string]interface{}{
 			"name":   "value",
@@ -207,7 +207,7 @@ func (m *Source) Reset() error {
 			"set":    "0_meta",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -217,7 +217,7 @@ func (m *Source) Reset() error {
 			"set":    "0_sets",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_version",
 		map[string]interface{}{
 			"name":   "version",
@@ -227,7 +227,7 @@ func (m *Source) Reset() error {
 			"set":    "0_sets",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -237,7 +237,7 @@ func (m *Source) Reset() error {
 			"set":    "0_sets",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -247,7 +247,7 @@ func (m *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_type",
 		map[string]interface{}{
 			"name":   "type",
@@ -257,7 +257,7 @@ func (m *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_null",
 		map[string]interface{}{
 			"name":   "null",
@@ -267,7 +267,7 @@ func (m *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -277,7 +277,7 @@ func (m *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_rels_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -287,7 +287,7 @@ func (m *Source) Reset() error {
 			"set":    "0_rels",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_rels_to-one",
 		map[string]interface{}{
 			"name":   "to-one",
@@ -297,7 +297,7 @@ func (m *Source) Reset() error {
 			"set":    "0_rels",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_rels_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -307,7 +307,7 @@ func (m *Source) Reset() error {
 			"set":    "0_rels",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_funcs_func",
 		map[string]interface{}{
 			"name":   "func",
@@ -353,10 +353,10 @@ func (m *Source) Reset() error {
 	// 	InverseType:  "0_rels",
 	// 	InverseToOne: false,
 	// })
-	// m.schema.AddType(typ)
+	// s.schema.AddType(typ)
 
-	m.data["0_rels"] = &set.Set{}
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_rels"] = &set.Set{}
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_attrs",
 		map[string]interface{}{
 			"name":    "attrs",
@@ -366,7 +366,7 @@ func (m *Source) Reset() error {
 			"set":     "0_sets",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_rels",
 		map[string]interface{}{
 			"name":    "rels",
@@ -376,7 +376,7 @@ func (m *Source) Reset() error {
 			"set":     "0_sets",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_get_func",
 		map[string]interface{}{
 			"name":    "get_func",
@@ -386,7 +386,7 @@ func (m *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_create_func",
 		map[string]interface{}{
 			"name":    "create_func",
@@ -396,7 +396,7 @@ func (m *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_update_func",
 		map[string]interface{}{
 			"name":    "update_func",
@@ -406,7 +406,7 @@ func (m *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_sets_delete_func",
 		map[string]interface{}{
 			"name":    "delete_func",
@@ -416,7 +416,7 @@ func (m *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_attrs_set",
 		map[string]interface{}{
 			"name":    "set",
@@ -426,7 +426,7 @@ func (m *Source) Reset() error {
 			"set":     "0_attrs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_rels_inverse",
 		map[string]interface{}{
 			"name":    "inverse",
@@ -436,7 +436,7 @@ func (m *Source) Reset() error {
 			"set":     "0_rels",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_rels_set",
 		map[string]interface{}{
 			"name":    "set",
@@ -446,7 +446,7 @@ func (m *Source) Reset() error {
 			"set":     "0_rels",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_funcs_get_func",
 		map[string]interface{}{
 			"name":    "get_func",
@@ -456,7 +456,7 @@ func (m *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_funcs_create_func",
 		map[string]interface{}{
 			"name":    "create_func",
@@ -466,7 +466,7 @@ func (m *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_funcs_update_func",
 		map[string]interface{}{
 			"name":    "update_func",
@@ -476,7 +476,7 @@ func (m *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(set.NewRecord(
 		"0_funcs_delete_func",
 		map[string]interface{}{
 			"name":    "delete_func",
@@ -496,10 +496,10 @@ func (m *Source) Reset() error {
 	// 	Type: jsonapi.AttrTypeString,
 	// 	Null: false,
 	// })
-	// m.schema.AddType(typ)
+	// s.schema.AddType(typ)
 
-	m.data["0_funcs"] = &set.Set{}
-	m.data["0_sets"].Add(set.NewRecord(
+	s.data["0_funcs"] = &set.Set{}
+	s.data["0_sets"].Add(set.NewRecord(
 		"_not_implemented",
 		map[string]interface{}{
 			"func": `func(snap *Snapshot) error {
@@ -508,7 +508,7 @@ func (m *Source) Reset() error {
 		},
 	))
 
-	// errs := m.schema.Check()
+	// errs := s.schema.Check()
 	// if len(errs) > 0 {
 	// 	return errs[0]
 	// }
@@ -517,30 +517,30 @@ func (m *Source) Reset() error {
 }
 
 // Resource ...
-func (m *Source) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
-	m.Lock()
-	defer m.Unlock()
+func (s *Source) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
+	s.Lock()
+	defer s.Unlock()
 
 	// Get resource
-	res := m.data[qry.Set].Resource(qry.ID, qry.Fields)
+	res := s.data[qry.Set].Resource(qry.ID, qry.Fields)
 
 	return res, nil
 }
 
 // Collection ...
-func (m *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
-	m.Lock()
-	defer m.Unlock()
+func (s *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
+	s.Lock()
+	defer s.Unlock()
 
 	// BelongsToFilter
 	var ids []string
 	if qry.BelongsToFilter.ID != "" {
-		res := m.data[qry.BelongsToFilter.Type].Resource(qry.BelongsToFilter.ID, []string{})
+		res := s.data[qry.BelongsToFilter.Type].Resource(qry.BelongsToFilter.ID, []string{})
 		ids = res.GetToMany(qry.BelongsToFilter.Name)
 	}
 
 	// Get all records from the given set
-	recs := m.data[qry.Set].Collection(
+	recs := s.data[qry.Set].Collection(
 		ids,
 		nil,
 		qry.Sort,
@@ -553,40 +553,40 @@ func (m *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
 }
 
 // Apply ...
-func (m *Source) Apply(ops []karigo.Op) error {
-	m.Lock()
-	defer m.Unlock()
+func (s *Source) Apply(ops []karigo.Op) error {
+	s.Lock()
+	defer s.Unlock()
 
 	for _, op := range ops {
 		switch op.Op {
 		case karigo.OpSet:
-			m.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
+			s.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
 		}
 	}
 
 	return nil
 }
 
-func (m *Source) opSet(setname, id, field string, v interface{}) {
+func (s *Source) opSet(setname, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s (%v)\n", setname, id, field, v)
 
 	if id != "" && field != "id" {
 		// Set a field
-		m.data[setname].Set(id, field, v)
+		s.data[setname].Set(id, field, v)
 	} else if id == "" && field == "id" {
 		// Create a resource
 
 		// Before, check whether it's a new set because then it
-		// requires a new entry in m.data.
+		// requires a new entry in s.data.
 		if setname == "0_sets" {
-			m.data[v.(string)] = &set.Set{}
+			s.data[v.(string)] = &set.Set{}
 		}
 
-		m.data[setname].Add(set.NewRecord(v.(string), map[string]interface{}{}))
+		s.data[setname].Add(set.NewRecord(v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" {
 		// Delete a resource
 		if v.(string) == "" {
-			m.data[setname].Del(id)
+			s.data[setname].Del(id)
 		}
 	} else {
 		// Should not happen

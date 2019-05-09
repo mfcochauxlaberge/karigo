@@ -2,7 +2,6 @@ package sourcetest
 
 import (
 	"errors"
-	"math"
 
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/sourcetest/internal/scenarios"
@@ -52,20 +51,27 @@ func Test(src karigo.Source) error {
 		}
 
 		// Check
-		for set := range scenario.Verif {
-			col, err := src.Collection(karigo.QueryCol{
-				Set: set,
-				// Fields: []string{}, TODO Fields?
-				// Sort: []string{}, TODO Sorting?
-				PageSize: int(math.MaxInt64),
-			})
-			if err != nil {
-				return err
-			}
-			if col == nil {
-				return errors.New("no collection returned")
-			}
-		}
+		// TODO Check the result
+		// sort.Strings(scenario.Verif)
+		// keys := src.keys()
+		// sort.Strings(keys)
+		// for _, k1 := range scenario.Verif {
+		// 	for _, k2 := range src.keys() {
+
+		// 		// col, err := src.Collection(karigo.QueryCol{
+		// 		// 	Set: set,
+		// 		// 	// Fields: []string{}, TODO Fields?
+		// 		// 	// Sort: []string{}, TODO Sorting?
+		// 		// 	PageSize: int(math.MaxInt64),
+		// 		// })
+		// 		// if err != nil {
+		// 		// 	return err
+		// 		// }
+		// 		// if col == nil {
+		// 		// 	return errors.New("no collection returned")
+		// 		// }
+		// 	}
+		// }
 	}
 
 	return nil

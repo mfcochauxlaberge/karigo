@@ -355,3 +355,8 @@ func (s *Set) check() {
 		s.sdata = []*Record{}
 	}
 }
+
+func (s *Set) keys() []string {
+	keys := []string{}
+	return keys
+}

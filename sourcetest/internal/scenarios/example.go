@@ -1,7 +1,6 @@
 package scenarios
 
 import (
-	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/mfcochauxlaberge/karigo"
 )
 
@@ -28,7 +27,7 @@ func init() {
 				// Data
 				karigo.NewOpSet("users", "", "id", "abc123"),
 			},
-			Verif: map[string][]jsonapi.Resource{},
+			Verif: []string{},
 		},
 	)
 }
