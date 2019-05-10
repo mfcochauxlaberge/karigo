@@ -52,7 +52,14 @@ func (s *Set) Collection(ids []string, _ *jsonapi.Condition, sort []string, fiel
 				}
 			}
 		}
+	} else {
+		for _, rec := range s.sdata {
+			tempSet.Add(rec)
+		}
 	}
+
+	// fmt.Printf("set: %v\n", s.sdata)
+	// fmt.Printf("tempSet: %v\n", tempSet.sdata)
 
 	// TODO Filter
 
@@ -60,20 +67,26 @@ func (s *Set) Collection(ids []string, _ *jsonapi.Condition, sort []string, fiel
 	tempSet.Sort(sort)
 
 	// Pagination
-	if pageSize == 0 {
+	// if pageSize == 0 {
+	// 	tempSet = &Set{}
+	// } else {
+	skip := int(pageNumber * pageSize)
+	// fmt.Printf("pagenumber: %d\n", pageNumber)
+	// fmt.Printf("pagesize: %d\n", pageSize)
+	// fmt.Printf("skip: %d\n", skip)
+	// fmt.Printf("len(tempSet.data): %d\n", len(tempSet.data))
+	if skip >= len(tempSet.data) {
 		tempSet = &Set{}
 	} else {
-		skip := int(pageNumber * pageSize)
-		if skip >= len(tempSet.data) {
-			tempSet = &Set{}
-		} else {
-			page := &Set{}
-			for i := skip; i < len(tempSet.sdata) || i < int(pageSize); i++ {
-				page.Add(tempSet.sdata[i])
-			}
-			tempSet = page
+		page := &Set{}
+		for i := skip; i < len(tempSet.sdata) && (pageSize == 0 || i < int(pageSize)); i++ {
+			page.Add(tempSet.sdata[i])
 		}
+		tempSet = page
 	}
+	// }
+
+	// fmt.Printf("tempSet after: %v\n", tempSet.sdata)
 
 	// Make the collection
 	col := []jsonapi.Resource{}
