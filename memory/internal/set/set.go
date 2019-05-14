@@ -62,7 +62,7 @@ func (s *Set) Collection(ids []string, _ *jsonapi.Condition, sort []string, fiel
 	// TODO Filter
 
 	// Sort
-	tempSet.Sort(sort)
+	// tempSet.Sort(sort)
 
 	// Pagination
 	// if pageSize == 0 {

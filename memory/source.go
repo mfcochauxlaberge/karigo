@@ -14,7 +14,7 @@ type Source struct {
 	Location string
 
 	// schema *jsonapi.Schema
-	data map[string]*set.Set
+	data map[string]*jsonapi.SoftCollection
 
 	// oldSchema *jsonapi.Schema
 	// oldData map[string]set.Set
@@ -27,7 +27,7 @@ func (s *Source) Reset() error {
 	s.Lock()
 	defer s.Unlock()
 
-	s.data = map[string]*set.Set{}
+	s.data = map[string]*jsonapi.SoftCollection{}
 
 	// s.schema = &jsonapi.Schema{}
 
@@ -42,7 +42,7 @@ func (s *Source) Reset() error {
 	// })
 	// s.schema.AddType(typ)
 
-	s.data["0_meta"] = &set.Set{}
+	s.data["0_meta"] = &jsonapi.SoftCollection{}
 
 	// 0_sets
 	// typ = jsonapi.Type{
@@ -81,8 +81,8 @@ func (s *Source) Reset() error {
 	// })
 	// s.schema.AddType(typ)
 
-	s.data["0_sets"] = &set.Set{}
-	s.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"] = &jsonapi.SoftCollection{}
+	s.data["0_sets"].Add(makeSoftResource(
 		"0_meta",
 		map[string]interface{}{
 			"name":    "0_meta",
@@ -93,7 +93,7 @@ func (s *Source) Reset() error {
 			},
 		},
 	))
-	s.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(makeSoftResource(
 		"0_sets",
 		map[string]interface{}{
 			"name":    "0_sets",
@@ -114,7 +114,7 @@ func (s *Source) Reset() error {
 			},
 		},
 	))
-	s.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(makeSoftResource(
 		"0_attrs",
 		map[string]interface{}{
 			"name":    "0_attrs",
@@ -131,7 +131,7 @@ func (s *Source) Reset() error {
 			},
 		},
 	))
-	s.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(makeSoftResource(
 		"0_rels",
 		map[string]interface{}{
 			"name":    "0_rels",
@@ -147,7 +147,7 @@ func (s *Source) Reset() error {
 			},
 		},
 	))
-	s.data["0_sets"].Add(set.NewRecord(
+	s.data["0_sets"].Add(makeSoftResource(
 		"0_funcs",
 		map[string]interface{}{
 			"name":    "0_funcs",
@@ -196,8 +196,8 @@ func (s *Source) Reset() error {
 	// })
 	// s.schema.AddType(typ)
 
-	s.data["0_attrs"] = &set.Set{}
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"] = &jsonapi.SoftCollection{}
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_meta_value",
 		map[string]interface{}{
 			"name":   "value",
@@ -207,7 +207,7 @@ func (s *Source) Reset() error {
 			"set":    "0_meta",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_sets_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -217,7 +217,7 @@ func (s *Source) Reset() error {
 			"set":    "0_sets",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_sets_version",
 		map[string]interface{}{
 			"name":   "version",
@@ -227,7 +227,7 @@ func (s *Source) Reset() error {
 			"set":    "0_sets",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_sets_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -237,7 +237,7 @@ func (s *Source) Reset() error {
 			"set":    "0_sets",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_attrs_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -247,7 +247,7 @@ func (s *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_attrs_type",
 		map[string]interface{}{
 			"name":   "type",
@@ -257,7 +257,7 @@ func (s *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_attrs_null",
 		map[string]interface{}{
 			"name":   "null",
@@ -267,7 +267,7 @@ func (s *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_attrs_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -277,7 +277,7 @@ func (s *Source) Reset() error {
 			"set":    "0_attrs",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_rels_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -287,7 +287,7 @@ func (s *Source) Reset() error {
 			"set":    "0_rels",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_rels_to-one",
 		map[string]interface{}{
 			"name":   "to-one",
@@ -297,7 +297,7 @@ func (s *Source) Reset() error {
 			"set":    "0_rels",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_rels_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -307,7 +307,7 @@ func (s *Source) Reset() error {
 			"set":    "0_rels",
 		},
 	))
-	s.data["0_attrs"].Add(set.NewRecord(
+	s.data["0_attrs"].Add(makeSoftResource(
 		"0_funcs_func",
 		map[string]interface{}{
 			"name":   "func",
@@ -355,8 +355,8 @@ func (s *Source) Reset() error {
 	// })
 	// s.schema.AddType(typ)
 
-	s.data["0_rels"] = &set.Set{}
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"] = &jsonapi.SoftCollection{}
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_sets_attrs",
 		map[string]interface{}{
 			"name":    "attrs",
@@ -366,7 +366,7 @@ func (s *Source) Reset() error {
 			"set":     "0_sets",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_sets_rels",
 		map[string]interface{}{
 			"name":    "rels",
@@ -376,7 +376,7 @@ func (s *Source) Reset() error {
 			"set":     "0_sets",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_sets_get_func",
 		map[string]interface{}{
 			"name":    "get_func",
@@ -386,7 +386,7 @@ func (s *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_sets_create_func",
 		map[string]interface{}{
 			"name":    "create_func",
@@ -396,7 +396,7 @@ func (s *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_sets_update_func",
 		map[string]interface{}{
 			"name":    "update_func",
@@ -406,7 +406,7 @@ func (s *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_sets_delete_func",
 		map[string]interface{}{
 			"name":    "delete_func",
@@ -416,7 +416,7 @@ func (s *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_attrs_set",
 		map[string]interface{}{
 			"name":    "set",
@@ -426,7 +426,7 @@ func (s *Source) Reset() error {
 			"set":     "0_attrs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_rels_inverse",
 		map[string]interface{}{
 			"name":    "inverse",
@@ -436,7 +436,7 @@ func (s *Source) Reset() error {
 			"set":     "0_rels",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_rels_set",
 		map[string]interface{}{
 			"name":    "set",
@@ -446,7 +446,7 @@ func (s *Source) Reset() error {
 			"set":     "0_rels",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_funcs_get_func",
 		map[string]interface{}{
 			"name":    "get_func",
@@ -456,7 +456,7 @@ func (s *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_funcs_create_func",
 		map[string]interface{}{
 			"name":    "create_func",
@@ -466,7 +466,7 @@ func (s *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_funcs_update_func",
 		map[string]interface{}{
 			"name":    "update_func",
@@ -476,7 +476,7 @@ func (s *Source) Reset() error {
 			"set":     "0_funcs",
 		},
 	))
-	s.data["0_rels"].Add(set.NewRecord(
+	s.data["0_rels"].Add(makeSoftResource(
 		"0_funcs_delete_func",
 		map[string]interface{}{
 			"name":    "delete_func",
@@ -498,8 +498,8 @@ func (s *Source) Reset() error {
 	// })
 	// s.schema.AddType(typ)
 
-	s.data["0_funcs"] = &set.Set{}
-	s.data["0_funcs"].Add(set.NewRecord(
+	s.data["0_funcs"] = &jsonapi.SoftCollection{}
+	s.data["0_funcs"].Add(makeSoftResource(
 		"_not_implemented",
 		map[string]interface{}{
 			"func": `func(snap *Snapshot) error {
@@ -582,7 +582,7 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 			s.data[v.(string)] = &set.Set{}
 		}
 
-		s.data[setname].Add(set.NewRecord(v.(string), map[string]interface{}{}))
+		s.data[setname].Add(makeSoftResource(v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" {
 		// Delete a resource
 		if v.(string) == "" {
@@ -592,4 +592,16 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 		// Should not happen
 		// TODO Should this code path be reported?
 	}
+}
+
+func makeSoftResource(id string, vals map[string]interface{}) *jsonapi.SoftResource {
+	sr := &jsonapi.SoftResource{}
+
+	sr.SetID(id)
+
+	// for _, v:=range vals {
+	// 	sr.Set
+	// }
+
+	return sr
 }
