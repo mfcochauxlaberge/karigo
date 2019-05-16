@@ -5,7 +5,6 @@ import (
 
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory/internal/set"
 )
 
 // Source ...
@@ -556,8 +555,7 @@ func (s *Source) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
 	// Get resource
 	res := s.data[qry.Set].Resource(qry.ID, qry.Fields)
 
-	// return res, nil
-	return nil, nil
+	return res, nil
 }
 
 // Collection ...
@@ -573,7 +571,7 @@ func (s *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
 	}
 
 	// Get all records from the given set
-	recs := s.data[qry.Set].Collection(
+	recs := s.data[qry.Set].Range(
 		ids,
 		nil,
 		qry.Sort,
@@ -606,21 +604,22 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 
 	if id != "" && field != "id" {
 		// Set a field
-		s.data[setname].Set(id, field, v)
+		s.data[setname].SetField(id, field, v)
 	} else if id == "" && field == "id" {
 		// Create a resource
 
 		// Before, check whether it's a new set because then it
 		// requires a new entry in s.data.
 		if setname == "0_sets" {
-			s.data[v.(string)] = &set.Set{}
+			s.data[v.(string)] = &jsonapi.SoftCollection{}
 		}
 
-		s.data[setname].Add(makeSoftResource(v.(string), map[string]interface{}{}))
+		typ := s.data[setname].Type()
+		s.data[setname].Add(makeSoftResource(&typ, v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" {
 		// Delete a resource
 		if v.(string) == "" {
-			s.data[setname].Del(id)
+			s.data[setname].Remove(id)
 		}
 	} else {
 		// Should not happen
