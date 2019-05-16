@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -12,8 +13,8 @@ type Source struct {
 	ID       string
 	Location string
 
-	// schema *jsonapi.Schema
-	data map[string]*jsonapi.SoftCollection
+	schema *jsonapi.Schema
+	data   map[string]*jsonapi.SoftCollection
 
 	// oldSchema *jsonapi.Schema
 	// oldData map[string]set.Set
@@ -42,7 +43,7 @@ func (s *Source) Reset() error {
 	// s.schema.AddType(typ)
 
 	s.data["0_meta"] = &jsonapi.SoftCollection{}
-	s.data["0_meta"].SetType(typ)
+	s.data["0_meta"].Type = typ
 
 	// 0_sets
 	typ = &jsonapi.Type{
@@ -600,27 +601,53 @@ func (s *Source) Apply(ops []karigo.Op) error {
 }
 
 func (s *Source) opSet(setname, id, field string, v interface{}) {
-	// fmt.Printf("set, id, field = %s, %s, %s (%v)\n", setname, id, field, v)
+	fmt.Printf("set, id, field = %s, %s, %s (%v)\n", setname, id, field, v)
+
+	// Type change
+	if setname == "0_sets" {
+		if id != "" && field == "active" && v.(bool) {
+			name := v.(string)
+			// New set
+			s.data[name] = &jsonapi.SoftCollection{}
+			s.data[name].Type = &jsonapi.Type{
+				Name: name,
+			}
+		}
+	} else if setname == "0_attrs" {
+		if id != "" && field == "active" && v.(bool) {
+			// New set
+			jsonapi.GetAttrType(s.data[v.(string)].GetValue(id, "type").(string))
+			attrType, _ := jsonapi.GetAttrType(s.data[v.(string)].GetValue(id, "type").(string))
+			s.data[v.(string)].Type.AddAttr(jsonapi.Attr{
+				Name: s.data[v.(string)].GetValue(id, "name").(string),
+				Type: attrType,
+				Null: s.data[v.(string)].GetValue(id, "null").(bool),
+			})
+		}
+	} else if setname == "0_rels" {
+		if id != "" && field == "active" && v.(bool) {
+			// New set
+			s.data[v.(string)] = &jsonapi.SoftCollection{}
+			// attrType, _ := jsonapi.GetAttrType(s.data[v.(string)].GetValue(id, "type").(string))
+			// s.data[v.(string)].Type.AddAttr(jsonapi.Attr{
+			// 	Name: s.data[v.(string)].GetValue(id, "name").(string),
+			// 	Type: attrType,
+			// 	Null: s.data[v.(string)].GetValue(id, "null").(bool),
+			// })
+		}
+	}
 
 	if id != "" && field != "id" {
 		// Set a field
 		s.data[setname].SetField(id, field, v)
 	} else if id == "" && field == "id" {
 		// Create a resource
-
-		// Before, check whether it's a new set because then it
-		// requires a new entry in s.data.
-		if setname == "0_sets" {
-			s.data[v.(string)] = &jsonapi.SoftCollection{}
-		}
-
-		typ := s.data[setname].Type()
-		s.data[setname].Add(makeSoftResource(&typ, v.(string), map[string]interface{}{}))
-	} else if id != "" && field == "id" {
+		// typ, _ := s.schema.GetType(setname)
+		typ := s.data[setname].Type
+		s.data[setname].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
+	} else if id != "" && field == "id" && v.(string) == "" {
 		// Delete a resource
-		if v.(string) == "" {
-			s.data[setname].Remove(id)
-		}
+		s.data[setname].Remove(id)
 	} else {
 		// Should not happen
 		// TODO Should this code path be reported?
