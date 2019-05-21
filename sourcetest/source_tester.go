@@ -16,8 +16,6 @@ func Test(src karigo.Source) error {
 
 	// Run scenarios
 	for _, scenario := range scenarios {
-		fmt.Printf("A SCENARIO!\n")
-
 		// Reset
 		err := src.Reset()
 		if err != nil {
@@ -37,28 +35,16 @@ func Test(src karigo.Source) error {
 				if err != nil {
 					return err
 				}
-			// case string:
-			// 	switch s {
-			// 	case "rollback":
-			// 		err = srcRollback()
-			// 		if err != nil {
-			// 			return err
-			// 		}
-			// 	case "commit":
-			// 		err = srcCommit()
-			// 		if err != nil {
-			// 			return err
-			// 		}
-			// 	}
 			default:
 				return errors.New("karigo: unknown step")
 			}
 		}
 
 		// Check
-		// TODO Check the result
+		verif := scenario.Verif
 		keys := []string{}
 
+		// Keys
 		sets, err := src.Collection(karigo.QueryCol{
 			Set:        "0_sets",
 			Sort:       []string{"id"},
@@ -69,10 +55,8 @@ func Test(src karigo.Source) error {
 			return fmt.Errorf("could not get list of sets: %s", err)
 		}
 
-		for i, set := range sets {
+		for _, set := range sets {
 			id := set.GetID()
-
-			fmt.Printf("Set %d: %s\n", i, id)
 
 			col, err := src.Collection(karigo.QueryCol{
 				Set:        id,
@@ -86,52 +70,89 @@ func Test(src karigo.Source) error {
 
 			// For each resource...
 			for _, res := range col {
-				// fmt.Printf("Col!\n")
 				// Add a key for each attribute.
 				for _, attr := range res.Attrs() {
-					// fmt.Printf("Attr!\n")
 					v := res.Get(attr.Name)
-					keys = append(keys, fmt.Sprintf("%s=%v", attr.Name, v))
+					key := fmt.Sprintf("%s.%s.%s", id, res.GetID(), attr.Name)
+					keys = append(keys, fmt.Sprintf("%s=%v", key, v))
 				}
 				// Add a key for each relationsip.
 				for _, rel := range res.Rels() {
+					key := fmt.Sprintf("%s.%s.%s", id, res.GetID(), rel.Name)
+					var r string
 					if rel.ToOne {
-						r := res.GetToOne(rel.Name)
-						keys = append(keys, fmt.Sprintf("%s=%s", rel.Name, r))
+						r = res.GetToOne(rel.Name)
 					} else {
 						rs := res.GetToMany(rel.Name)
-						list := strings.Join(rs, ",")
-						keys = append(keys, fmt.Sprintf("%s=%s", rel.Name, list))
+						r = strings.Join(rs, ",")
 					}
+					keys = append(keys, fmt.Sprintf("%s=%s", key, r))
 				}
 			}
 		}
 
-		sort.Strings(scenario.Verif)
+		sort.Strings(verif)
 		sort.Strings(keys)
 
-		fmt.Printf("Verif: %v\n", scenario.Verif)
-		fmt.Printf("keys: %v\n", keys)
+		errorFound := false
+		i1 := 0
+		i2 := 0
+		for i1 < len(verif) || i2 < len(keys) {
+			var key1, key2 string
+			if i1 < len(verif) {
+				key1 = verif[i1]
+			}
+			if i2 < len(keys) {
+				key2 = keys[i2]
+			}
 
-		i := 0
-		j := 0
-		for i = 0; i < len(scenario.Verif) && j < len(keys); {
-			key1 := scenario.Verif[i]
-			key2 := keys[j]
-
-			if key1 == key2 {
-				i++
-				j++
+			// Both lists have been fully read
+			if key1 == "" && key2 == "" {
 				break
 			}
 
-			if key1 < key2 {
-				fmt.Printf("Key %q is missing.", key1)
-				i++
-			} else {
-				fmt.Printf("Key %q is not supposed to exist.", key1)
-				j++
+			// List of keys is too short
+			if key1 != "" && key2 == "" {
+				errorFound = true
+				fmt.Printf("Key %q is missing.\n", key2)
+				i1++
+				continue
 			}
+
+			// List of keys is too long
+			if key1 == "" && key2 != "" {
+				errorFound = true
+				fmt.Printf("Key %q is not supposed to exist.\n", key2)
+				i2++
+				continue
+			}
+
+			// Both keys are the same
+			if key1 == key2 {
+				i1++
+				i2++
+				continue
+			}
+
+			// Key is not in verification list
+			if key1 < key2 {
+				errorFound = true
+				fmt.Printf("Key %q is missing.\n", key2)
+				i1++
+				continue
+			}
+
+			// Key from verification list does not exist
+			if key1 > key2 {
+				errorFound = true
+				fmt.Printf("Key %q is not supposed to exist.\n", key2)
+				i2++
+				continue
+			}
+		}
+
+		if errorFound {
+			return errors.New("verification failed")
 		}
 	}
 
