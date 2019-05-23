@@ -1,10 +1,12 @@
-# karigo
+# Karigo
 
 Karigo is an API framework that follows the [JSON:API specification](https://jsonapi.org/format).
 
 ## State
 
-This is a **work in progress**. Some of the features explained in this document might not exist yet. See the issues and the pull requests on GitHub to have an idea of what is being worked on. The is also a list of todos below.
+This is a **work in progress**. Some of the features explained in this document might not exist yet. See the issues and the pull requests on GitHub to have an idea of what is being worked on.
+
+See the [minimum viable project board](https://github.com/mfcochauxlaberge/karigo/projects/1) for a list of the first features being implemented and their current states. The work is being done on the `mvp` branch.
 
 ## Concepts
 
@@ -52,17 +54,6 @@ Each request is appended to an ordered log. An entry in the log is simply a list
 ### Transactions
 
 Each request that modifies at least one resource needs to append a transaction to the log.
-
-## Todos
-
- - [ ] Basic log and operations
- - [ ] In-memory source and log
- - [ ] Logging and tracing
- - [ ] GET request
- - [ ] POST/PATCH/DELETE requests
- - [ ] SQL generator
- - [ ] Transactions
- - [ ] CLI application
 
 ## Documentation
 
