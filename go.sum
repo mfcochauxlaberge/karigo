@@ -12,6 +12,8 @@ github.com/mfcochauxlaberge/jsonapi v0.8.1 h1:AheD69y5U13mVDxpSdzC5xymXzOOReuI1S
 github.com/mfcochauxlaberge/jsonapi v0.8.1/go.mod h1:W4t/DvEdn9zYyD/fFTDD7Ip0wSsygpmmk3YoKjkrBA8=
 github.com/mfcochauxlaberge/jsonapi v0.9.0 h1:RafkMW3jUGWhQR4TyKTlmqJtNiGXzeuy0QmhuL+cvyw=
 github.com/mfcochauxlaberge/jsonapi v0.9.0/go.mod h1:W4t/DvEdn9zYyD/fFTDD7Ip0wSsygpmmk3YoKjkrBA8=
+github.com/mfcochauxlaberge/jsonapi v0.10.0 h1:+lsK3bjgCIt/v+tk5OgrI9VBcgT5Gwr9oUSvc09JVto=
+github.com/mfcochauxlaberge/jsonapi v0.10.0/go.mod h1:W4t/DvEdn9zYyD/fFTDD7Ip0wSsygpmmk3YoKjkrBA8=
 github.com/mfcochauxlaberge/tchek v0.3.0 h1:SFmqbnfjxMbP7yV/FuHioIwYI9tmDtmO9Jd5smGu0KQ=
 github.com/mfcochauxlaberge/tchek v0.3.0/go.mod h1:e8jX6VID1Ku1XAZq8lkxRuGfSKIFL9sL7w4E3WDkx7o=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=

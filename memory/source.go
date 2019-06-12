@@ -609,32 +609,32 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 	} else if setname == "0_attrs" {
 		if id != "" && field == "active" && v.(bool) {
 			// New attribute
-			setID := s.sets["0_attrs"].GetValue(id, "set").(string)
-			attrType, _ := jsonapi.GetAttrType(s.sets["0_attrs"].GetValue(id, "type").(string))
+			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
+			attrType, _ := jsonapi.GetAttrType(s.sets["0_attrs"].Resource(id, nil).Get("type").(string))
 			s.sets[setID].Type.AddAttr(jsonapi.Attr{
 				Name: id,
 				Type: attrType,
-				Null: s.sets["0_attrs"].GetValue(id, "null").(bool),
+				Null: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
 			})
 		}
 	} else if setname == "0_rels" {
 		if id != "" && field == "active" && v.(bool) {
 			// New relationship
-			setID := s.sets["0_rels"].GetValue(id, "set").(string)
+			setID := s.sets["0_rels"].Resource(id, nil).Get("set").(string)
 			s.sets[setID].Type.AddRel(jsonapi.Rel{
 				Name:  id,
-				Type:  s.sets["0_rels"].GetValue(id, "set").(string),
-				ToOne: s.sets["0_rels"].GetValue(id, "to-one").(bool),
+				Type:  s.sets["0_rels"].Resource(id, nil).Get("set").(string),
+				ToOne: s.sets["0_rels"].Resource(id, nil).Get("to-one").(bool),
 				// InverseName:  id,
-				// InverseType:  s.sets["0_rels"].GetValue(id, "type").(string),
-				// InverseToOne: s.sets["0_rels"].GetValue(id, "to-one").(bool),
+				// InverseType:  s.sets["0_rels"].Resource(id,nil).Get("type").(string),
+				// InverseToOne: s.sets["0_rels"].Resource(id,nil).Get("to-one").(bool),
 			})
 		}
 	}
 
 	if id != "" && field != "id" {
 		// Set a field
-		s.sets[setname].SetField(id, field, v)
+		s.sets[setname].Resource(id, nil).Set(field, v)
 	} else if id == "" && field == "id" {
 		// Create a resource
 		typ := s.sets[setname].Type
