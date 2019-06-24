@@ -1,6 +1,6 @@
 module github.com/mfcochauxlaberge/karigo
 
-go 1.11
+go 1.12
 
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
