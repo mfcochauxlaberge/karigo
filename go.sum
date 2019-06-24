@@ -14,12 +14,16 @@ github.com/mfcochauxlaberge/jsonapi v0.9.0 h1:RafkMW3jUGWhQR4TyKTlmqJtNiGXzeuy0Q
 github.com/mfcochauxlaberge/jsonapi v0.9.0/go.mod h1:W4t/DvEdn9zYyD/fFTDD7Ip0wSsygpmmk3YoKjkrBA8=
 github.com/mfcochauxlaberge/jsonapi v0.10.0 h1:+lsK3bjgCIt/v+tk5OgrI9VBcgT5Gwr9oUSvc09JVto=
 github.com/mfcochauxlaberge/jsonapi v0.10.0/go.mod h1:W4t/DvEdn9zYyD/fFTDD7Ip0wSsygpmmk3YoKjkrBA8=
+github.com/mfcochauxlaberge/jsonapi v0.10.1-0.20190624203133-49bb8d4dccd1 h1:o8BaBXTYEN0MSTOYyq3rArGLLNp3F+An/doWkLMNnms=
+github.com/mfcochauxlaberge/jsonapi v0.10.1-0.20190624203133-49bb8d4dccd1/go.mod h1:TohQe4cLxy0/NAd0QVYaNrJ2tnQuPxHrmYTZYL/DhiI=
 github.com/mfcochauxlaberge/tchek v0.3.0 h1:SFmqbnfjxMbP7yV/FuHioIwYI9tmDtmO9Jd5smGu0KQ=
 github.com/mfcochauxlaberge/tchek v0.3.0/go.mod h1:e8jX6VID1Ku1XAZq8lkxRuGfSKIFL9sL7w4E3WDkx7o=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=
 github.com/mitchellh/reflectwalk v1.0.0 h1:9D+8oIskB4VJBN5SFlmc27fSlIBZaov1Wpk/IfikLNY=
 github.com/mitchellh/reflectwalk v1.0.0/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
+github.com/mitchellh/reflectwalk v1.0.1 h1:FVzMWA5RllMAKIdUSC8mdWo3XtwoecrH79BY70sEEpE=
+github.com/mitchellh/reflectwalk v1.0.1/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/spf13/cobra v0.0.3 h1:ZlrZ4XsMRm04Fr5pSFxBgfND2EBVa1nLpiy1stUsX/8=
@@ -27,5 +31,6 @@ github.com/spf13/cobra v0.0.3/go.mod h1:1l0Ry5zgKvJasoi3XT1TypsSe7PqH0Sj9dhYf7v3
 github.com/spf13/pflag v1.0.3 h1:zPAT6CGy6wXeQ7NtTnaTerfKOsV6V6F8agHXFiazDkg=
 github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=
 github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0Q=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

@@ -35,10 +35,8 @@ func (s *Source) Reset() error {
 		Null: false,
 	})
 
-	s.sets["0_meta"] = &jsonapi.SoftCollection{
-		Type: typ,
-	}
-	s.sets["0_meta"].Type = typ
+	s.sets["0_meta"] = &jsonapi.SoftCollection{}
+	s.sets["0_meta"].SetType(typ)
 
 	// 0_sets
 	typ = &jsonapi.Type{
@@ -76,9 +74,8 @@ func (s *Source) Reset() error {
 		InverseToOne: true,
 	})
 
-	s.sets["0_sets"] = &jsonapi.SoftCollection{
-		Type: typ,
-	}
+	s.sets["0_sets"] = &jsonapi.SoftCollection{}
+	s.sets["0_sets"].SetType(typ)
 	s.sets["0_sets"].Add(makeSoftResource(
 		typ,
 		"0_meta",
@@ -197,9 +194,8 @@ func (s *Source) Reset() error {
 		InverseToOne: false,
 	})
 
-	s.sets["0_attrs"] = &jsonapi.SoftCollection{
-		Type: typ,
-	}
+	s.sets["0_attrs"] = &jsonapi.SoftCollection{}
+	s.sets["0_attrs"].SetType(typ)
 	s.sets["0_attrs"].Add(makeSoftResource(
 		typ,
 		"0_meta_value",
@@ -370,9 +366,8 @@ func (s *Source) Reset() error {
 	})
 	// s.schema.AddType(typ)
 
-	s.sets["0_rels"] = &jsonapi.SoftCollection{
-		Type: typ,
-	}
+	s.sets["0_rels"] = &jsonapi.SoftCollection{}
+	s.sets["0_rels"].SetType(typ)
 	s.sets["0_rels"].Add(makeSoftResource(
 		typ,
 		"0_sets_attrs",
@@ -527,9 +522,8 @@ func (s *Source) Reset() error {
 		Null: false,
 	})
 
-	s.sets["0_funcs"] = &jsonapi.SoftCollection{
-		Type: typ,
-	}
+	s.sets["0_funcs"] = &jsonapi.SoftCollection{}
+	s.sets["0_funcs"].SetType(typ)
 	s.sets["0_funcs"].Add(makeSoftResource(
 		typ,
 		"_not_implemented",
@@ -602,16 +596,16 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 		if id != "" && field == "active" && v.(bool) {
 			// New set
 			s.sets[id] = &jsonapi.SoftCollection{}
-			s.sets[id].Type = &jsonapi.Type{
+			s.sets[id].SetType(&jsonapi.Type{
 				Name: id,
-			}
+			})
 		}
 	} else if setname == "0_attrs" {
 		if id != "" && field == "active" && v.(bool) {
 			// New attribute
 			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
 			attrType, _ := jsonapi.GetAttrType(s.sets["0_attrs"].Resource(id, nil).Get("type").(string))
-			s.sets[setID].Type.AddAttr(jsonapi.Attr{
+			s.sets[setID].GetType().AddAttr(jsonapi.Attr{
 				Name: id,
 				Type: attrType,
 				Null: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
@@ -621,7 +615,7 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 		if id != "" && field == "active" && v.(bool) {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).Get("set").(string)
-			s.sets[setID].Type.AddRel(jsonapi.Rel{
+			s.sets[setID].GetType().AddRel(jsonapi.Rel{
 				Name:  id,
 				Type:  s.sets["0_rels"].Resource(id, nil).Get("set").(string),
 				ToOne: s.sets["0_rels"].Resource(id, nil).Get("to-one").(bool),
@@ -637,7 +631,7 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 		s.sets[setname].Resource(id, nil).Set(field, v)
 	} else if id == "" && field == "id" {
 		// Create a resource
-		typ := s.sets[setname].Type
+		typ := s.sets[setname].GetType()
 		s.sets[setname].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" && v.(string) == "" {
 		// Delete a resource
