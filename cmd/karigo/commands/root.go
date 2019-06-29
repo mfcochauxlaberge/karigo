@@ -12,8 +12,9 @@ var rootCmd = &cobra.Command{}
 // Execute ...
 func Execute() {
 	rootCmd.AddCommand(
-		cmdVersion,
+		cmdExec,
 		cmdRun,
+		cmdVersion,
 	)
 
 	if err := rootCmd.Execute(); err != nil {

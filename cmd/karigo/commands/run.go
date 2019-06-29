@@ -10,10 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-// pretty *bool
-)
-
 var cmdRun = &cobra.Command{
 	Use:   "run",
 	Short: "Run the server",
@@ -31,8 +27,4 @@ var cmdRun = &cobra.Command{
 			panic(err)
 		}
 	},
-}
-
-func init() {
-	// pretty = cmdRun.Flags().BoolP("pretty", "p", false, "show prettier output")
 }
