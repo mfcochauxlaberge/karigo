@@ -15,8 +15,8 @@ type QueryCol struct {
 	PageNumber int
 }
 
-// NewQueryCol creates a new *QueryCol object from a *jsonapi.URL object.
-func NewQueryCol(url *jsonapi.URL) *QueryCol {
+// NewQueryCol creates a new QueryCol object from a *jsonapi.URL object.
+func NewQueryCol(url *jsonapi.URL) QueryCol {
 	var fields []string
 	if f, ok := url.Params.Fields[url.ResType]; ok {
 		fields = make([]string, len(f))
@@ -25,7 +25,7 @@ func NewQueryCol(url *jsonapi.URL) *QueryCol {
 		fields = []string{"id"}
 	}
 
-	query := &QueryCol{
+	query := QueryCol{
 		Set:             url.ResType,
 		Fields:          fields,
 		BelongsToFilter: url.BelongsToFilter,
@@ -45,8 +45,8 @@ type QueryRes struct {
 	Fields []string
 }
 
-// NewQueryRes creates a new *Query object from a *jsonapi.URL object.
-func NewQueryRes(url *jsonapi.URL) *QueryRes {
+// NewQueryRes creates a new QueryRes object from a *jsonapi.URL object.
+func NewQueryRes(url *jsonapi.URL) QueryRes {
 	var fields []string
 	if f, ok := url.Params.Fields[url.ResType]; ok {
 		fields = make([]string, len(f))
@@ -55,7 +55,7 @@ func NewQueryRes(url *jsonapi.URL) *QueryRes {
 		fields = []string{"id"}
 	}
 
-	query := &QueryRes{
+	query := QueryRes{
 		Set:    url.ResType,
 		ID:     url.ResID,
 		Fields: fields,

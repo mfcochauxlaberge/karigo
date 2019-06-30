@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/mfcochauxlaberge/karigo"
 
@@ -18,7 +17,6 @@ var cmdRun = &cobra.Command{
 		)
 
 		fmt.Printf("Loading...")
-		time.Sleep(time.Second)
 		fmt.Printf(" done.\n")
 		fmt.Printf("Listening on port %d...\n", port)
 

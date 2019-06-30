@@ -2,7 +2,6 @@ package karigo
 
 import (
 	"errors"
-	"net/http"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -16,10 +15,9 @@ func NewNode(journal Journal, src Source) *Node {
 			src: src,
 		},
 
-		funcs: map[string]Tx{},
+		// funcs: map[string]Tx{},
 
-		requests: make(chan *http.Request),
-		err:      make(chan error),
+		err: make(chan error),
 	}
 
 	return node
@@ -31,11 +29,11 @@ type Node struct {
 	log  Journal
 	main source
 
-	// Funcs
-	funcs map[string]Tx
+	// Schema
+	schema *jsonapi.Schema
+	// funcs  map[string]Tx
 
 	// Channels
-	requests chan *http.Request
 	err      chan error
 	shutdown chan bool
 
@@ -55,24 +53,46 @@ func (n *Node) Run() error {
 }
 
 // Handle ...
-func (n *Node) Handle(r *http.Request) *jsonapi.Document {
+func (n *Node) Handle(r *Request) *jsonapi.Document {
 	n.Lock()
 	defer n.Unlock()
 
-	// Tx
+	// Transaction
 	var tx Tx
-	tx = n.funcs[""]
-	if tx == nil {
-		tx = TxNotFound
+	switch r.Method {
+	case "GET":
+		tx = TxGet
+	case "POST":
+		tx = TxCreate
+	case "PATCH":
+		tx = TxUpdate
+	case "DELETE":
+		tx = TxDelete
+	default:
+		tx = TxNotImplemented
 	}
 
 	doc := &jsonapi.Document{}
 
+	// Execute
 	cp := &Checkpoint{
 		node: n,
 		ops:  []Op{},
 	}
 	tx(cp)
+
+	switch r.Method {
+	case "GET":
+		if r.URL.IsCol {
+			cp.Collection(NewQueryCol(r.URL))
+		} else {
+			cp.Resource(NewQueryRes(r.URL))
+		}
+	case "POST", "PATCH":
+		cp.Resource(NewQueryRes(r.URL))
+	default:
+		tx = TxNotImplemented
+	}
 
 	if cp.err != nil {
 		var jaErr jsonapi.Error

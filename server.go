@@ -2,9 +2,12 @@ package karigo
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/sirupsen/logrus"
+	"github.com/twinj/uuid"
 )
 
 // Server ...
@@ -19,12 +22,15 @@ func (s *Server) Run() {
 	// Logger
 	s.logger = logrus.New()
 	s.logger.Formatter = &logrus.TextFormatter{}
+	// s.logger.Formatter = &logrus.JSONFormatter{}
+
+	s.logger.WithField("event", "server_started").Info("Server started")
 
 	// Nodes
 	s.Nodes = map[string]*Node{}
 
 	local := &Node{}
-	s.Nodes["127.0.0.1"] = local
+	s.Nodes["localhost"] = local
 
 	// Listen and serve
 	err := http.ListenAndServe(":8080", s)
@@ -35,16 +41,39 @@ func (s *Server) Run() {
 
 // ServeHTTP ...
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	domain := r.URL.Host
+	requestID := uuid.NewV4()
+	shortID := makeShortID(requestID)
 
-	s.logger.Logf(logrus.InfoLevel, "Received request from %s", domain)
+	// URL
+	domain, _ := domainAndPort(r.Host)
+	if domain == "" || domain == "127.0.0.1" {
+		domain = "localhost"
+	}
+
+	url, err := jsonapi.ParseRawURL(&jsonapi.Schema{}, r.URL.String())
+	if err != nil {
+		s.logger.WithField("url", r.URL.String()).Warn("Invalid URL")
+	}
+
+	logger := s.logger.WithFields(logrus.Fields{
+		"id":     shortID,
+		"domain": domain,
+		"url":    url,
+	})
+
+	logger.WithField("event", "incoming_request").Info("New request incoming")
 
 	if _, ok := s.Nodes[domain]; !ok {
+		logger.WithField("event", "unknown_domain").Warn("Domain not found")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	doc := s.Nodes[domain].Handle(r)
+	req := &Request{
+		Method: r.Method,
+	}
+
+	doc := s.Nodes[domain].Handle(req)
 
 	pl, err := jsonapi.Marshal(doc, nil)
 	if err != nil {
@@ -53,4 +82,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(pl)
+}
+
+func domainAndPort(host string) (string, int) {
+	fragments := strings.Split(host, ":")
+
+	domain := fragments[0]
+
+	var (
+		port int
+		err  error
+	)
+	if len(fragments) > 1 {
+		port, err = strconv.Atoi(fragments[1])
+		if err != nil {
+			port = 0
+		}
+	}
+
+	return domain, port
+}
+
+func makeShortID(uuid uuid.UUID) string {
+	return uuid.String()[0:8]
 }

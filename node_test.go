@@ -1,12 +1,12 @@
 package karigo_test
 
 import (
-	"net/http/httptest"
 	"testing"
 
-	"github.com/mfcochauxlaberge/jsonapi"
-	"github.com/mfcochauxlaberge/karigo"
+	. "github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/memory"
+
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 func TestNode(t *testing.T) {
@@ -20,7 +20,7 @@ func TestNode(t *testing.T) {
 	})
 
 	// Schema
-	schema := jsonapi.Schema{}
+	schema := &jsonapi.Schema{}
 	schema.AddType(typ)
 
 	// Source
@@ -33,10 +33,18 @@ func TestNode(t *testing.T) {
 	journal := &memory.Journal{}
 
 	// Node
-	node := karigo.NewNode(journal, src)
+	node := NewNode(journal, src)
 	go node.Run()
 
-	req := httptest.NewRequest("GET", "/things", nil)
+	url, err := jsonapi.ParseRawURL(schema, "/things")
+	if err != nil {
+		panic(err)
+	}
+
+	req := &Request{
+		Method: "GET",
+		URL:    url,
+	}
 	res := node.Handle(req)
 	if len(res.Errors) == 0 {
 		t.Errorf("No errors occured.\n")

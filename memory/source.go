@@ -3,8 +3,9 @@ package memory
 import (
 	"sync"
 
-	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/mfcochauxlaberge/karigo"
+
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 // Source ...
@@ -12,8 +13,7 @@ type Source struct {
 	ID       string
 	Location string
 
-	schema *jsonapi.Schema
-	sets   map[string]*jsonapi.SoftCollection
+	sets map[string]*jsonapi.SoftCollection
 
 	sync.Mutex
 }
@@ -364,7 +364,6 @@ func (s *Source) Reset() error {
 		InverseType:  "0_rels",
 		InverseToOne: false,
 	})
-	// s.schema.AddType(typ)
 
 	s.sets["0_rels"] = &jsonapi.SoftCollection{}
 	s.sets["0_rels"].SetType(typ)
