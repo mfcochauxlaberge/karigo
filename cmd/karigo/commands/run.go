@@ -2,8 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/mfcochauxlaberge/karigo"
@@ -26,10 +24,6 @@ var cmdRun = &cobra.Command{
 
 		// Server
 		server := &karigo.Server{}
-
-		err := http.ListenAndServe(":"+strconv.Itoa(port), server)
-		if err != http.ErrServerClosed {
-			panic(err)
-		}
+		server.Run()
 	},
 }
