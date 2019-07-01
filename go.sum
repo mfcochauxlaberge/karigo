@@ -8,8 +8,8 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGiHgQ4OO8tzTaLawm8vnODuwDk=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
-github.com/mfcochauxlaberge/jsonapi v0.10.1-0.20190624203133-49bb8d4dccd1 h1:o8BaBXTYEN0MSTOYyq3rArGLLNp3F+An/doWkLMNnms=
-github.com/mfcochauxlaberge/jsonapi v0.10.1-0.20190624203133-49bb8d4dccd1/go.mod h1:TohQe4cLxy0/NAd0QVYaNrJ2tnQuPxHrmYTZYL/DhiI=
+github.com/mfcochauxlaberge/jsonapi v0.11.0 h1:RYOkeTH7wmJem1VRWgOJfKwPgsUfS3cOQtGPy5h9Cd4=
+github.com/mfcochauxlaberge/jsonapi v0.11.0/go.mod h1:TFyYEu/S5AZyttGxf6erEjcpzRF1yZNwNM8voKxYaIA=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=
 github.com/mitchellh/reflectwalk v1.0.0 h1:9D+8oIskB4VJBN5SFlmc27fSlIBZaov1Wpk/IfikLNY=

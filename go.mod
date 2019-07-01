@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/mfcochauxlaberge/jsonapi v0.10.1-0.20190624203133-49bb8d4dccd1
+	github.com/mfcochauxlaberge/jsonapi v0.11.0
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
