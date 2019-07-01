@@ -21,8 +21,8 @@ type Server struct {
 func (s *Server) Run() {
 	// Logger
 	s.logger = logrus.New()
-	s.logger.Formatter = &logrus.TextFormatter{}
-	// s.logger.Formatter = &logrus.JSONFormatter{}
+	// s.logger.Formatter = &logrus.TextFormatter{}
+	s.logger.Formatter = &logrus.JSONFormatter{}
 
 	s.logger.WithField("event", "server_started").Info("Server started")
 
@@ -50,15 +50,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		domain = "localhost"
 	}
 
-	url, err := jsonapi.ParseRawURL(&jsonapi.Schema{}, r.URL.String())
-	if err != nil {
-		s.logger.WithField("url", r.URL.String()).Warn("Invalid URL")
-	}
-
 	logger := s.logger.WithFields(logrus.Fields{
 		"id":     shortID,
 		"domain": domain,
-		"url":    url,
 	})
 
 	logger.WithField("event", "incoming_request").Info("New request incoming")
@@ -69,8 +63,18 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	url, err := jsonapi.ParseRawURL(&jsonapi.Schema{}, r.URL.String())
+	if err != nil {
+		s.logger.WithField("url", r.URL.String()).Warn("Invalid URL")
+	}
+
+	logger = s.logger.WithFields(logrus.Fields{
+		"url": url,
+	})
+
 	req := &Request{
 		Method: r.Method,
+		URL:    url,
 	}
 
 	doc := s.Nodes[domain].Handle(req)
