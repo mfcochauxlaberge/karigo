@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/mfcochauxlaberge/karigo"
@@ -23,61 +24,24 @@ func (s *Source) Reset() error {
 	s.Lock()
 	defer s.Unlock()
 
+	types := map[string]*jsonapi.Type{}
+	for _, typ := range karigo.FirstSchema().Types {
+		typ := typ
+		types[typ.Name] = &typ
+	}
+
 	s.sets = map[string]*jsonapi.SoftCollection{}
 
 	// 0_meta
-	typ := &jsonapi.Type{
-		Name: "0_meta",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "value",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-
 	s.sets["0_meta"] = &jsonapi.SoftCollection{}
-	s.sets["0_meta"].SetType(typ)
+	s.sets["0_meta"].SetType(types["0_meta"])
 
 	// 0_sets
-	typ = &jsonapi.Type{
-		Name: "0_sets",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "name",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "version",
-		Type: jsonapi.AttrTypeUint,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "active",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "attrs",
-		Type:         "0_attrs",
-		ToOne:        false,
-		InverseName:  "set",
-		InverseType:  "0_sets",
-		InverseToOne: true,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "rels",
-		Type:         "0_rels",
-		ToOne:        false,
-		InverseName:  "set",
-		InverseType:  "0_sets",
-		InverseToOne: true,
-	})
-
 	s.sets["0_sets"] = &jsonapi.SoftCollection{}
-	s.sets["0_sets"].SetType(typ)
+	s.sets["0_sets"].SetType(types["0_sets"])
+
 	s.sets["0_sets"].Add(makeSoftResource(
-		typ,
+		types["0_sets"],
 		"0_meta",
 		map[string]interface{}{
 			"name":    "0_meta",
@@ -89,7 +53,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_sets"].Add(makeSoftResource(
-		typ,
+		types["0_sets"],
 		"0_sets",
 		map[string]interface{}{
 			"name":    "0_sets",
@@ -103,15 +67,11 @@ func (s *Source) Reset() error {
 			"rels": []string{
 				"0_sets_attrs",
 				"0_sets_rels",
-				"0_funcs_get_func",
-				"0_funcs_create_func",
-				"0_funcs_update_func",
-				"0_funcs_delete_func",
 			},
 		},
 	))
 	s.sets["0_sets"].Add(makeSoftResource(
-		typ,
+		types["0_sets"],
 		"0_attrs",
 		map[string]interface{}{
 			"name":    "0_attrs",
@@ -129,7 +89,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_sets"].Add(makeSoftResource(
-		typ,
+		types["0_sets"],
 		"0_rels",
 		map[string]interface{}{
 			"name":    "0_rels",
@@ -145,59 +105,13 @@ func (s *Source) Reset() error {
 			},
 		},
 	))
-	s.sets["0_sets"].Add(makeSoftResource(
-		typ,
-		"0_funcs",
-		map[string]interface{}{
-			"name":    "0_funcs",
-			"version": 0,
-			"active":  true,
-			"attrs": []string{
-				"0_funcs_func",
-			},
-			"rels": []string{
-				"0_funcs_set",
-			},
-		},
-	))
 
 	// 0_attrs
-	typ = &jsonapi.Type{
-		Name: "0_attrs",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "name",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "type",
-		Type: jsonapi.AttrTypeUint,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "null",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "active",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "set",
-		Type:         "0_sets",
-		ToOne:        true,
-		InverseName:  "attrs",
-		InverseType:  "0_attrs",
-		InverseToOne: false,
-	})
-
 	s.sets["0_attrs"] = &jsonapi.SoftCollection{}
-	s.sets["0_attrs"].SetType(typ)
+	s.sets["0_attrs"].SetType(types["0_attrs"])
+
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_meta_value",
 		map[string]interface{}{
 			"name":   "value",
@@ -208,7 +122,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_sets_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -219,7 +133,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_sets_version",
 		map[string]interface{}{
 			"name":   "version",
@@ -230,7 +144,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_sets_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -241,7 +155,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_attrs_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -252,7 +166,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_attrs_type",
 		map[string]interface{}{
 			"name":   "type",
@@ -263,7 +177,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_attrs_null",
 		map[string]interface{}{
 			"name":   "null",
@@ -274,7 +188,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_attrs_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -285,7 +199,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_rels_name",
 		map[string]interface{}{
 			"name":   "name",
@@ -296,7 +210,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_rels_to-one",
 		map[string]interface{}{
 			"name":   "to-one",
@@ -307,7 +221,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
+		types["0_attrs"],
 		"0_rels_active",
 		map[string]interface{}{
 			"name":   "active",
@@ -317,58 +231,13 @@ func (s *Source) Reset() error {
 			"set":    "0_rels",
 		},
 	))
-	s.sets["0_attrs"].Add(makeSoftResource(
-		typ,
-		"0_funcs_func",
-		map[string]interface{}{
-			"name":   "func",
-			"type":   "string",
-			"null":   false,
-			"active": true,
-			"set":    "0_funcs",
-		},
-	))
 
 	// 0_rels
-	typ = &jsonapi.Type{
-		Name: "0_rels",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "name",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "to-one",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddAttr(jsonapi.Attr{
-		Name: "active",
-		Type: jsonapi.AttrTypeBool,
-		Null: false,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "inverse",
-		Type:         "0_rels",
-		ToOne:        true,
-		InverseName:  "inverse",
-		InverseType:  "0_rels",
-		InverseToOne: true,
-	})
-	typ.AddRel(jsonapi.Rel{
-		Name:         "set",
-		Type:         "0_sets",
-		ToOne:        true,
-		InverseName:  "rels",
-		InverseType:  "0_rels",
-		InverseToOne: false,
-	})
-
 	s.sets["0_rels"] = &jsonapi.SoftCollection{}
-	s.sets["0_rels"].SetType(typ)
+	s.sets["0_rels"].SetType(types["0_rels"])
+
 	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
+		types["0_rels"],
 		"0_sets_attrs",
 		map[string]interface{}{
 			"name":    "attrs",
@@ -379,7 +248,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
+		types["0_rels"],
 		"0_sets_rels",
 		map[string]interface{}{
 			"name":    "rels",
@@ -390,51 +259,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_sets_get_func",
-		map[string]interface{}{
-			"name":    "get_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "", // TODO Inverse?
-			"set":     "0_funcs",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_sets_create_func",
-		map[string]interface{}{
-			"name":    "create_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "", // TODO Inverse?
-			"set":     "0_funcs",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_sets_update_func",
-		map[string]interface{}{
-			"name":    "update_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "", // TODO Inverse?
-			"set":     "0_funcs",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_sets_delete_func",
-		map[string]interface{}{
-			"name":    "delete_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "", // TODO Inverse?
-			"set":     "0_funcs",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
+		types["0_rels"],
 		"0_attrs_set",
 		map[string]interface{}{
 			"name":    "set",
@@ -445,7 +270,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
+		types["0_rels"],
 		"0_rels_inverse",
 		map[string]interface{}{
 			"name":    "inverse",
@@ -456,7 +281,7 @@ func (s *Source) Reset() error {
 		},
 	))
 	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
+		types["0_rels"],
 		"0_rels_set",
 		map[string]interface{}{
 			"name":    "set",
@@ -464,72 +289,6 @@ func (s *Source) Reset() error {
 			"active":  true,
 			"inverse": "0_sets_rels",
 			"set":     "0_rels",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_funcs_get_func",
-		map[string]interface{}{
-			"name":    "get_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "0_sets_rels",
-			"set":     "0_funcs",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_funcs_create_func",
-		map[string]interface{}{
-			"name":    "create_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "0_sets_rels",
-			"set":     "0_funcs",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_funcs_update_func",
-		map[string]interface{}{
-			"name":    "update_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "0_sets_rels",
-			"set":     "0_funcs",
-		},
-	))
-	s.sets["0_rels"].Add(makeSoftResource(
-		typ,
-		"0_funcs_delete_func",
-		map[string]interface{}{
-			"name":    "delete_func",
-			"to-one":  true,
-			"active":  true,
-			"inverse": "0_sets_rels",
-			"set":     "0_funcs",
-		},
-	))
-
-	// 0_funcs
-	typ = &jsonapi.Type{
-		Name: "funcs",
-	}
-	typ.AddAttr(jsonapi.Attr{
-		Name: "func",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
-	})
-
-	s.sets["0_funcs"] = &jsonapi.SoftCollection{}
-	s.sets["0_funcs"].SetType(typ)
-	s.sets["0_funcs"].Add(makeSoftResource(
-		typ,
-		"_not_implemented",
-		map[string]interface{}{
-			"func": `func(snap *Snapshot) error {
-				snap.Fail(ErrNotImplemented)
-			}`,
 		},
 	))
 
@@ -605,9 +364,9 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
 			attrType, _ := jsonapi.GetAttrType(s.sets["0_attrs"].Resource(id, nil).Get("type").(string))
 			s.sets[setID].GetType().AddAttr(jsonapi.Attr{
-				Name: id,
-				Type: attrType,
-				Null: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
+				Name:     id,
+				Type:     attrType,
+				Nullable: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
 			})
 		}
 	} else if setname == "0_rels" {
@@ -627,7 +386,24 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 
 	if id != "" && field != "id" {
 		// Set a field
-		s.sets[setname].Resource(id, nil).Set(field, v)
+		typ := s.sets[setname].GetType()
+		for _, attr := range typ.Attrs {
+			if attr.Name == field {
+				s.sets[setname].Resource(id, nil).Set(field, v)
+				fmt.Printf("attr %s set to %v\n", attr.Name, v)
+			}
+		}
+		for _, rel := range typ.Rels {
+			if rel.Name == field {
+				if rel.ToOne {
+					s.sets[setname].Resource(id, nil).SetToOne(field, v.(string))
+					fmt.Printf("to one rel %s set to %v\n", rel.Name, v)
+				} else {
+					s.sets[setname].Resource(id, nil).Set(field, v.([]string))
+					fmt.Printf("to many rel %s set to %v\n", rel.Name, v)
+				}
+			}
+		}
 	} else if id == "" && field == "id" {
 		// Create a resource
 		typ := s.sets[setname].GetType()
@@ -647,7 +423,20 @@ func makeSoftResource(typ *jsonapi.Type, id string, vals map[string]interface{})
 	sr.SetID(id)
 
 	for f, v := range vals {
-		sr.Set(f, v)
+		for _, attr := range typ.Attrs {
+			if attr.Name == f {
+				sr.Set(f, v)
+			}
+		}
+		for _, rel := range typ.Rels {
+			if rel.Name == f {
+				if rel.ToOne {
+					sr.SetToOne(f, v.(string))
+				} else {
+					sr.Set(f, v.([]string))
+				}
+			}
+		}
 	}
 
 	return sr

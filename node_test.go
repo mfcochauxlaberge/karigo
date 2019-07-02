@@ -14,9 +14,9 @@ func TestNode(t *testing.T) {
 	typ := jsonapi.Type{}
 	typ.Name = "things"
 	typ.AddAttr(jsonapi.Attr{
-		Name: "name",
-		Type: jsonapi.AttrTypeString,
-		Null: false,
+		Name:     "name",
+		Type:     jsonapi.AttrTypeString,
+		Nullable: false,
 	})
 
 	// Schema

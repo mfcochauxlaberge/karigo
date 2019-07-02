@@ -15,9 +15,11 @@ func NewNode(journal Journal, src Source) *Node {
 			src: src,
 		},
 
+		schema: FirstSchema(),
 		// funcs: map[string]Tx{},
 
-		err: make(chan error),
+		err:      make(chan error),
+		shutdown: make(chan bool),
 	}
 
 	return node
@@ -128,4 +130,130 @@ func (n *Node) collection(v uint, qry QueryCol) ([]jsonapi.Resource, error) {
 // do ...
 func (n *Node) do(ops []Op) error {
 	return errors.New("karigo: an operation could not be executed")
+}
+
+// FirstSchema ...
+func FirstSchema() *jsonapi.Schema {
+	schema := &jsonapi.Schema{}
+
+	// Meta
+	typ := &jsonapi.Type{
+		Name: "0_meta",
+	}
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "value",
+		Type:     jsonapi.AttrTypeString,
+		Nullable: false,
+	})
+	schema.AddType(*typ)
+
+	// Sets
+	typ = &jsonapi.Type{
+		Name: "0_sets",
+	}
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "name",
+		Type:     jsonapi.AttrTypeString,
+		Nullable: false,
+	})
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "version",
+		Type:     jsonapi.AttrTypeUint,
+		Nullable: false,
+	})
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "active",
+		Type:     jsonapi.AttrTypeBool,
+		Nullable: false,
+	})
+	typ.AddRel(jsonapi.Rel{
+		Name:         "attrs",
+		Type:         "0_attrs",
+		ToOne:        false,
+		InverseName:  "set",
+		InverseType:  "0_sets",
+		InverseToOne: true,
+	})
+	typ.AddRel(jsonapi.Rel{
+		Name:         "rels",
+		Type:         "0_rels",
+		ToOne:        false,
+		InverseName:  "set",
+		InverseType:  "0_sets",
+		InverseToOne: true,
+	})
+	schema.AddType(*typ)
+
+	// Attrs
+	typ = &jsonapi.Type{
+		Name: "0_attrs",
+	}
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "name",
+		Type:     jsonapi.AttrTypeString,
+		Nullable: false,
+	})
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "type",
+		Type:     jsonapi.AttrTypeString,
+		Nullable: false,
+	})
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "null",
+		Type:     jsonapi.AttrTypeBool,
+		Nullable: false,
+	})
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "active",
+		Type:     jsonapi.AttrTypeBool,
+		Nullable: false,
+	})
+	typ.AddRel(jsonapi.Rel{
+		Name:         "set",
+		Type:         "0_sets",
+		ToOne:        true,
+		InverseName:  "attrs",
+		InverseType:  "0_attrs",
+		InverseToOne: false,
+	})
+	schema.AddType(*typ)
+
+	// Rels
+	typ = &jsonapi.Type{
+		Name: "0_rels",
+	}
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "name",
+		Type:     jsonapi.AttrTypeString,
+		Nullable: false,
+	})
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "to-one",
+		Type:     jsonapi.AttrTypeBool,
+		Nullable: false,
+	})
+	typ.AddAttr(jsonapi.Attr{
+		Name:     "active",
+		Type:     jsonapi.AttrTypeBool,
+		Nullable: false,
+	})
+	typ.AddRel(jsonapi.Rel{
+		Name:         "inverse",
+		Type:         "0_rels",
+		ToOne:        true,
+		InverseName:  "inverse",
+		InverseType:  "0_rels",
+		InverseToOne: true,
+	})
+	typ.AddRel(jsonapi.Rel{
+		Name:         "set",
+		Type:         "0_sets",
+		ToOne:        true,
+		InverseName:  "rels",
+		InverseType:  "0_rels",
+		InverseToOne: false,
+	})
+	schema.AddType(*typ)
+
+	return schema
 }
