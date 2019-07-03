@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/mfcochauxlaberge/karigo"
@@ -390,17 +389,14 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 		for _, attr := range typ.Attrs {
 			if attr.Name == field {
 				s.sets[setname].Resource(id, nil).Set(field, v)
-				fmt.Printf("attr %s set to %v\n", attr.Name, v)
 			}
 		}
 		for _, rel := range typ.Rels {
 			if rel.Name == field {
 				if rel.ToOne {
 					s.sets[setname].Resource(id, nil).SetToOne(field, v.(string))
-					fmt.Printf("to one rel %s set to %v\n", rel.Name, v)
 				} else {
-					s.sets[setname].Resource(id, nil).Set(field, v.([]string))
-					fmt.Printf("to many rel %s set to %v\n", rel.Name, v)
+					s.sets[setname].Resource(id, nil).SetToMany(field, v.([]string))
 				}
 			}
 		}
@@ -433,7 +429,7 @@ func makeSoftResource(typ *jsonapi.Type, id string, vals map[string]interface{})
 				if rel.ToOne {
 					sr.SetToOne(f, v.(string))
 				} else {
-					sr.Set(f, v.([]string))
+					sr.SetToMany(f, v.([]string))
 				}
 			}
 		}

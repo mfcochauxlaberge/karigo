@@ -5,13 +5,18 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"testing"
 
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/sourcetest/internal/scenarios"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Test ...
-func Test(src karigo.Source) error {
+func Test(t *testing.T, src karigo.Source) error {
+	assert := assert.New(t)
+
 	scenarios := scenarios.Scenarios
 
 	// Run scenarios
@@ -94,66 +99,7 @@ func Test(src karigo.Source) error {
 		sort.Strings(verif)
 		sort.Strings(keys)
 
-		errorFound := false
-		i1 := 0
-		i2 := 0
-		for i1 < len(verif) || i2 < len(keys) {
-			var key1, key2 string
-			if i1 < len(verif) {
-				key1 = verif[i1]
-			}
-			if i2 < len(keys) {
-				key2 = keys[i2]
-			}
-
-			// Both lists have been fully read
-			if key1 == "" && key2 == "" {
-				break
-			}
-
-			// List of keys is too short
-			if key1 != "" && key2 == "" {
-				errorFound = true
-				fmt.Printf("Key %q is missing.\n", key2)
-				i1++
-				continue
-			}
-
-			// List of keys is too long
-			if key1 == "" && key2 != "" {
-				errorFound = true
-				fmt.Printf("Key %q is not supposed to exist.\n", key2)
-				i2++
-				continue
-			}
-
-			// Both keys are the same
-			if key1 == key2 {
-				i1++
-				i2++
-				continue
-			}
-
-			// Key is not in verification list
-			if key1 < key2 {
-				errorFound = true
-				fmt.Printf("Key %q is missing.\n", key2)
-				i1++
-				continue
-			}
-
-			// Key from verification list does not exist
-			if key1 > key2 {
-				errorFound = true
-				fmt.Printf("Key %q is not supposed to exist.\n", key2)
-				i2++
-				continue
-			}
-		}
-
-		if errorFound {
-			return errors.New("verification failed")
-		}
+		assert.Equal(verif, keys)
 	}
 
 	return nil
