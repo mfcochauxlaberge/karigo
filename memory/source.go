@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"reflect"
 	"sync"
 
 	"github.com/mfcochauxlaberge/karigo"
@@ -339,6 +340,8 @@ func (s *Source) Apply(ops []karigo.Op) error {
 		switch op.Op {
 		case karigo.OpSet:
 			s.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
+		case karigo.OpAdd:
+			s.opAdd(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
 		}
 	}
 
@@ -410,6 +413,29 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 	} else {
 		// Should not happen
 		// TODO Should this code path be reported?
+	}
+}
+
+func (s *Source) opAdd(setname, id, field string, v interface{}) {
+	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", setname, id, field, v)
+
+	curr := reflect.ValueOf(s.sets[setname].Resource(id, nil).Get(field))
+	curr = reflect.Append(curr, reflect.ValueOf(v))
+
+	typ := s.sets[setname].GetType()
+	for _, attr := range typ.Attrs {
+		if attr.Name == field {
+			s.sets[setname].Resource(id, nil).Set(field, v)
+		}
+	}
+	for _, rel := range typ.Rels {
+		if rel.Name == field {
+			if rel.ToOne {
+				s.sets[setname].Resource(id, nil).SetToOne(field, curr.Interface().(string))
+			} else {
+				s.sets[setname].Resource(id, nil).SetToMany(field, curr.Interface().([]string))
+			}
+		}
 	}
 }
 

@@ -3,6 +3,7 @@ package karigo
 // Operations
 const (
 	OpSet = iota
+	OpAdd = iota
 )
 
 // Op ...
@@ -21,6 +22,19 @@ func NewOpSet(set, id, field string, v interface{}) Op {
 			Field: field,
 		},
 		Op:    OpSet,
+		Value: v,
+	}
+}
+
+// NewOpAdd ...
+func NewOpAdd(set, id, field string, v interface{}) Op {
+	return Op{
+		Key: Key{
+			Set:   set,
+			ID:    id,
+			Field: field,
+		},
+		Op:    OpAdd,
 		Value: v,
 	}
 }
@@ -45,6 +59,7 @@ func NewOpAddAttr(set, name, typ string, null bool) []Op {
 		NewOpSet("0_attrs", id, "null", null),
 		NewOpSet("0_attrs", id, "set", set),
 		NewOpSet("0_attrs", id, "active", true),
+		NewOpAdd("0_sets", set, "attrs", id),
 	}
 }
 
@@ -57,5 +72,6 @@ func NewOpAddRel(set, name string, toOne bool) []Op {
 		NewOpSet("0_rels", id, "to-one", toOne),
 		NewOpSet("0_rels", id, "set", set),
 		NewOpSet("0_rels", id, "active", true),
+		NewOpAdd("0_sets", set, "rels", id),
 	}
 }
