@@ -14,3 +14,5 @@ require (
 	github.com/stretchr/testify v1.3.0
 	github.com/twinj/uuid v1.0.0
 )
+
+replace github.com/mfcochauxlaberge/jsonapi => ../jsonapi

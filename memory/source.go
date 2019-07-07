@@ -9,6 +9,8 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
+var _ karigo.Source = (*Source)(nil)
+
 // Source ...
 type Source struct {
 	ID       string
@@ -364,9 +366,10 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 		if id != "" && field == "active" && v.(bool) {
 			// New attribute
 			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
+			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
 			attrType, _ := jsonapi.GetAttrType(s.sets["0_attrs"].Resource(id, nil).Get("type").(string))
 			s.sets[setID].GetType().AddAttr(jsonapi.Attr{
-				Name:     id,
+				Name:     attrName,
 				Type:     attrType,
 				Nullable: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
 			})
@@ -375,8 +378,9 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 		if id != "" && field == "active" && v.(bool) {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).Get("set").(string)
+			relName := s.sets["0_rels"].Resource(id, nil).Get("name").(string)
 			s.sets[setID].GetType().AddRel(jsonapi.Rel{
-				Name:  id,
+				Name:  relName,
 				Type:  s.sets["0_rels"].Resource(id, nil).Get("set").(string),
 				ToOne: s.sets["0_rels"].Resource(id, nil).Get("to-one").(bool),
 				// InverseName:  id,

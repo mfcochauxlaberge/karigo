@@ -1,6 +1,8 @@
 package karigo
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,16 +23,10 @@ type Server struct {
 func (s *Server) Run() {
 	// Logger
 	s.logger = logrus.New()
-	// s.logger.Formatter = &logrus.TextFormatter{}
-	s.logger.Formatter = &logrus.JSONFormatter{}
+	s.logger.Formatter = &logrus.TextFormatter{}
+	// s.logger.Formatter = &logrus.JSONFormatter{}
 
 	s.logger.WithField("event", "server_started").Info("Server started")
-
-	// Nodes
-	s.Nodes = map[string]*Node{}
-
-	local := &Node{}
-	s.Nodes["localhost"] = local
 
 	// Listen and serve
 	err := http.ListenAndServe(":8080", s)
@@ -57,15 +53,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	logger.WithField("event", "incoming_request").Info("New request incoming")
 
-	if _, ok := s.Nodes[domain]; !ok {
+	var (
+		node *Node
+		ok   bool
+	)
+	if node, ok = s.Nodes[domain]; !ok {
 		logger.WithField("event", "unknown_domain").Warn("Domain not found")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	url, err := jsonapi.ParseRawURL(&jsonapi.Schema{}, r.URL.String())
+	url, err := jsonapi.ParseRawURL(node.schema, r.URL.String())
 	if err != nil {
-		s.logger.WithField("url", r.URL.String()).Warn("Invalid URL")
+		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	logger = s.logger.WithFields(logrus.Fields{
@@ -85,7 +87,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("500 Internal Server Error"))
 	}
 
-	w.Write(pl)
+	out := &bytes.Buffer{}
+	err = json.Indent(out, pl, "", "\t")
+
+	w.Write(out.Bytes())
 }
 
 func domainAndPort(host string) (string, int) {

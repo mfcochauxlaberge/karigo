@@ -4,5 +4,4 @@ import (
 	"testing"
 )
 
-func TestServer(t *testing.T) {
-}
+func TestServer(t *testing.T) {}

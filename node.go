@@ -128,7 +128,7 @@ func (n *Node) collection(v uint, qry QueryCol) ([]jsonapi.Resource, error) {
 }
 
 // do ...
-func (n *Node) do(ops []Op) error {
+func (n *Node) apply(ops []Op) error {
 	return errors.New("karigo: an operation could not be executed")
 }
 

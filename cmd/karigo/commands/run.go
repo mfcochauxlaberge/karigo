@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/memory"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +22,13 @@ var cmdRun = &cobra.Command{
 		fmt.Printf("Listening on port %d...\n", port)
 
 		// Server
-		server := &karigo.Server{}
+		server := &karigo.Server{
+			Nodes: map[string]*karigo.Node{},
+		}
+
+		node := karigo.NewNode(&memory.Journal{}, &memory.Source{})
+		server.Nodes["localhost"] = node
+
 		server.Run()
 	},
 }

@@ -179,9 +179,9 @@ func init() {
 				"0_sets.users.name=users",
 				"0_sets.users.rels=users_articles",
 				"0_sets.users.version=0",
-				"users.abc123.users_articles=",
-				"users.abc123.users_password=",
-				"users.abc123.users_username=",
+				"users.abc123.articles=",
+				"users.abc123.password=",
+				"users.abc123.username=",
 			},
 		},
 	)
