@@ -26,7 +26,9 @@ var cmdRun = &cobra.Command{
 			Nodes: map[string]*karigo.Node{},
 		}
 
-		node := karigo.NewNode(&memory.Journal{}, &memory.Source{})
+		src := &memory.Source{}
+		src.Reset()
+		node := karigo.NewNode(&memory.Journal{}, src)
 		server.Nodes["localhost"] = node
 
 		server.Run()

@@ -4,9 +4,7 @@ package karigo
 type Tx func(*Checkpoint)
 
 // TxGet ...
-func TxGet(cp *Checkpoint) {
-	cp.Fail(ErrNotImplemented)
-}
+func TxGet(cp *Checkpoint) {}
 
 // TxCreate ...
 func TxCreate(cp *Checkpoint) {

@@ -28,6 +28,16 @@ func (s *Server) Run() {
 
 	s.logger.WithField("event", "server_started").Info("Server started")
 
+	if node, ok := s.Nodes["localhost"]; ok {
+		ops := []Op{}
+		ops = append(ops, NewOpSet("0_meta", "", "id", "password"))
+		ops = append(ops, NewOpSet("0_meta", "password", "value", "123456seven"))
+		err := node.apply(ops)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	// Listen and serve
 	err := http.ListenAndServe(":8080", s)
 	if err != http.ErrServerClosed {
@@ -46,19 +56,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		domain = "localhost"
 	}
 
-	logger := s.logger.WithFields(logrus.Fields{
+	entry := s.logger.WithFields(logrus.Fields{
 		"id":     shortID,
 		"domain": domain,
 	})
 
-	logger.WithField("event", "incoming_request").Info("New request incoming")
+	entry.WithField("event", "incoming_request").Info("New request incoming")
 
 	var (
 		node *Node
 		ok   bool
 	)
 	if node, ok = s.Nodes[domain]; !ok {
-		logger.WithField("event", "unknown_domain").Warn("Domain not found")
+		entry.WithField("event", "unknown_domain").Warn("Domain not found")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -70,7 +80,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger = s.logger.WithFields(logrus.Fields{
+	entry = s.logger.WithFields(logrus.Fields{
 		"url": url,
 	})
 
@@ -81,7 +91,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	doc := s.Nodes[domain].Handle(req)
 
-	pl, err := jsonapi.Marshal(doc, nil)
+	pl, err := jsonapi.Marshal(doc, url)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("500 Internal Server Error"))

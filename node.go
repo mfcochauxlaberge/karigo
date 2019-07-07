@@ -85,10 +85,18 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	switch r.Method {
 	case "GET":
-		if r.URL.IsCol {
-			cp.Collection(NewQueryCol(r.URL))
+		if !r.URL.IsCol {
+			res := cp.Resource(NewQueryRes(r.URL))
+			doc.Data = jsonapi.Resource(res)
 		} else {
-			cp.Resource(NewQueryRes(r.URL))
+			col := &jsonapi.SoftCollection{}
+			resources := cp.Collection(NewQueryCol(r.URL))
+			for _, res := range resources {
+				typ := res.GetType()
+				col.SetType(&typ)
+				col.Add(res)
+			}
+			doc.Data = jsonapi.Collection(col)
 		}
 	case "POST", "PATCH":
 		cp.Resource(NewQueryRes(r.URL))
@@ -105,8 +113,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			jaErr = jsonapi.NewErrInternalServerError()
 		}
 		doc.Errors = []jsonapi.Error{jaErr}
-	} else {
-		doc.Data = nil
 	}
 
 	return doc
@@ -116,7 +122,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 func (n *Node) resource(v uint, qry QueryRes) (jsonapi.Resource, error) {
 	// TODO Validate the query?
 
-	return nil, errors.New("karigo: no source could handle the query")
+	return n.main.src.Resource(qry)
 }
 
 // collection ...
@@ -129,7 +135,11 @@ func (n *Node) collection(v uint, qry QueryCol) ([]jsonapi.Resource, error) {
 
 // do ...
 func (n *Node) apply(ops []Op) error {
-	return errors.New("karigo: an operation could not be executed")
+	err := n.main.src.Apply(ops)
+	if err != nil {
+		return errors.New("karigo: an operation could not be executed")
+	}
+	return nil
 }
 
 // FirstSchema ...

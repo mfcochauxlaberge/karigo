@@ -3,6 +3,7 @@ package karigo_test
 import (
 	"testing"
 
+	"github.com/mfcochauxlaberge/karigo"
 	. "github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/memory"
 
@@ -24,10 +25,10 @@ func TestNode(t *testing.T) {
 	schema.AddType(typ)
 
 	// Source
-	src := &memory.Source{
-		ID:       "memory",
-		Location: "local",
-	}
+	src := &memory.Source{}
+	src.Reset() // TODO Necessary?
+
+	src.Apply(karigo.NewOpAddSet("things"))
 
 	// Journal
 	journal := &memory.Journal{}
@@ -46,7 +47,7 @@ func TestNode(t *testing.T) {
 		URL:    url,
 	}
 	res := node.Handle(req)
-	if len(res.Errors) == 0 {
-		t.Errorf("No errors occured.\n")
+	if len(res.Errors) > 0 {
+		t.Errorf("At least one error occured: %v\n", err)
 	}
 }

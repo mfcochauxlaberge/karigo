@@ -13,9 +13,6 @@ var _ karigo.Source = (*Source)(nil)
 
 // Source ...
 type Source struct {
-	ID       string
-	Location string
-
 	sets map[string]*jsonapi.SoftCollection
 
 	sync.Mutex
@@ -350,11 +347,11 @@ func (s *Source) Apply(ops []karigo.Op) error {
 	return nil
 }
 
-func (s *Source) opSet(setname, id, field string, v interface{}) {
-	// fmt.Printf("set, id, field = %s, %s, %s = %v\n", setname, id, field, v)
+func (s *Source) opSet(set, id, field string, v interface{}) {
+	// fmt.Printf("set, id, field = %s, %s, %s = %v\n", set, id, field, v)
 
 	// Type change
-	if setname == "0_sets" {
+	if set == "0_sets" {
 		if id != "" && field == "active" && v.(bool) {
 			// New set
 			s.sets[id] = &jsonapi.SoftCollection{}
@@ -362,7 +359,7 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 				Name: id,
 			})
 		}
-	} else if setname == "0_attrs" {
+	} else if set == "0_attrs" {
 		if id != "" && field == "active" && v.(bool) {
 			// New attribute
 			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
@@ -374,7 +371,7 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 				Nullable: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
 			})
 		}
-	} else if setname == "0_rels" {
+	} else if set == "0_rels" {
 		if id != "" && field == "active" && v.(bool) {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).Get("set").(string)
@@ -392,52 +389,52 @@ func (s *Source) opSet(setname, id, field string, v interface{}) {
 
 	if id != "" && field != "id" {
 		// Set a field
-		typ := s.sets[setname].GetType()
+		typ := s.sets[set].GetType()
 		for _, attr := range typ.Attrs {
 			if attr.Name == field {
-				s.sets[setname].Resource(id, nil).Set(field, v)
+				s.sets[set].Resource(id, nil).Set(field, v)
 			}
 		}
 		for _, rel := range typ.Rels {
 			if rel.Name == field {
 				if rel.ToOne {
-					s.sets[setname].Resource(id, nil).SetToOne(field, v.(string))
+					s.sets[set].Resource(id, nil).SetToOne(field, v.(string))
 				} else {
-					s.sets[setname].Resource(id, nil).SetToMany(field, v.([]string))
+					s.sets[set].Resource(id, nil).SetToMany(field, v.([]string))
 				}
 			}
 		}
 	} else if id == "" && field == "id" {
 		// Create a resource
-		typ := s.sets[setname].GetType()
-		s.sets[setname].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
+		typ := s.sets[set].GetType()
+		s.sets[set].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" && v.(string) == "" {
 		// Delete a resource
-		s.sets[setname].Remove(id)
+		s.sets[set].Remove(id)
 	} else {
 		// Should not happen
 		// TODO Should this code path be reported?
 	}
 }
 
-func (s *Source) opAdd(setname, id, field string, v interface{}) {
-	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", setname, id, field, v)
+func (s *Source) opAdd(set, id, field string, v interface{}) {
+	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", set, id, field, v)
 
-	curr := reflect.ValueOf(s.sets[setname].Resource(id, nil).Get(field))
+	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).Get(field))
 	curr = reflect.Append(curr, reflect.ValueOf(v))
 
-	typ := s.sets[setname].GetType()
+	typ := s.sets[set].GetType()
 	for _, attr := range typ.Attrs {
 		if attr.Name == field {
-			s.sets[setname].Resource(id, nil).Set(field, v)
+			s.sets[set].Resource(id, nil).Set(field, v)
 		}
 	}
 	for _, rel := range typ.Rels {
 		if rel.Name == field {
 			if rel.ToOne {
-				s.sets[setname].Resource(id, nil).SetToOne(field, curr.Interface().(string))
+				s.sets[set].Resource(id, nil).SetToOne(field, curr.Interface().(string))
 			} else {
-				s.sets[setname].Resource(id, nil).SetToMany(field, curr.Interface().([]string))
+				s.sets[set].Resource(id, nil).SetToMany(field, curr.Interface().([]string))
 			}
 		}
 	}

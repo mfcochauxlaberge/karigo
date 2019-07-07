@@ -19,8 +19,6 @@ type Checkpoint struct {
 	ready bool
 
 	err error
-
-	Test string
 }
 
 // Resource ...
