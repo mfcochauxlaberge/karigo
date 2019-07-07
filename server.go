@@ -32,6 +32,9 @@ func (s *Server) Run() {
 		ops := []Op{}
 		ops = append(ops, NewOpSet("0_meta", "", "id", "password"))
 		ops = append(ops, NewOpSet("0_meta", "password", "value", "123456seven"))
+		ops = append(ops, NewOpSet("0_meta", "", "id", "name"))
+		ops = append(ops, NewOpSet("0_meta", "name", "value", "test"))
+
 		err := node.apply(ops)
 		if err != nil {
 			panic(err)
@@ -78,6 +81,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	if url.Params.PageSize == 0 {
+		url.Params.PageSize = 10
 	}
 
 	entry = s.logger.WithFields(logrus.Fields{

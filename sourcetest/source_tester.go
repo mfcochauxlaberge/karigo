@@ -54,7 +54,7 @@ func Test(t *testing.T, src karigo.Source) error {
 			Set:        "0_sets",
 			Sort:       []string{"id"},
 			PageNumber: 0,
-			PageSize:   0,
+			PageSize:   1000,
 		})
 		if err != nil {
 			return fmt.Errorf("could not get list of sets: %s", err)
@@ -67,7 +67,7 @@ func Test(t *testing.T, src karigo.Source) error {
 				Set:        id,
 				Sort:       []string{"id"},
 				PageNumber: 0,
-				PageSize:   0,
+				PageSize:   1000,
 			})
 			if err != nil {
 				return fmt.Errorf("could not get collection from %q: %s", id, err)

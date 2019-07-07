@@ -90,10 +90,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			doc.Data = jsonapi.Resource(res)
 		} else {
 			col := &jsonapi.SoftCollection{}
+			typ, _ := n.schema.GetType(r.URL.ResType)
+			col.SetType(&typ)
 			resources := cp.Collection(NewQueryCol(r.URL))
 			for _, res := range resources {
-				typ := res.GetType()
-				col.SetType(&typ)
 				col.Add(res)
 			}
 			doc.Data = jsonapi.Collection(col)
