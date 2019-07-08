@@ -26,7 +26,7 @@ func (s *Server) Run() {
 	s.logger.Formatter = &logrus.TextFormatter{}
 	// s.logger.Formatter = &logrus.JSONFormatter{}
 
-	s.logger.WithField("event", "server_started").Info("Server started")
+	s.logger.WithField("event", "server_start").Info("Server has started")
 
 	if node, ok := s.Nodes["localhost"]; ok {
 		ops := []Op{}
