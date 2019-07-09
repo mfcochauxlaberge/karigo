@@ -34,6 +34,8 @@ func (s *Server) Run() {
 		ops = append(ops, NewOpSet("0_meta", "password", "value", "123456seven"))
 		ops = append(ops, NewOpSet("0_meta", "", "id", "name"))
 		ops = append(ops, NewOpSet("0_meta", "name", "value", "test"))
+		ops = append(ops, NewOpSet("0_meta", "", "id", "name-again"))
+		ops = append(ops, NewOpSet("0_meta", "name-again", "value", "test"))
 
 		err := node.apply(ops)
 		if err != nil {
@@ -76,6 +78,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	node.logger = s.logger
+
 	url, err := jsonapi.ParseRawURL(node.schema, r.URL.String())
 	if err != nil {
 		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
@@ -96,7 +100,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		URL:    url,
 	}
 
-	doc := s.Nodes[domain].Handle(req)
+	doc := node.Handle(req)
 
 	pl, err := jsonapi.Marshal(doc, url)
 	if err != nil {

@@ -7,29 +7,23 @@ type Tx func(*Checkpoint)
 func TxGet(cp *Checkpoint) {}
 
 // TxCreate ...
-func TxCreate(cp *Checkpoint) {
-	cp.Fail(ErrNotImplemented)
-}
+func TxCreate(cp *Checkpoint) {}
 
 // TxUpdate ...
-func TxUpdate(cp *Checkpoint) {
-	cp.Fail(ErrNotImplemented)
-}
+func TxUpdate(cp *Checkpoint) {}
 
 // TxDelete ...
-func TxDelete(cp *Checkpoint) {
-	cp.Fail(ErrNotImplemented)
-}
+func TxDelete(cp *Checkpoint) {}
 
 // TxNotImplemented ...
-func TxNotImplemented(cp *Checkpoint) {
-	cp.Fail(ErrNotImplemented)
-}
+// func TxNotImplemented(cp *Checkpoint) {
+// 	cp.Fail(ErrNotImplemented)
+// }
 
 // TxNotFound ...
-func TxNotFound(cp *Checkpoint) {
-	cp.Fail(ErrNotFound)
-}
+// func TxNotFound(cp *Checkpoint) {
+// 	cp.Fail(ErrNotFound)
+// }
 
 // tx ...
 type tx struct{}

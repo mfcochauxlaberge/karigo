@@ -5,6 +5,8 @@ import (
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
+	"github.com/sirupsen/logrus"
+	"github.com/twinj/uuid"
 )
 
 // NewNode ...
@@ -20,6 +22,8 @@ func NewNode(journal Journal, src Source) *Node {
 
 		err:      make(chan error),
 		shutdown: make(chan bool),
+
+		logger: logrus.New(),
 	}
 
 	return node
@@ -40,6 +44,7 @@ type Node struct {
 	shutdown chan bool
 
 	// Internal
+	logger *logrus.Logger
 	sync.Mutex
 }
 
@@ -59,19 +64,25 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	n.Lock()
 	defer n.Unlock()
 
+	var id string
+
 	// Transaction
 	var tx Tx
 	switch r.Method {
 	case "GET":
+		n.logger.Debug("Executiong GET transaction")
 		tx = TxGet
 	case "POST":
+		id = uuid.NewV4().String()
+		n.apply([]Op{NewOpSet(r.URL.ResType, "", "id", id)})
+		n.logger.Debug("Executiong POST transaction")
 		tx = TxCreate
 	case "PATCH":
+		n.logger.Debug("Executiong PATCH transaction")
 		tx = TxUpdate
 	case "DELETE":
+		n.logger.Debug("Executiong DELETE transaction")
 		tx = TxDelete
-	default:
-		tx = TxNotImplemented
 	}
 
 	doc := &jsonapi.Document{}
@@ -99,9 +110,11 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			doc.Data = jsonapi.Collection(col)
 		}
 	case "POST", "PATCH":
-		cp.Resource(NewQueryRes(r.URL))
-	default:
-		tx = TxNotImplemented
+		qry := NewQueryRes(r.URL)
+		qry.ID = id
+		res := cp.Resource(qry)
+		doc.Data = jsonapi.Resource(res)
+	case "DELETE":
 	}
 
 	if cp.err != nil {
