@@ -67,22 +67,18 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	var id string
 
 	// Transaction
-	var tx Tx
+	tx := TxNothing
 	switch r.Method {
 	case "GET":
 		n.logger.Debug("Executiong GET transaction")
-		tx = TxGet
 	case "POST":
 		id = uuid.NewV4().String()
 		n.apply([]Op{NewOpSet(r.URL.ResType, "", "id", id)})
 		n.logger.Debug("Executiong POST transaction")
-		tx = TxCreate
 	case "PATCH":
 		n.logger.Debug("Executiong PATCH transaction")
-		tx = TxUpdate
 	case "DELETE":
 		n.logger.Debug("Executiong DELETE transaction")
-		tx = TxDelete
 	}
 
 	doc := &jsonapi.Document{}

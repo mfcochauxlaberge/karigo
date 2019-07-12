@@ -3,17 +3,20 @@ package karigo
 // Tx ...
 type Tx func(*Checkpoint)
 
+// TxNothing ...
+func TxNothing(cp *Checkpoint) {}
+
 // TxGet ...
-func TxGet(cp *Checkpoint) {}
+// func TxGet(cp *Checkpoint) {}
 
 // TxCreate ...
-func TxCreate(cp *Checkpoint) {}
+// func TxCreate(cp *Checkpoint) {}
 
 // TxUpdate ...
-func TxUpdate(cp *Checkpoint) {}
+// func TxUpdate(cp *Checkpoint) {}
 
 // TxDelete ...
-func TxDelete(cp *Checkpoint) {}
+// func TxDelete(cp *Checkpoint) {}
 
 // TxNotImplemented ...
 // func TxNotImplemented(cp *Checkpoint) {
@@ -26,4 +29,4 @@ func TxDelete(cp *Checkpoint) {}
 // }
 
 // tx ...
-type tx struct{}
+// type tx struct{}
