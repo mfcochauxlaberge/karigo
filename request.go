@@ -16,7 +16,7 @@ const (
 
 // NewRequest ...
 func NewRequest(r *http.Request) (*Request, error) {
-	jurl, err := jsonapi.ParseRawURL(&jsonapi.Schema{}, r.URL.RawPath)
+	jurl, err := jsonapi.NewURLFromRaw(&jsonapi.Schema{}, r.URL.RawPath)
 	// if err != nil {
 	// 	return nil, err
 	// }

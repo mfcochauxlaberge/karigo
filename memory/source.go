@@ -365,7 +365,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
 			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
 			attrType, _ := jsonapi.GetAttrType(s.sets["0_attrs"].Resource(id, nil).Get("type").(string))
-			s.sets[setID].GetType().AddAttr(jsonapi.Attr{
+			s.sets[setID].Type.AddAttr(jsonapi.Attr{
 				Name:     attrName,
 				Type:     attrType,
 				Nullable: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
@@ -376,7 +376,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).Get("set").(string)
 			relName := s.sets["0_rels"].Resource(id, nil).Get("name").(string)
-			s.sets[setID].GetType().AddRel(jsonapi.Rel{
+			s.sets[setID].Type.AddRel(jsonapi.Rel{
 				Name:  relName,
 				Type:  s.sets["0_rels"].Resource(id, nil).Get("set").(string),
 				ToOne: s.sets["0_rels"].Resource(id, nil).Get("to-one").(bool),
@@ -389,7 +389,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 
 	if id != "" && field != "id" {
 		// Set a field
-		typ := s.sets[set].GetType()
+		typ := s.sets[set].Type
 		for _, attr := range typ.Attrs {
 			if attr.Name == field {
 				s.sets[set].Resource(id, nil).Set(field, v)
@@ -406,7 +406,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 		}
 	} else if id == "" && field == "id" {
 		// Create a resource
-		typ := s.sets[set].GetType()
+		typ := s.sets[set].Type
 		s.sets[set].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
 	} else if id != "" && field == "id" && v.(string) == "" {
 		// Delete a resource
@@ -423,7 +423,7 @@ func (s *Source) opAdd(set, id, field string, v interface{}) {
 	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).Get(field))
 	curr = reflect.Append(curr, reflect.ValueOf(v))
 
-	typ := s.sets[set].GetType()
+	typ := s.sets[set].Type
 	for _, attr := range typ.Attrs {
 		if attr.Name == field {
 			s.sets[set].Resource(id, nil).Set(field, v)

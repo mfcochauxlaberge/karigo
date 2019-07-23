@@ -37,6 +37,24 @@ func (s *Server) Run() {
 		ops = append(ops, NewOpSet("0_meta", "", "id", "name-again"))
 		ops = append(ops, NewOpSet("0_meta", "name-again", "value", "test"))
 
+		ops = append(ops, NewOpAddSet("users")...)
+		ops = append(ops, NewOpAddAttr("users", "username", "string", false)...)
+		ops = append(ops, NewOpAddAttr("users", "name", "string", false)...)
+		ops = append(ops, NewOpAddAttr("users", "password", "string", false)...)
+		// ops = append(ops, NewOpAddAttr("users", "created-at", "string", time.Now())...)
+		ops = append(ops, NewOpSet("users", "", "id", "abc123"))
+		ops = append(ops, NewOpSet("users", "abc123", "username", "user1"))
+		ops = append(ops, NewOpSet("users", "abc123", "name", "Bob"))
+		ops = append(ops, NewOpSet("users", "abc123", "password", "j2K2sN1s7"))
+		ops = append(ops, NewOpSet("users", "", "id", "def456"))
+		ops = append(ops, NewOpSet("users", "def456", "username", "user2"))
+		ops = append(ops, NewOpSet("users", "def456", "name", "John"))
+		ops = append(ops, NewOpSet("users", "def456", "password", "K1nas82J2"))
+		ops = append(ops, NewOpSet("users", "", "id", "ghi789"))
+		ops = append(ops, NewOpSet("users", "ghi789", "username", "user3"))
+		ops = append(ops, NewOpSet("users", "ghi789", "name", "Ted"))
+		ops = append(ops, NewOpSet("users", "ghi789", "password", "aJ2n2s8sa"))
+
 		err := node.apply(ops)
 		if err != nil {
 			panic(err)
@@ -80,7 +98,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	node.logger = s.logger
 
-	url, err := jsonapi.ParseRawURL(node.schema, r.URL.String())
+	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
 	if err != nil {
 		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
 		w.WriteHeader(http.StatusInternalServerError)

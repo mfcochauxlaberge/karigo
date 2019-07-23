@@ -37,7 +37,7 @@ func TestNode(t *testing.T) {
 	node := NewNode(journal, src)
 	go node.Run()
 
-	url, err := jsonapi.ParseRawURL(schema, "/things")
+	url, err := jsonapi.NewURLFromRaw(schema, "/things")
 	if err != nil {
 		panic(err)
 	}

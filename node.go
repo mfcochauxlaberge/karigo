@@ -83,13 +83,14 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	doc := &jsonapi.Document{}
 
-	// Execute
+	// Execution
 	cp := &Checkpoint{
 		node: n,
 		ops:  []Op{},
 	}
 	tx(cp)
 
+	// Response payload
 	switch r.Method {
 	case "GET":
 		if !r.URL.IsCol {
@@ -97,7 +98,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			doc.Data = jsonapi.Resource(res)
 		} else {
 			col := &jsonapi.SoftCollection{}
-			typ, _ := n.schema.GetType(r.URL.ResType)
+			typ := n.schema.GetType(r.URL.ResType)
 			col.SetType(&typ)
 			resources := cp.Collection(NewQueryCol(r.URL))
 			for _, res := range resources {
@@ -111,6 +112,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		res := cp.Resource(qry)
 		doc.Data = jsonapi.Resource(res)
 	case "DELETE":
+		// cp.
 	}
 
 	if cp.err != nil {
