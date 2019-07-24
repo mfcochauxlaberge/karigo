@@ -66,6 +66,22 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	var id string
 
+	// // Check for schema change
+	// if r.Method == "POST" {
+	// 	switch r.URL.ResType {
+	// 	case "0_sets":
+	// 		res := r.Body.Data.(jsonapi.Resource)
+	// 		var (
+	// 			name = res.Get("name")
+	// 		)
+
+	// 	case "0_attrs":
+	// 	case "0_rels":
+	// 	}
+	// } else if r.Method == "PATCH" {
+	// 	// if r.URL
+	// }
+
 	// Transaction
 	tx := TxNothing
 	switch r.Method {
