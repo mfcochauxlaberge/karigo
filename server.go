@@ -71,33 +71,32 @@ func (s *Server) Run() {
 // ServeHTTP ...
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestID := uuid.NewV4()
-	shortID := makeShortID(requestID)
+	// shortID := requestID.String()[0:8]
 
-	// URL
-	domain, _ := domainAndPort(r.Host)
-	if domain == "" || domain == "127.0.0.1" {
-		domain = "localhost"
-	}
+	// Parse domain and port
+	domain, port := domainAndPort(r.Host)
 
-	entry := s.logger.WithFields(logrus.Fields{
-		"id":     shortID,
+	// Populate logger with rid
+	logger := s.logger.WithField("rid", requestID)
+
+	logger.WithFields(logrus.Fields{
+		"event":  "read_request",
 		"domain": domain,
-	})
+		"port":   port,
+	}).Info("New request incoming")
 
-	entry.WithField("event", "incoming_request").Info("New request incoming")
-
+	// Find node from domain
 	var (
 		node *Node
 		ok   bool
 	)
 	if node, ok = s.Nodes[domain]; !ok {
-		entry.WithField("event", "unknown_domain").Warn("Domain not found")
+		logger.WithField("event", "unknown_domain").Warn("App not found from domain")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	node.logger = s.logger
-
+	// Parse URL
 	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
 	if err != nil {
 		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
@@ -105,31 +104,43 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// logger = logger.WithFields(logrus.Fields{
+	// 	"app": node.,
+	// })
+
+	// Set default page size
 	if url.Params.PageSize == 0 {
 		url.Params.PageSize = 10
 	}
 
-	entry = s.logger.WithFields(logrus.Fields{
-		"url": url,
-	})
+	logger.WithFields(logrus.Fields{
+		"event": "parse_url",
+		"url":   url.String(),
+	}).Info("URL parsing")
 
+	// Build request
 	req := &Request{
+		ID:     requestID.String(),
 		Method: r.Method,
 		URL:    url,
 	}
 
+	// Send request to node
 	doc := node.Handle(req)
 
+	// Marshal response
 	pl, err := jsonapi.Marshal(doc, url)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 Internal Server Error"))
+		_, _ = w.Write([]byte("500 Internal Server Error"))
 	}
 
+	// Indent response
 	out := &bytes.Buffer{}
-	err = json.Indent(out, pl, "", "\t")
+	_ = json.Indent(out, pl, "", "\t")
 
-	w.Write(out.Bytes())
+	// Send response
+	_, _ = w.Write(out.Bytes())
 }
 
 func domainAndPort(host string) (string, int) {
@@ -149,8 +160,4 @@ func domainAndPort(host string) (string, int) {
 	}
 
 	return domain, port
-}
-
-func makeShortID(uuid uuid.UUID) string {
-	return uuid.String()[0:8]
 }

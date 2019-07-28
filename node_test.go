@@ -14,7 +14,7 @@ func TestNode(t *testing.T) {
 	// Fake type
 	typ := jsonapi.Type{}
 	typ.Name = "things"
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "name",
 		Type:     jsonapi.AttrTypeString,
 		Nullable: false,
@@ -22,20 +22,20 @@ func TestNode(t *testing.T) {
 
 	// Schema
 	schema := &jsonapi.Schema{}
-	schema.AddType(typ)
+	_ = schema.AddType(typ)
 
 	// Source
 	src := &memory.Source{}
-	src.Reset() // TODO Necessary?
+	_ = src.Reset() // TODO Necessary?
 
-	src.Apply(karigo.NewOpAddSet("things"))
+	_ = src.Apply(karigo.NewOpAddSet("things"))
 
 	// Journal
 	journal := &memory.Journal{}
 
 	// Node
 	node := NewNode(journal, src)
-	go node.Run()
+	go func() { _ = node.Run() }()
 
 	url, err := jsonapi.NewURLFromRaw(schema, "/things")
 	if err != nil {

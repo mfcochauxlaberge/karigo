@@ -13,10 +13,10 @@ type Checkpoint struct {
 
 	version uint
 	// locks   map[string]bool // false for read, true for write
-	tx    SourceTx
-	ops   []Op
-	undo  []Op
-	ready bool
+	// tx    SourceTx
+	ops []Op
+	// undo  []Op
+	// ready bool
 
 	err error
 }

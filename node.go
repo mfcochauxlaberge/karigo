@@ -31,6 +31,9 @@ func NewNode(journal Journal, src Source) *Node {
 
 // Node ...
 type Node struct {
+	Name    string
+	Domains []string
+
 	// Run
 	log  Journal
 	main source
@@ -61,12 +64,9 @@ func (n *Node) Run() error {
 
 // Handle ...
 func (n *Node) Handle(r *Request) *jsonapi.Document {
-	n.Lock()
-	defer n.Unlock()
-
 	var id string
 
-	// // Check for schema change
+	// Check for schema change
 	// if r.Method == "POST" {
 	// 	switch r.URL.ResType {
 	// 	case "0_sets":
@@ -86,15 +86,15 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	tx := TxNothing
 	switch r.Method {
 	case "GET":
-		n.logger.Debug("Executiong GET transaction")
+		n.logger.Debug("GET request")
 	case "POST":
 		id = uuid.NewV4().String()
-		n.apply([]Op{NewOpSet(r.URL.ResType, "", "id", id)})
-		n.logger.Debug("Executiong POST transaction")
+		_ = n.apply([]Op{NewOpSet(r.URL.ResType, "", "id", id)})
+		n.logger.Debug("POST request")
 	case "PATCH":
-		n.logger.Debug("Executiong PATCH transaction")
+		n.logger.Debug("PATCH request")
 	case "DELETE":
-		n.logger.Debug("Executiong DELETE transaction")
+		n.logger.Debug("DELETE request")
 	}
 
 	doc := &jsonapi.Document{}
@@ -177,33 +177,33 @@ func FirstSchema() *jsonapi.Schema {
 	typ := &jsonapi.Type{
 		Name: "0_meta",
 	}
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "value",
 		Type:     jsonapi.AttrTypeString,
 		Nullable: false,
 	})
-	schema.AddType(*typ)
+	_ = schema.AddType(*typ)
 
 	// Sets
 	typ = &jsonapi.Type{
 		Name: "0_sets",
 	}
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "name",
 		Type:     jsonapi.AttrTypeString,
 		Nullable: false,
 	})
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "version",
 		Type:     jsonapi.AttrTypeUint,
 		Nullable: false,
 	})
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "active",
 		Type:     jsonapi.AttrTypeBool,
 		Nullable: false,
 	})
-	typ.AddRel(jsonapi.Rel{
+	_ = typ.AddRel(jsonapi.Rel{
 		Name:         "attrs",
 		Type:         "0_attrs",
 		ToOne:        false,
@@ -211,7 +211,7 @@ func FirstSchema() *jsonapi.Schema {
 		InverseType:  "0_sets",
 		InverseToOne: true,
 	})
-	typ.AddRel(jsonapi.Rel{
+	_ = typ.AddRel(jsonapi.Rel{
 		Name:         "rels",
 		Type:         "0_rels",
 		ToOne:        false,
@@ -219,33 +219,33 @@ func FirstSchema() *jsonapi.Schema {
 		InverseType:  "0_sets",
 		InverseToOne: true,
 	})
-	schema.AddType(*typ)
+	_ = schema.AddType(*typ)
 
 	// Attrs
 	typ = &jsonapi.Type{
 		Name: "0_attrs",
 	}
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "name",
 		Type:     jsonapi.AttrTypeString,
 		Nullable: false,
 	})
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "type",
 		Type:     jsonapi.AttrTypeString,
 		Nullable: false,
 	})
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "null",
 		Type:     jsonapi.AttrTypeBool,
 		Nullable: false,
 	})
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "active",
 		Type:     jsonapi.AttrTypeBool,
 		Nullable: false,
 	})
-	typ.AddRel(jsonapi.Rel{
+	_ = typ.AddRel(jsonapi.Rel{
 		Name:         "set",
 		Type:         "0_sets",
 		ToOne:        true,
@@ -253,28 +253,28 @@ func FirstSchema() *jsonapi.Schema {
 		InverseType:  "0_attrs",
 		InverseToOne: false,
 	})
-	schema.AddType(*typ)
+	_ = schema.AddType(*typ)
 
 	// Rels
 	typ = &jsonapi.Type{
 		Name: "0_rels",
 	}
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "name",
 		Type:     jsonapi.AttrTypeString,
 		Nullable: false,
 	})
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "to-one",
 		Type:     jsonapi.AttrTypeBool,
 		Nullable: false,
 	})
-	typ.AddAttr(jsonapi.Attr{
+	_ = typ.AddAttr(jsonapi.Attr{
 		Name:     "active",
 		Type:     jsonapi.AttrTypeBool,
 		Nullable: false,
 	})
-	typ.AddRel(jsonapi.Rel{
+	_ = typ.AddRel(jsonapi.Rel{
 		Name:         "inverse",
 		Type:         "0_rels",
 		ToOne:        true,
@@ -282,7 +282,7 @@ func FirstSchema() *jsonapi.Schema {
 		InverseType:  "0_rels",
 		InverseToOne: true,
 	})
-	typ.AddRel(jsonapi.Rel{
+	_ = typ.AddRel(jsonapi.Rel{
 		Name:         "set",
 		Type:         "0_sets",
 		ToOne:        true,
@@ -290,7 +290,7 @@ func FirstSchema() *jsonapi.Schema {
 		InverseType:  "0_rels",
 		InverseToOne: false,
 	})
-	schema.AddType(*typ)
+	_ = schema.AddType(*typ)
 
 	return schema
 }

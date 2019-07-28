@@ -32,6 +32,7 @@ func NewRequest(r *http.Request) (*Request, error) {
 
 // Request ...
 type Request struct {
+	ID     string
 	Method string
 	URL    *jsonapi.URL
 	Body   *jsonapi.Document

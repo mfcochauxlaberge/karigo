@@ -365,7 +365,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
 			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
 			attrType, _ := jsonapi.GetAttrType(s.sets["0_attrs"].Resource(id, nil).Get("type").(string))
-			s.sets[setID].Type.AddAttr(jsonapi.Attr{
+			_ = s.sets[setID].Type.AddAttr(jsonapi.Attr{
 				Name:     attrName,
 				Type:     attrType,
 				Nullable: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
@@ -376,7 +376,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).Get("set").(string)
 			relName := s.sets["0_rels"].Resource(id, nil).Get("name").(string)
-			s.sets[setID].Type.AddRel(jsonapi.Rel{
+			_ = s.sets[setID].Type.AddRel(jsonapi.Rel{
 				Name:  relName,
 				Type:  s.sets["0_rels"].Resource(id, nil).Get("set").(string),
 				ToOne: s.sets["0_rels"].Resource(id, nil).Get("to-one").(bool),

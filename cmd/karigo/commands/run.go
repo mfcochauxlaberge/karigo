@@ -27,9 +27,13 @@ var cmdRun = &cobra.Command{
 		}
 
 		src := &memory.Source{}
-		src.Reset()
+		_ = src.Reset()
 		node := karigo.NewNode(&memory.Journal{}, src)
-		server.Nodes["localhost"] = node
+		node.Name = "test"
+		node.Domains = []string{"localhost", "127.0.0.1"}
+		for _, domain := range node.Domains {
+			server.Nodes[domain] = node
+		}
 
 		server.Run()
 	},
