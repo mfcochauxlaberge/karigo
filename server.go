@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -23,7 +24,24 @@ type Server struct {
 func (s *Server) Run() {
 	// Logger
 	s.logger = logrus.New()
-	s.logger.Formatter = &logrus.TextFormatter{}
+	s.logger.Formatter = &logrus.TextFormatter{
+		FullTimestamp:    true,
+		QuoteEmptyFields: true,
+		SortingFunc: func(keys []string) {
+			hasrid := false
+			for i := range keys {
+				if keys[i] == "rid" {
+					hasrid = true
+					keys = append(keys[:i], keys[i+1:]...)
+					break
+				}
+			}
+			sort.Strings(keys)
+			if hasrid {
+				keys = append(keys, "rid")
+			}
+		},
+	}
 	// s.logger.Formatter = &logrus.JSONFormatter{}
 
 	s.logger.WithField("event", "server_start").Info("Server has started")
@@ -70,8 +88,7 @@ func (s *Server) Run() {
 
 // ServeHTTP ...
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	requestID := uuid.NewV4()
-	// shortID := requestID.String()[0:8]
+	requestID := uuid.NewV4().String()[:8]
 
 	// Parse domain and port
 	domain, port := domainAndPort(r.Host)
@@ -93,6 +110,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if node, ok = s.Nodes[domain]; !ok {
 		logger.WithField("event", "unknown_domain").Warn("App not found from domain")
 		w.WriteHeader(http.StatusNotFound)
+		logger.WithField("event", "set_http_status_code").Warn("See HTTP status code")
+		logger.WithField("event", "send_response").Warn("Send response")
 		return
 	}
 
@@ -116,11 +135,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logger.WithFields(logrus.Fields{
 		"event": "parse_url",
 		"url":   url.String(),
-	}).Info("URL parsing")
+	}).Info("URL parsed")
 
 	// Build request
 	req := &Request{
-		ID:     requestID.String(),
+		ID:     requestID,
 		Method: r.Method,
 		URL:    url,
 	}
