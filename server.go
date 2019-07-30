@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -27,20 +26,6 @@ func (s *Server) Run() {
 	s.logger.Formatter = &logrus.TextFormatter{
 		FullTimestamp:    true,
 		QuoteEmptyFields: true,
-		SortingFunc: func(keys []string) {
-			hasrid := false
-			for i := range keys {
-				if keys[i] == "rid" {
-					hasrid = true
-					keys = append(keys[:i], keys[i+1:]...)
-					break
-				}
-			}
-			sort.Strings(keys)
-			if hasrid {
-				keys = append(keys, "rid")
-			}
-		},
 	}
 	// s.logger.Formatter = &logrus.JSONFormatter{}
 
