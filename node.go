@@ -64,9 +64,66 @@ func (n *Node) Run() error {
 
 // Handle ...
 func (n *Node) Handle(r *Request) *jsonapi.Document {
-	var id string
+	var (
+		res jsonapi.Resource
+		id  string
+	)
+	if r.Body != nil && r.Body.Data != nil {
+		res, _ = r.Body.Data.(jsonapi.Resource)
+	}
 
-	// Check for schema change
+	n.logger.Debugf("Node %s received a request", n.Name)
+
+	// Prepare transaction
+	tx := TxNothing
+	ops := []Op{}
+	switch r.Method {
+	case "GET":
+		n.logger.Debug("GET request")
+		tx = TxGet
+	case "POST":
+		n.logger.Debug("POST request")
+		tx = TxCreate
+		id = uuid.NewV4().String()[:8]
+		ops = []Op{NewOpSet(r.URL.ResType, "", "id", id)}
+	case "PATCH":
+		n.logger.Debug("PATCH request")
+		tx = TxUpdate
+		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", id)}
+		for _, attr := range res.Attrs() {
+			ops = append(ops, NewOpSet(
+				r.URL.ResType,
+				id,
+				attr.Name,
+				res.Get(attr.Name),
+			))
+		}
+		for _, rel := range res.Rels() {
+			if rel.ToOne {
+				ops = append(ops, NewOpSet(
+					r.URL.ResType,
+					id,
+					rel.Name,
+					res.GetToOne(rel.Name),
+				))
+			} else {
+				ops = append(ops, NewOpSet(
+					r.URL.ResType,
+					id,
+					rel.Name,
+					res.GetToMany(rel.Name),
+				))
+			}
+		}
+	case "DELETE":
+		n.logger.Debug("DELETE request")
+		tx = TxDelete
+		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
+	}
+
+	doc := &jsonapi.Document{}
+
+	// // Handle schema change
 	// if r.Method == "POST" {
 	// 	switch r.URL.ResType {
 	// 	case "0_sets":
@@ -74,7 +131,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	// 		var (
 	// 			name = res.Get("name")
 	// 		)
-
 	// 	case "0_attrs":
 	// 	case "0_rels":
 	// 	}
@@ -82,56 +138,15 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	// 	// if r.URL
 	// }
 
-	// Transaction
-	tx := TxNothing
-	switch r.Method {
-	case "GET":
-		n.logger.Debug("GET request")
-	case "POST":
-		id = uuid.NewV4().String()
-		_ = n.apply([]Op{NewOpSet(r.URL.ResType, "", "id", id)})
-		n.logger.Debug("POST request")
-	case "PATCH":
-		n.logger.Debug("PATCH request")
-	case "DELETE":
-		n.logger.Debug("DELETE request")
-	}
-
-	doc := &jsonapi.Document{}
-
 	// Execution
 	cp := &Checkpoint{
 		node: n,
 		ops:  []Op{},
 	}
-	tx(cp)
-
-	// Response payload
-	switch r.Method {
-	case "GET":
-		if !r.URL.IsCol {
-			res := cp.Resource(NewQueryRes(r.URL))
-			doc.Data = jsonapi.Resource(res)
-		} else {
-			col := &jsonapi.SoftCollection{}
-			typ := n.schema.GetType(r.URL.ResType)
-			col.SetType(&typ)
-			resources := cp.Collection(NewQueryCol(r.URL))
-			for _, res := range resources {
-				col.Add(res)
-			}
-			doc.Data = jsonapi.Collection(col)
-		}
-	case "POST", "PATCH":
-		qry := NewQueryRes(r.URL)
-		qry.ID = id
-		res := cp.Resource(qry)
-		doc.Data = jsonapi.Resource(res)
-	case "DELETE":
-		// cp.
-	}
+	tx(cp, ops)
 
 	if cp.err != nil {
+		// Handle error
 		var jaErr jsonapi.Error
 		switch cp.err {
 		case ErrNotImplemented:
@@ -140,6 +155,31 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			jaErr = jsonapi.NewErrInternalServerError()
 		}
 		doc.Errors = []jsonapi.Error{jaErr}
+	} else {
+		// Response payload
+		switch r.Method {
+		case "GET":
+			if !r.URL.IsCol {
+				res := cp.Resource(NewQueryRes(r.URL))
+				doc.Data = jsonapi.Resource(res)
+			} else {
+				col := &jsonapi.SoftCollection{}
+				typ := n.schema.GetType(r.URL.ResType)
+				col.SetType(&typ)
+				resources := cp.Collection(NewQueryCol(r.URL))
+				for _, res := range resources {
+					col.Add(res)
+				}
+				doc.Data = jsonapi.Collection(col)
+			}
+		case "POST", "PATCH":
+			qry := NewQueryRes(r.URL)
+			qry.ID = id
+			res := cp.Resource(qry)
+			doc.Data = jsonapi.Resource(res)
+		case "DELETE":
+			// cp.
+		}
 	}
 
 	return doc

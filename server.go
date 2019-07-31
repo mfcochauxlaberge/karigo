@@ -25,9 +25,11 @@ func (s *Server) Run() {
 	s.logger = logrus.New()
 	s.logger.Formatter = &logrus.TextFormatter{
 		FullTimestamp:    true,
+		TimestampFormat:  "2006-01-02 15:04:05",
 		QuoteEmptyFields: true,
 	}
 	// s.logger.Formatter = &logrus.JSONFormatter{}
+	s.logger.SetLevel(logrus.DebugLevel)
 
 	s.logger.WithField("event", "server_start").Info("Server has started")
 
@@ -62,6 +64,10 @@ func (s *Server) Run() {
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	for _, node := range s.Nodes {
+		node.logger = s.logger
 	}
 
 	// Listen and serve
@@ -100,6 +106,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.WithFields(logrus.Fields{
+		"app": node.Name,
+	}).Debug("App found")
+
 	// Parse URL
 	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
 	if err != nil {
@@ -107,10 +117,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// logger = logger.WithFields(logrus.Fields{
-	// 	"app": node.,
-	// })
 
 	// Set default page size
 	if url.Params.PageSize == 0 {
@@ -120,7 +126,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logger.WithFields(logrus.Fields{
 		"event": "parse_url",
 		"url":   url.String(),
-	}).Info("URL parsed")
+	}).Debug("URL parsed")
 
 	// Build request
 	req := &Request{

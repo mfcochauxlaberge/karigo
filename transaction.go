@@ -4,29 +4,29 @@ package karigo
 type Tx func(*Checkpoint)
 
 // TxNothing ...
-func TxNothing(cp *Checkpoint) {}
+func TxNothing(*Checkpoint, []Op) {}
 
 // TxGet ...
-// func TxGet(cp *Checkpoint) {}
+func TxGet(cp *Checkpoint, ops []Op) {}
 
 // TxCreate ...
-// func TxCreate(cp *Checkpoint) {}
+func TxCreate(cp *Checkpoint, ops []Op) {}
 
 // TxUpdate ...
-// func TxUpdate(cp *Checkpoint) {}
+func TxUpdate(cp *Checkpoint, ops []Op) {}
 
 // TxDelete ...
-// func TxDelete(cp *Checkpoint) {}
+func TxDelete(cp *Checkpoint, ops []Op) {}
 
 // TxNotImplemented ...
-// func TxNotImplemented(cp *Checkpoint) {
-// 	cp.Fail(ErrNotImplemented)
-// }
+func TxNotImplemented(cp *Checkpoint) {
+	cp.Fail(ErrNotImplemented)
+}
 
 // TxNotFound ...
-// func TxNotFound(cp *Checkpoint) {
-// 	cp.Fail(ErrNotFound)
-// }
+func TxNotFound(cp *Checkpoint) {
+	cp.Fail(ErrNotFound)
+}
 
 // tx ...
 // type tx struct{}
