@@ -74,21 +74,18 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	n.logger.Debugf("Node %s received a request", n.Name)
 
-	// Prepare transaction
-	tx := TxNothing
+	tx := TxDefault
 	ops := []Op{}
+	// Prepare transaction
 	switch r.Method {
-	case "GET":
+	case GET:
 		n.logger.Debug("GET request")
-		tx = TxGet
-	case "POST":
+	case POST:
 		n.logger.Debug("POST request")
-		tx = TxCreate
 		id = uuid.NewV4().String()[:8]
 		ops = []Op{NewOpSet(r.URL.ResType, "", "id", id)}
-	case "PATCH":
+	case PATCH:
 		n.logger.Debug("PATCH request")
-		tx = TxUpdate
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", id)}
 		for _, attr := range res.Attrs() {
 			ops = append(ops, NewOpSet(
@@ -115,9 +112,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				))
 			}
 		}
-	case "DELETE":
+	case DELETE:
 		n.logger.Debug("DELETE request")
-		tx = TxDelete
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
 
@@ -138,12 +134,16 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	// 	// if r.URL
 	// }
 
-	// Execution
 	cp := &Checkpoint{
 		node: n,
 		ops:  []Op{},
 	}
-	tx(cp, ops)
+	if r.isSchemaChange() {
+		// Handle schema change
+	} else {
+		// Execution
+		tx(cp, ops)
+	}
 
 	if cp.err != nil {
 		// Handle error

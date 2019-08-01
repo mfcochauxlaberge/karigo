@@ -52,9 +52,7 @@ func (s *Checkpoint) Collection(qry QueryCol) []jsonapi.Resource {
 }
 
 // Apply ...
-func (s *Checkpoint) Apply(ops []Op) error {
-	return nil
-}
+func (s *Checkpoint) Apply(ops []Op) {}
 
 // Fail ...
 func (s *Checkpoint) Fail(err error) {

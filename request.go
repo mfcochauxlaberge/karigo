@@ -37,3 +37,13 @@ type Request struct {
 	URL    *jsonapi.URL
 	Body   *jsonapi.Document
 }
+
+func (r *Request) isSchemaChange() bool {
+	if r.Method != GET {
+		switch r.URL.ResType {
+		case "0_sets", "0_attrs", "0_rels":
+			return true
+		}
+	}
+	return false
+}
