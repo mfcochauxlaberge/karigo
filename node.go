@@ -213,124 +213,150 @@ func (n *Node) apply(ops []Op) error {
 func FirstSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
 
-	// Meta
-	typ := &jsonapi.Type{
-		Name: "0_meta",
+	typ, err := jsonapi.ReflectType(meta{})
+	if err != nil {
+		panic(err)
 	}
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "value",
-		Type:     jsonapi.AttrTypeString,
-		Nullable: false,
-	})
-	_ = schema.AddType(*typ)
+	schema.AddType(typ)
 
-	// Sets
-	typ = &jsonapi.Type{
-		Name: "0_sets",
+	typ, err = jsonapi.ReflectType(set{})
+	if err != nil {
+		panic(err)
 	}
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "name",
-		Type:     jsonapi.AttrTypeString,
-		Nullable: false,
-	})
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "version",
-		Type:     jsonapi.AttrTypeUint,
-		Nullable: false,
-	})
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "active",
-		Type:     jsonapi.AttrTypeBool,
-		Nullable: false,
-	})
-	_ = typ.AddRel(jsonapi.Rel{
-		Name:         "attrs",
-		Type:         "0_attrs",
-		ToOne:        false,
-		InverseName:  "set",
-		InverseType:  "0_sets",
-		InverseToOne: true,
-	})
-	_ = typ.AddRel(jsonapi.Rel{
-		Name:         "rels",
-		Type:         "0_rels",
-		ToOne:        false,
-		InverseName:  "set",
-		InverseType:  "0_sets",
-		InverseToOne: true,
-	})
-	_ = schema.AddType(*typ)
+	schema.AddType(typ)
 
-	// Attrs
-	typ = &jsonapi.Type{
-		Name: "0_attrs",
+	typ, err = jsonapi.ReflectType(attr{})
+	if err != nil {
+		panic(err)
 	}
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "name",
-		Type:     jsonapi.AttrTypeString,
-		Nullable: false,
-	})
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "type",
-		Type:     jsonapi.AttrTypeString,
-		Nullable: false,
-	})
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "null",
-		Type:     jsonapi.AttrTypeBool,
-		Nullable: false,
-	})
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "active",
-		Type:     jsonapi.AttrTypeBool,
-		Nullable: false,
-	})
-	_ = typ.AddRel(jsonapi.Rel{
-		Name:         "set",
-		Type:         "0_sets",
-		ToOne:        true,
-		InverseName:  "attrs",
-		InverseType:  "0_attrs",
-		InverseToOne: false,
-	})
-	_ = schema.AddType(*typ)
+	schema.AddType(typ)
 
-	// Rels
-	typ = &jsonapi.Type{
-		Name: "0_rels",
+	typ, err = jsonapi.ReflectType(rel{})
+	if err != nil {
+		panic(err)
 	}
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "name",
-		Type:     jsonapi.AttrTypeString,
-		Nullable: false,
-	})
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "to-one",
-		Type:     jsonapi.AttrTypeBool,
-		Nullable: false,
-	})
-	_ = typ.AddAttr(jsonapi.Attr{
-		Name:     "active",
-		Type:     jsonapi.AttrTypeBool,
-		Nullable: false,
-	})
-	_ = typ.AddRel(jsonapi.Rel{
-		Name:         "inverse",
-		Type:         "0_rels",
-		ToOne:        true,
-		InverseName:  "inverse",
-		InverseType:  "0_rels",
-		InverseToOne: true,
-	})
-	_ = typ.AddRel(jsonapi.Rel{
-		Name:         "set",
-		Type:         "0_sets",
-		ToOne:        true,
-		InverseName:  "rels",
-		InverseType:  "0_rels",
-		InverseToOne: false,
-	})
-	_ = schema.AddType(*typ)
+	schema.AddType(typ)
 
 	return schema
+
+	// // Meta
+	// typ := &jsonapi.Type{
+	// 	Name: "0_meta",
+	// }
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "value",
+	// 	Type:     jsonapi.AttrTypeString,
+	// 	Nullable: false,
+	// })
+	// _ = schema.AddType(*typ)
+
+	// // Sets
+	// typ = &jsonapi.Type{
+	// 	Name: "0_sets",
+	// }
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "name",
+	// 	Type:     jsonapi.AttrTypeString,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "version",
+	// 	Type:     jsonapi.AttrTypeUint,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "active",
+	// 	Type:     jsonapi.AttrTypeBool,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddRel(jsonapi.Rel{
+	// 	Name:         "attrs",
+	// 	Type:         "0_attrs",
+	// 	ToOne:        false,
+	// 	InverseName:  "set",
+	// 	InverseType:  "0_sets",
+	// 	InverseToOne: true,
+	// })
+	// _ = typ.AddRel(jsonapi.Rel{
+	// 	Name:         "rels",
+	// 	Type:         "0_rels",
+	// 	ToOne:        false,
+	// 	InverseName:  "set",
+	// 	InverseType:  "0_sets",
+	// 	InverseToOne: true,
+	// })
+	// _ = schema.AddType(*typ)
+
+	// // Attrs
+	// typ = &jsonapi.Type{
+	// 	Name: "0_attrs",
+	// }
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "name",
+	// 	Type:     jsonapi.AttrTypeString,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "type",
+	// 	Type:     jsonapi.AttrTypeString,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "null",
+	// 	Type:     jsonapi.AttrTypeBool,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "active",
+	// 	Type:     jsonapi.AttrTypeBool,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddRel(jsonapi.Rel{
+	// 	Name:         "set",
+	// 	Type:         "0_sets",
+	// 	ToOne:        true,
+	// 	InverseName:  "attrs",
+	// 	InverseType:  "0_attrs",
+	// 	InverseToOne: false,
+	// })
+	// _ = schema.AddType(*typ)
+
+	// // Rels
+	// typ = &jsonapi.Type{
+	// 	Name: "0_rels",
+	// }
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "name",
+	// 	Type:     jsonapi.AttrTypeString,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "to-one",
+	// 	Type:     jsonapi.AttrTypeBool,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddAttr(jsonapi.Attr{
+	// 	Name:     "active",
+	// 	Type:     jsonapi.AttrTypeBool,
+	// 	Nullable: false,
+	// })
+	// _ = typ.AddRel(jsonapi.Rel{
+	// 	Name:         "inverse",
+	// 	Type:         "0_rels",
+	// 	ToOne:        true,
+	// 	InverseName:  "inverse",
+	// 	InverseType:  "0_rels",
+	// 	InverseToOne: true,
+	// })
+	// _ = typ.AddRel(jsonapi.Rel{
+	// 	Name:         "set",
+	// 	Type:         "0_sets",
+	// 	ToOne:        true,
+	// 	InverseName:  "rels",
+	// 	InverseType:  "0_rels",
+	// 	InverseToOne: false,
+	// })
+	// _ = schema.AddType(*typ)
+
+	// return schema
 }
