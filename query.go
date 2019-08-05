@@ -11,8 +11,8 @@ type QueryCol struct {
 	BelongsToFilter jsonapi.BelongsToFilter
 	// Filter          *jsonapi.Condition
 	Sort       []string
-	PageSize   int
-	PageNumber int
+	PageSize   uint
+	PageNumber uint
 }
 
 // NewQueryCol creates a new QueryCol object from a *jsonapi.URL object.

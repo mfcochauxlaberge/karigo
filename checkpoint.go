@@ -56,7 +56,7 @@ func (s *Checkpoint) Apply(ops []Op) {}
 
 // Fail ...
 func (s *Checkpoint) Fail(err error) {
-	if s.err == nil {
+	if err != nil && s.err == nil {
 		s.err = err
 	}
 }

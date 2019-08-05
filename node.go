@@ -119,27 +119,13 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	doc := &jsonapi.Document{}
 
-	// // Handle schema change
-	// if r.Method == "POST" {
-	// 	switch r.URL.ResType {
-	// 	case "0_sets":
-	// 		res := r.Body.Data.(jsonapi.Resource)
-	// 		var (
-	// 			name = res.Get("name")
-	// 		)
-	// 	case "0_attrs":
-	// 	case "0_rels":
-	// 	}
-	// } else if r.Method == "PATCH" {
-	// 	// if r.URL
-	// }
-
 	cp := &Checkpoint{
 		node: n,
 		ops:  []Op{},
 	}
 	if r.isSchemaChange() {
 		// Handle schema change
+		handleSchemaChange(cp, n.schema, r)
 	} else {
 		// Execution
 		tx(cp, ops)
@@ -213,25 +199,25 @@ func (n *Node) apply(ops []Op) error {
 func FirstSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
 
-	typ, err := jsonapi.ReflectType(meta{})
+	typ, err := jsonapi.Reflect(meta{})
 	if err != nil {
 		panic(err)
 	}
 	_ = schema.AddType(typ)
 
-	typ, err = jsonapi.ReflectType(set{})
+	typ, err = jsonapi.Reflect(set{})
 	if err != nil {
 		panic(err)
 	}
 	_ = schema.AddType(typ)
 
-	typ, err = jsonapi.ReflectType(attr{})
+	typ, err = jsonapi.Reflect(attr{})
 	if err != nil {
 		panic(err)
 	}
 	_ = schema.AddType(typ)
 
-	typ, err = jsonapi.ReflectType(rel{})
+	typ, err = jsonapi.Reflect(rel{})
 	if err != nil {
 		panic(err)
 	}
