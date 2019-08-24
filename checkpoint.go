@@ -37,7 +37,7 @@ func (s *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
 }
 
 // Collection ...
-func (s *Checkpoint) Collection(qry QueryCol) []jsonapi.Resource {
+func (s *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 	if s.err != nil {
 		return nil
 	}

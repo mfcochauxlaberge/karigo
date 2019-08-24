@@ -306,7 +306,7 @@ func (s *Source) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
 }
 
 // Collection ...
-func (s *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
+func (s *Source) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -318,11 +318,11 @@ func (s *Source) Collection(qry karigo.QueryCol) ([]jsonapi.Resource, error) {
 	}
 
 	// Get all records from the given set
-	recs := s.sets[qry.Set].Range(
+	recs := jsonapi.Range(
+		s.sets[qry.Set],
 		ids,
 		nil,
 		qry.Sort,
-		qry.Fields,
 		uint(qry.PageSize),
 		uint(qry.PageNumber),
 	)

@@ -60,7 +60,8 @@ func Test(t *testing.T, src karigo.Source) error {
 			return fmt.Errorf("could not get list of sets: %s", err)
 		}
 
-		for _, set := range sets {
+		for i := 0; i < sets.Len(); i++ {
+			set := sets.At(i)
 			id := set.GetID()
 
 			col, err := src.Collection(karigo.QueryCol{
@@ -74,7 +75,9 @@ func Test(t *testing.T, src karigo.Source) error {
 			}
 
 			// For each resource...
-			for _, res := range col {
+			for j := 0; j < col.Len(); j++ {
+				res := col.At(j)
+
 				// Add a key for each attribute.
 				for _, attr := range res.Attrs() {
 					v := res.Get(attr.Name)

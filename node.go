@@ -153,8 +153,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				typ := n.schema.GetType(r.URL.ResType)
 				col.SetType(&typ)
 				resources := cp.Collection(NewQueryCol(r.URL))
-				for _, res := range resources {
-					col.Add(res)
+				for i := 0; i < resources.Len(); i++ {
+					col.Add(resources.At(i))
 				}
 				doc.Data = jsonapi.Collection(col)
 			}
@@ -179,7 +179,7 @@ func (n *Node) resource(v uint, qry QueryRes) (jsonapi.Resource, error) {
 }
 
 // collection ...
-func (n *Node) collection(v uint, qry QueryCol) ([]jsonapi.Resource, error) {
+func (n *Node) collection(v uint, qry QueryCol) (jsonapi.Collection, error) {
 	// TODO Validate the query?
 	// TODO Complete the sorting rule
 
@@ -199,25 +199,25 @@ func (n *Node) apply(ops []Op) error {
 func FirstSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
 
-	typ, err := jsonapi.Reflect(meta{})
+	typ, err := jsonapi.BuildType(meta{})
 	if err != nil {
 		panic(err)
 	}
 	_ = schema.AddType(typ)
 
-	typ, err = jsonapi.Reflect(set{})
+	typ, err = jsonapi.BuildType(set{})
 	if err != nil {
 		panic(err)
 	}
 	_ = schema.AddType(typ)
 
-	typ, err = jsonapi.Reflect(attr{})
+	typ, err = jsonapi.BuildType(attr{})
 	if err != nil {
 		panic(err)
 	}
 	_ = schema.AddType(typ)
 
-	typ, err = jsonapi.Reflect(rel{})
+	typ, err = jsonapi.BuildType(rel{})
 	if err != nil {
 		panic(err)
 	}

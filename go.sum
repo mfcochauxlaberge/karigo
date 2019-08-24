@@ -10,6 +10,8 @@ github.com/konsorten/go-windows-terminal-sequences v1.0.1 h1:mweAR1A6xJ3oS2pRaGi
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/mfcochauxlaberge/jsonapi v0.13.0 h1:oicTJ30w3WEge0c0Qp7HkRF292MR6YNtUEla9s0aEkQ=
 github.com/mfcochauxlaberge/jsonapi v0.13.0/go.mod h1:TFyYEu/S5AZyttGxf6erEjcpzRF1yZNwNM8voKxYaIA=
+github.com/mfcochauxlaberge/jsonapi v0.13.1-0.20190824180853-a252815f7bdf h1:SL6PZv8nulkWTX+xd0jVk30YQy/GuKmweJ3knZCyyY8=
+github.com/mfcochauxlaberge/jsonapi v0.13.1-0.20190824180853-a252815f7bdf/go.mod h1:TFyYEu/S5AZyttGxf6erEjcpzRF1yZNwNM8voKxYaIA=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=
 github.com/mitchellh/reflectwalk v1.0.0 h1:9D+8oIskB4VJBN5SFlmc27fSlIBZaov1Wpk/IfikLNY=

@@ -11,7 +11,7 @@ type Source interface {
 	Reset() error
 
 	Resource(QueryRes) (jsonapi.Resource, error)
-	Collection(QueryCol) ([]jsonapi.Resource, error)
+	Collection(QueryCol) (jsonapi.Collection, error)
 	Apply([]Op) error
 }
 
