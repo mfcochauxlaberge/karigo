@@ -1,6 +1,8 @@
 package karigo
 
 import (
+	"errors"
+
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -29,7 +31,7 @@ func (s *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
 
 	res, err := s.node.resource(s.version, qry)
 	if err != nil {
-		s.Fail(err)
+		s.Check(err)
 		return nil
 	}
 
@@ -44,7 +46,7 @@ func (s *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 
 	col, err := s.node.collection(s.version, qry)
 	if err != nil {
-		s.Fail(err)
+		s.Check(err)
 		return nil
 	}
 
@@ -54,9 +56,17 @@ func (s *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 // Apply ...
 func (s *Checkpoint) Apply(ops []Op) {}
 
-// Fail ...
-func (s *Checkpoint) Fail(err error) {
+// Check ...
+func (s *Checkpoint) Check(err error) {
 	if err != nil && s.err == nil {
 		s.err = err
 	}
+}
+
+// Fail ...
+func (s *Checkpoint) Fail(err error) {
+	if err == nil {
+		err = errors.New("an error occured")
+	}
+	s.err = err
 }

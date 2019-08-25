@@ -1,6 +1,7 @@
 package karigo
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -59,7 +60,7 @@ type rel struct {
 	InverseSet string `json:"inverse-set" api:"rel,0_rels"`
 }
 
-func handleSchemaChange(cp *Checkpoint, s *jsonapi.Schema, r *Request) {
+func handleSchemaChange(r *Request, cp *Checkpoint, s *jsonapi.Schema) {
 	var (
 		res jsonapi.Resource
 		ops []Op
@@ -70,36 +71,60 @@ func handleSchemaChange(cp *Checkpoint, s *jsonapi.Schema, r *Request) {
 
 	err = validateSchemaChange(res)
 	if err != nil {
-		cp.Fail(err)
+		cp.Check(err)
 	}
 
 	if r.Method == "POST" {
-		// Add set
-		ops, err = addSet(s, res)
-		cp.Fail(err)
-		cp.Apply(ops)
-
-		// Add attribute
-		ops, err = addAttr(s, res)
-		cp.Fail(err)
-		cp.Apply(ops)
-
-		// Add relationship
-		ops, err = addRel(s, res)
-		cp.Fail(err)
-		cp.Apply(ops)
+		if res.GetType().Name == "0_sets" {
+			// Add set
+			ops, err = addSet(s, res)
+			cp.Check(err)
+			cp.Apply(ops)
+		} else if res.GetType().Name == "0_attrs" {
+			// Add attribute
+			ops, err = addAttr(s, res)
+			cp.Check(err)
+			cp.Apply(ops)
+		} else if res.GetType().Name == "0_rels" {
+			// Add relationship
+			ops, err = addRel(s, res)
+			cp.Check(err)
+			cp.Apply(ops)
+		}
 
 	} else if r.Method == "PATCH" {
 		// Can only be for activating or deactivating
 		// a set, attribute, or relationship.
-		ops, err := activateSet(s, res)
-		cp.Fail(err)
-		cp.Apply(ops)
+		if activate, ok := res.Get("active").(bool); activate && ok {
+			ops, err = activateSet(s, res)
+			cp.Check(err)
+			cp.Apply(ops)
+		}
+
+		if deactivate, ok := res.Get("active").(bool); !deactivate && ok {
+			ops, err = deactivateSet(s, res)
+			cp.Check(err)
+			cp.Apply(ops)
+		}
 	} else if r.Method == "DELETE" {
-		// Only possible is active is false
-		ops, err := deleteSet(s, res)
-		cp.Fail(err)
-		cp.Apply(ops)
+		currRes := cp.Resource(QueryRes{
+			Set:    res.GetType().Name,
+			ID:     res.GetID(),
+			Fields: []string{"active"},
+		})
+
+		if currRes.GetID() == "" {
+			cp.Fail(errors.New("schema element does not exist"))
+		}
+
+		if active, _ := currRes.Get("active").(bool); !active {
+			// Only possible is active is false
+			ops, err = deleteSet(s, res)
+			cp.Check(err)
+			cp.Apply(ops)
+		} else {
+			cp.Fail(errors.New("schema element is still active"))
+		}
 	}
 }
 

@@ -7,5 +7,4 @@ var Scenarios = []Scenario{}
 type Scenario struct {
 	Name  string
 	Steps []interface{}
-	Verif []string
 }
