@@ -1,8 +1,12 @@
 package sourcetest
 
 import (
+	"bytes"
 	"errors"
+	"flag"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -12,6 +16,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
+var update = flag.Bool("update-golden-files", false, "update the golden files")
 
 // Test ...
 func Test(t *testing.T, src karigo.Source) error {
@@ -46,7 +52,7 @@ func Test(t *testing.T, src karigo.Source) error {
 		}
 
 		// Check
-		verif := scenario.Verif
+		// verif := scenario.Verif
 		keys := []string{}
 
 		// Keys
@@ -99,10 +105,32 @@ func Test(t *testing.T, src karigo.Source) error {
 			}
 		}
 
-		sort.Strings(verif)
+		// sort.Strings(verif)
 		sort.Strings(keys)
 
-		assert.Equal(verif, keys)
+		// Golden file
+		filename := strings.Replace(scenario.Name, " ", "_", -1) + ".txt"
+		path := filepath.Join("testdata", "goldenfiles", "scenarios", filename)
+		if !*update {
+			// Retrieve the expected result from file
+			contents, _ := ioutil.ReadFile(path)
+			expected := []string{}
+			for _, key := range strings.Split(string(contents), "\n") {
+				if key != "" {
+					expected = append(expected, key)
+				}
+			}
+			assert.Equal(expected, keys)
+		} else {
+			dst := &bytes.Buffer{}
+			for _, key := range keys {
+				_, _ = fmt.Fprintln(dst, key)
+			}
+			// TODO Figure out whether 0644 is okay or not.
+			err = ioutil.WriteFile(path, dst.Bytes(), 0644)
+			assert.NoError(err)
+		}
+
 	}
 
 	return nil

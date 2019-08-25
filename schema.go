@@ -47,13 +47,16 @@ type rel struct {
 	ID string `json:"id" api:"0_rels"`
 
 	// Attributes
-	Name   string `json:"name" api:"attr"`
-	ToOne  bool   `json:"to-one" api:"attr"`
-	Active bool   `json:"active" api:"attr"`
+	Name          string `json:"name" api:"attr"`
+	ToOne         bool   `json:"to-one" api:"attr"`
+	Active        bool   `json:"active" api:"attr"`
+	InverseName   string `json:"inverse-name" api:"attr"`
+	InverseToOne  bool   `json:"inverse-to-one" api:"attr"`
+	InverseActive bool   `json:"inverse-active" api:"attr"`
 
 	// Relationships
-	Inverse string `json:"inverse" api:"rel,0_rels,inverse"`
-	Set     string `json:"set" api:"rel,0_sets,attrs"`
+	Set        string `json:"set" api:"rel,0_sets,rels"`
+	InverseSet string `json:"inverse-set" api:"rel,0_rels"`
 }
 
 func handleSchemaChange(cp *Checkpoint, s *jsonapi.Schema, r *Request) {
