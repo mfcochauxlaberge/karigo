@@ -23,7 +23,14 @@ func init() {
 				karigo.NewOpAddAttr("articles", "updated-at", "string", false),
 
 				// Relationships
-				karigo.NewOpAddRel("users", "articles", false),
+				karigo.NewOpAddRel(
+					"users",
+					"articles",
+					"articles",
+					"author",
+					false,
+					true,
+				),
 
 				// Data
 				karigo.NewOpSet("users", "", "id", "abc123"),

@@ -92,12 +92,12 @@ func Test(t *testing.T, src karigo.Source) error {
 				}
 				// Add a key for each relationsip.
 				for _, rel := range res.Rels() {
-					key := fmt.Sprintf("%s.%s.%s", id, res.GetID(), rel.Name)
+					key := fmt.Sprintf("%s.%s.%s", id, res.GetID(), rel.FromName)
 					var r string
 					if rel.ToOne {
-						r = res.GetToOne(rel.Name)
+						r = res.GetToOne(rel.FromName)
 					} else {
-						rs := res.GetToMany(rel.Name)
+						rs := res.GetToMany(rel.FromName)
 						r = strings.Join(rs, ",")
 					}
 					keys = append(keys, fmt.Sprintf("%s=%s", key, r))
@@ -120,7 +120,7 @@ func Test(t *testing.T, src karigo.Source) error {
 					expected = append(expected, key)
 				}
 			}
-			assert.Equal(expected, keys)
+			assert.Equal(expected, keys, scenario.Name)
 		} else {
 			dst := &bytes.Buffer{}
 			for _, key := range keys {

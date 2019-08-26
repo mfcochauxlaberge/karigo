@@ -100,15 +100,15 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				ops = append(ops, NewOpSet(
 					r.URL.ResType,
 					id,
-					rel.Name,
-					res.GetToOne(rel.Name),
+					rel.FromName,
+					res.GetToOne(rel.FromName),
 				))
 			} else {
 				ops = append(ops, NewOpSet(
 					r.URL.ResType,
 					id,
-					rel.Name,
-					res.GetToMany(rel.Name),
+					rel.FromName,
+					res.GetToMany(rel.FromName),
 				))
 			}
 		}
@@ -193,35 +193,4 @@ func (n *Node) apply(ops []Op) error {
 		return errors.New("karigo: an operation could not be executed")
 	}
 	return nil
-}
-
-// FirstSchema ...
-func FirstSchema() *jsonapi.Schema {
-	schema := &jsonapi.Schema{}
-
-	typ, err := jsonapi.BuildType(meta{})
-	if err != nil {
-		panic(err)
-	}
-	_ = schema.AddType(typ)
-
-	typ, err = jsonapi.BuildType(set{})
-	if err != nil {
-		panic(err)
-	}
-	_ = schema.AddType(typ)
-
-	typ, err = jsonapi.BuildType(attr{})
-	if err != nil {
-		panic(err)
-	}
-	_ = schema.AddType(typ)
-
-	typ, err = jsonapi.BuildType(rel{})
-	if err != nil {
-		panic(err)
-	}
-	_ = schema.AddType(typ)
-
-	return schema
 }

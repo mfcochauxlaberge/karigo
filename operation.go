@@ -64,14 +64,17 @@ func NewOpAddAttr(set, name, typ string, null bool) []Op {
 }
 
 // NewOpAddRel ...
-func NewOpAddRel(set, name string, toOne bool) []Op {
-	id := set + "_" + name
+func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
+	id := fromSet + "_" + fromName
 	return []Op{
 		NewOpSet("0_rels", "", "id", id),
-		NewOpSet("0_rels", id, "name", name),
+		NewOpSet("0_rels", id, "from-name", fromName),
+		NewOpSet("0_rels", id, "from-set", fromSet),
 		NewOpSet("0_rels", id, "to-one", toOne),
-		NewOpSet("0_rels", id, "set", set),
+		NewOpSet("0_rels", id, "to-set", toSet),
+		NewOpSet("0_rels", id, "to-name", toName),
+		NewOpSet("0_rels", id, "from-one", fromOne),
 		NewOpSet("0_rels", id, "active", true),
-		NewOpAdd("0_sets", set, "rels", id),
+		NewOpAdd("0_sets", fromSet, "rels", id),
 	}
 }
