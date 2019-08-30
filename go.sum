@@ -14,6 +14,8 @@ github.com/mfcochauxlaberge/jsonapi v0.13.1-0.20190826040957-d9e62e268c2a h1:CS+
 github.com/mfcochauxlaberge/jsonapi v0.13.1-0.20190826040957-d9e62e268c2a/go.mod h1:6iuMio5sPVzHSqeCr4wGiqmpfuUkcIOi3ks0NbOKof4=
 github.com/mfcochauxlaberge/jsonapi v0.13.1-0.20190830012545-b8b795fa61af h1:ovjV97GfSTupTG/m9P1B1S4vM0sBMM49DM+lyCliVsg=
 github.com/mfcochauxlaberge/jsonapi v0.13.1-0.20190830012545-b8b795fa61af/go.mod h1:6iuMio5sPVzHSqeCr4wGiqmpfuUkcIOi3ks0NbOKof4=
+github.com/mfcochauxlaberge/jsonapi v0.14.0 h1:G/F8l/50wZSyo/dE/3AwEkFN1KGUbjgAPQifJZZUvDg=
+github.com/mfcochauxlaberge/jsonapi v0.14.0/go.mod h1:6iuMio5sPVzHSqeCr4wGiqmpfuUkcIOi3ks0NbOKof4=
 github.com/mitchellh/copystructure v1.0.0 h1:Laisrj+bAB6b/yJwB5Bt3ITZhGJdqmxquMKeZ+mmkFQ=
 github.com/mitchellh/copystructure v1.0.0/go.mod h1:SNtv71yrdKgLRyLFxmLdkAbkKEFWgYaq1OVrnRcwhnw=
 github.com/mitchellh/reflectwalk v1.0.0 h1:9D+8oIskB4VJBN5SFlmc27fSlIBZaov1Wpk/IfikLNY=
