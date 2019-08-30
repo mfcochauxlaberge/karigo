@@ -31,18 +31,11 @@ func (s *Source) Reset() error {
 
 	s.sets = map[string]*jsonapi.SoftCollection{}
 
-	// 0_meta
-	s.sets["0_meta"] = &jsonapi.SoftCollection{}
-	s.sets["0_meta"].SetType(types["0_meta"])
-
-	s.sets["0_sets"] = &jsonapi.SoftCollection{}
-	s.sets["0_sets"].SetType(types["0_sets"])
-
-	s.sets["0_attrs"] = &jsonapi.SoftCollection{}
-	s.sets["0_attrs"].SetType(types["0_attrs"])
-
-	s.sets["0_rels"] = &jsonapi.SoftCollection{}
-	s.sets["0_rels"].SetType(types["0_rels"])
+	// Sets
+	for _, typ := range types {
+		s.sets[typ.Name] = &jsonapi.SoftCollection{}
+		s.sets[typ.Name].SetType(typ)
+	}
 
 	// Types and attributes
 	for _, typ := range types {

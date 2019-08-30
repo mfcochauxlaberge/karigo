@@ -44,6 +44,24 @@ func FirstSchema() *jsonapi.Schema {
 		panic(err)
 	}
 
+	typ, err = jsonapi.BuildType(log{})
+	if err != nil {
+		panic(err)
+	}
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(op{})
+	if err != nil {
+		panic(err)
+	}
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
 	return schema
 }
 
@@ -97,6 +115,22 @@ type rel struct {
 	// Relationships
 	FromSet string `json:"from-set" api:"rel,0_sets,rels"`
 	ToSet   string `json:"to-set" api:"rel,0_sets"`
+}
+
+// log ...
+type log struct {
+	ID string `json:"id" api:"0_log"`
+
+	// Relationships
+	Ops []string `json:"ops" api:"rel,0_ops,version"`
+}
+
+// op ...
+type op struct {
+	ID string `json:"id" api:"0_ops"`
+
+	// Relationships
+	Version string `json:"version" api:"rel,0_log,ops"`
 }
 
 func handleSchemaChange(r *Request, cp *Checkpoint, s *jsonapi.Schema) {
