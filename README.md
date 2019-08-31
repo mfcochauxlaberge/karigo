@@ -3,6 +3,12 @@
 <div align="center" style="text-align: center;">
   <img src="logo.png" height="120">
   <br>
+  <a href="https://travis-ci.com/mfcochauxlaberge/karigo">
+    <img src="https://travis-ci.com/mfcochauxlaberge/karigo.svg?branch=master">
+  </a>
+  <!-- <a href="https://codecov.io/gh/mfcochauxlaberge/karigo">
+    <img src="https://codecov.io/gh/mfcochauxlaberge/karigo/branch/master/graph/badge.svg">
+  </a> -->
   <a href="https://godoc.org/github.com/mfcochauxlaberge/karigo">
     <img src="https://godoc.org/github.com/golang/gddo?status.svg">
   </a>
