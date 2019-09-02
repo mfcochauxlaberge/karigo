@@ -3,6 +3,7 @@ package karigo
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -129,10 +130,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}).Debug("URL parsed")
 
 	// Build request
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	req := &Request{
 		ID:     requestID,
 		Method: r.Method,
 		URL:    url,
+		Body:   body,
 	}
 
 	// Send request to node

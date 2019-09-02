@@ -1,8 +1,6 @@
 package karigo
 
 import (
-	"net/http"
-
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -14,28 +12,13 @@ const (
 	DELETE = "DELETE"
 )
 
-// NewRequest ...
-func NewRequest(r *http.Request) (*Request, error) {
-	jurl, err := jsonapi.NewURLFromRaw(&jsonapi.Schema{}, r.URL.RawPath)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	req := &Request{
-		Method: r.Method,
-		URL:    jurl,
-		Body:   &jsonapi.Document{},
-	}
-
-	return req, err
-}
-
 // Request ...
 type Request struct {
 	ID     string
 	Method string
 	URL    *jsonapi.URL
-	Body   *jsonapi.Document
+	Doc    *jsonapi.Document
+	Body   []byte
 }
 
 func (r *Request) isSchemaChange() bool {

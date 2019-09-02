@@ -2,6 +2,7 @@ package karigo
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -53,8 +54,8 @@ type Node struct {
 
 // Run ...
 func (n *Node) Run() error {
-	n.Lock()
-	n.Unlock()
+	// n.Lock()
+	// n.Unlock()
 
 	// Handle events
 	for {
@@ -67,9 +68,19 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	var (
 		res jsonapi.Resource
 		id  string
+		err error
 	)
-	if r.Body != nil && r.Body.Data != nil {
-		res, _ = r.Body.Data.(jsonapi.Resource)
+
+	if r.Method == POST || r.Method == PATCH {
+		fmt.Printf("about to unmarshal: %s\n", r.Body)
+		r.Doc, err = jsonapi.Unmarshal(r.Body, n.schema)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	if r.Doc != nil && r.Doc.Data != nil {
+		res, _ = r.Doc.Data.(jsonapi.Resource)
 	}
 
 	n.logger.Debugf("Node %s received a request", n.Name)
@@ -83,35 +94,39 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	case POST:
 		n.logger.Debug("POST request")
 		id = uuid.NewV4().String()[:8]
-		ops = []Op{NewOpSet(r.URL.ResType, "", "id", id)}
+		// TODO Do not hardcode the following condition.
+		if res.GetType().Name == "0_meta" {
+			id = res.GetID()
+		}
+		ops = NewOpInsert(res)
 	case PATCH:
 		n.logger.Debug("PATCH request")
-		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", id)}
-		for _, attr := range res.Attrs() {
-			ops = append(ops, NewOpSet(
-				r.URL.ResType,
-				id,
-				attr.Name,
-				res.Get(attr.Name),
-			))
-		}
-		for _, rel := range res.Rels() {
-			if rel.ToOne {
-				ops = append(ops, NewOpSet(
-					r.URL.ResType,
-					id,
-					rel.FromName,
-					res.GetToOne(rel.FromName),
-				))
-			} else {
-				ops = append(ops, NewOpSet(
-					r.URL.ResType,
-					id,
-					rel.FromName,
-					res.GetToMany(rel.FromName),
-				))
-			}
-		}
+		// ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", id)}
+		// for _, attr := range res.Attrs() {
+		// 	ops = append(ops, NewOpSet(
+		// 		r.URL.ResType,
+		// 		id,
+		// 		attr.Name,
+		// 		res.Get(attr.Name),
+		// 	))
+		// }
+		// for _, rel := range res.Rels() {
+		// 	if rel.ToOne {
+		// 		ops = append(ops, NewOpSet(
+		// 			r.URL.ResType,
+		// 			id,
+		// 			rel.FromName,
+		// 			res.GetToOne(rel.FromName),
+		// 		))
+		// 	} else {
+		// 		ops = append(ops, NewOpSet(
+		// 			r.URL.ResType,
+		// 			id,
+		// 			rel.FromName,
+		// 			res.GetToMany(rel.FromName),
+		// 		))
+		// 	}
+		// }
 	case DELETE:
 		n.logger.Debug("DELETE request")
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
@@ -144,10 +159,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	} else {
 		// Response payload
 		switch r.Method {
-		case "GET":
+		case GET:
 			if !r.URL.IsCol {
 				res := cp.Resource(NewQueryRes(r.URL))
-				doc.Data = jsonapi.Resource(res)
+				doc.Data = res
 			} else {
 				col := &jsonapi.SoftCollection{}
 				typ := n.schema.GetType(r.URL.ResType)
@@ -158,13 +173,12 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				}
 				doc.Data = jsonapi.Collection(col)
 			}
-		case "POST", "PATCH":
+		case POST, PATCH:
 			qry := NewQueryRes(r.URL)
 			qry.ID = id
 			res := cp.Resource(qry)
-			doc.Data = jsonapi.Resource(res)
-		case "DELETE":
-			// cp.
+			doc.Data = res
+		case DELETE:
 		}
 	}
 
@@ -172,21 +186,21 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 }
 
 // resource ...
-func (n *Node) resource(v uint, qry QueryRes) (jsonapi.Resource, error) {
+func (n *Node) resource(_ uint, qry QueryRes) (jsonapi.Resource, error) {
 	// TODO Validate the query?
 
 	return n.main.src.Resource(qry)
 }
 
 // collection ...
-func (n *Node) collection(v uint, qry QueryCol) (jsonapi.Collection, error) {
+func (n *Node) collection(_ uint, qry QueryCol) (jsonapi.Collection, error) {
 	// TODO Validate the query?
 	// TODO Complete the sorting rule
 
 	return n.main.src.Collection(qry)
 }
 
-// do ...
+// apply ...
 func (n *Node) apply(ops []Op) error {
 	err := n.main.src.Apply(ops)
 	if err != nil {

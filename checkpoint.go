@@ -24,14 +24,14 @@ type Checkpoint struct {
 }
 
 // Resource ...
-func (s *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
-	if s.err != nil {
+func (c *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
+	if c.err != nil {
 		return nil
 	}
 
-	res, err := s.node.resource(s.version, qry)
+	res, err := c.node.resource(c.version, qry)
 	if err != nil {
-		s.Check(err)
+		c.Check(err)
 		return nil
 	}
 
@@ -39,14 +39,14 @@ func (s *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
 }
 
 // Collection ...
-func (s *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
-	if s.err != nil {
+func (c *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
+	if c.err != nil {
 		return nil
 	}
 
-	col, err := s.node.collection(s.version, qry)
+	col, err := c.node.collection(c.version, qry)
 	if err != nil {
-		s.Check(err)
+		c.Check(err)
 		return nil
 	}
 
@@ -54,19 +54,21 @@ func (s *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 }
 
 // Apply ...
-func (s *Checkpoint) Apply(ops []Op) {}
+func (c *Checkpoint) Apply(ops []Op) {
+	c.Check(c.node.apply(ops))
+}
 
 // Check ...
-func (s *Checkpoint) Check(err error) {
-	if err != nil && s.err == nil {
-		s.err = err
+func (c *Checkpoint) Check(err error) {
+	if err != nil && c.err == nil {
+		c.err = err
 	}
 }
 
 // Fail ...
-func (s *Checkpoint) Fail(err error) {
+func (c *Checkpoint) Fail(err error) {
 	if err == nil {
-		err = errors.New("an error occured")
+		err = errors.New("an error occurred")
 	}
-	s.err = err
+	c.err = err
 }

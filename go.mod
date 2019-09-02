@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/mfcochauxlaberge/jsonapi v0.14.0
+	github.com/mfcochauxlaberge/jsonapi v0.14.1-0.20190902173233-55cc95e37028
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
@@ -14,5 +14,5 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/twinj/uuid v1.0.0
 	golang.org/x/sys v0.0.0-20190801041406-cbf593c0f2f3 // indirect
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )

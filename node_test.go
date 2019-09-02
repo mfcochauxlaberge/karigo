@@ -3,11 +3,10 @@ package karigo_test
 import (
 	"testing"
 
-	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/jsonapi"
+
 	. "github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/memory"
-
-	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 func TestNode(t *testing.T) {
@@ -28,7 +27,7 @@ func TestNode(t *testing.T) {
 	src := &memory.Source{}
 	_ = src.Reset() // TODO Necessary?
 
-	_ = src.Apply(karigo.NewOpAddSet("things"))
+	_ = src.Apply(NewOpAddSet("things"))
 
 	// Journal
 	journal := &memory.Journal{}
@@ -48,6 +47,6 @@ func TestNode(t *testing.T) {
 	}
 	res := node.Handle(req)
 	if len(res.Errors) > 0 {
-		t.Errorf("At least one error occured: %v\n", err)
+		t.Errorf("At least one error occurred: %v\n", err)
 	}
 }

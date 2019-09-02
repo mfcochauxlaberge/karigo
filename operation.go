@@ -1,5 +1,7 @@
 package karigo
 
+import "github.com/mfcochauxlaberge/jsonapi"
+
 // Operations
 const (
 	OpSet = iota
@@ -37,6 +39,34 @@ func NewOpAdd(set, id, field string, v interface{}) Op {
 		Op:    OpAdd,
 		Value: v,
 	}
+}
+
+// NewOpInsert ...
+func NewOpInsert(res jsonapi.Resource) []Op {
+	set := res.GetType().Name
+	id := res.GetID()
+	ops := []Op{}
+
+	// New resource
+	ops = append(ops, NewOpSet(set, "", "id", id))
+
+	// Attributes
+	for _, attr := range res.Attrs() {
+		ops = append(ops, NewOpSet(set, id, attr.Name, res.Get(attr.Name)))
+	}
+
+	// Relationships
+	for _, rel := range res.Rels() {
+		var op Op
+		if rel.ToOne {
+			op = NewOpSet(set, id, rel.FromName, res.GetToOne(rel.FromName))
+		} else {
+			op = NewOpSet(set, id, rel.FromName, res.GetToMany(rel.FromName))
+		}
+		ops = append(ops, op)
+	}
+
+	return ops
 }
 
 // NewOpAddSet ...
