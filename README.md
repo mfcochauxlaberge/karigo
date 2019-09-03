@@ -20,9 +20,7 @@ An ordered log is an easy data structure to implement and mutate. In karigo, the
 
 ## State
 
-This is a work in progress.
-
-See the [minimum viable project board](https://github.com/mfcochauxlaberge/karigo/projects/1) for a list of the first features being implemented and their current states. The work is being done on the `mvp` branch.
+This is a work in progress. It is not possible to make a production API with this tool yet.
 
 ## Documentation
 
