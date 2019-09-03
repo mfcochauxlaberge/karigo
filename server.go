@@ -152,6 +152,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte("500 Internal Server Error"))
 	}
+	if r.Method == DELETE && len(doc.Errors) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 
 	// Indent response
 	out := &bytes.Buffer{}

@@ -55,7 +55,9 @@ func (c *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 
 // Apply ...
 func (c *Checkpoint) Apply(ops []Op) {
-	c.Check(c.node.apply(ops))
+	if c.err == nil {
+		c.Check(c.node.apply(ops))
+	}
 }
 
 // Check ...
