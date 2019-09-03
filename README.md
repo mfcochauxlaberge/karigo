@@ -4,7 +4,7 @@
   <img src="logo.png" height="120">
   <br>
   <a href="https://travis-ci.com/mfcochauxlaberge/karigo">
-    <img src="https://travis-ci.com/mfcochauxlaberge/karigo.svg?branch=mvp">
+    <img src="https://travis-ci.com/mfcochauxlaberge/karigo.svg?branch=master">
   </a>
   <!-- <a href="https://codecov.io/gh/mfcochauxlaberge/karigo">
     <img src="https://codecov.io/gh/mfcochauxlaberge/karigo/branch/master/graph/badge.svg">
