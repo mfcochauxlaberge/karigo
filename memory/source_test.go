@@ -12,5 +12,4 @@ func TestMemorySource(t *testing.T) {
 	if err != nil {
 		t.Errorf("Source %T failed: %s", src, err)
 	}
-	// t.Errorf("FAIL!")
 }

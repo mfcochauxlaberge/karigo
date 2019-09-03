@@ -34,39 +34,6 @@ func (s *Server) Run() {
 
 	s.logger.WithField("event", "server_start").Info("Server has started")
 
-	if node, ok := s.Nodes["localhost"]; ok {
-		ops := []Op{}
-		ops = append(ops, NewOpSet("0_meta", "", "id", "password"))
-		ops = append(ops, NewOpSet("0_meta", "password", "value", "123456seven"))
-		ops = append(ops, NewOpSet("0_meta", "", "id", "name"))
-		ops = append(ops, NewOpSet("0_meta", "name", "value", "test"))
-		ops = append(ops, NewOpSet("0_meta", "", "id", "name-again"))
-		ops = append(ops, NewOpSet("0_meta", "name-again", "value", "test"))
-
-		ops = append(ops, NewOpAddSet("users")...)
-		ops = append(ops, NewOpAddAttr("users", "username", "string", false)...)
-		ops = append(ops, NewOpAddAttr("users", "name", "string", false)...)
-		ops = append(ops, NewOpAddAttr("users", "password", "string", false)...)
-		// ops = append(ops, NewOpAddAttr("users", "created-at", "string", time.Now())...)
-		ops = append(ops, NewOpSet("users", "", "id", "abc123"))
-		ops = append(ops, NewOpSet("users", "abc123", "username", "user1"))
-		ops = append(ops, NewOpSet("users", "abc123", "name", "Bob"))
-		ops = append(ops, NewOpSet("users", "abc123", "password", "j2K2sN1s7"))
-		ops = append(ops, NewOpSet("users", "", "id", "def456"))
-		ops = append(ops, NewOpSet("users", "def456", "username", "user2"))
-		ops = append(ops, NewOpSet("users", "def456", "name", "John"))
-		ops = append(ops, NewOpSet("users", "def456", "password", "K1nas82J2"))
-		ops = append(ops, NewOpSet("users", "", "id", "ghi789"))
-		ops = append(ops, NewOpSet("users", "ghi789", "username", "user3"))
-		ops = append(ops, NewOpSet("users", "ghi789", "name", "Ted"))
-		ops = append(ops, NewOpSet("users", "ghi789", "password", "aJ2n2s8sa"))
-
-		err := node.apply(ops)
-		if err != nil {
-			panic(err)
-		}
-	}
-
 	for _, node := range s.Nodes {
 		node.logger = s.logger
 	}
