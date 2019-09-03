@@ -18,9 +18,7 @@ Karigo is an API framework that follows the [JSON:API specification](https://jso
 
 ## State
 
-This is a **work in progress**. Some of the features explained in this document might not exist yet. See the issues and the pull requests on GitHub to have an idea of what is being worked on.
-
-See the [minimum viable project board](https://github.com/mfcochauxlaberge/karigo/projects/1) for a list of the first features being implemented and their current states. The work is being done on the `mvp` branch.
+This is a work in progress. It is not possible to make a production API with this tool yet.
 
 ## Concepts
 
