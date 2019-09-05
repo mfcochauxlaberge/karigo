@@ -16,7 +16,7 @@
 
 Karigo is an API service that follows the [JSON:API specification](https://jsonapi.org/format).
 
-The usual workflow is to run the binary first, then use the CLI to update the schema and business logic.
+Karigo is not a framework to build and run a binary. Karigo itself is the binary. When it is running for the first time, it always serves an empty API (no public schema and data). It then has to be customized using the CLI by adding types, validation, business logic, and more.
 
 ## State
 
