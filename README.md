@@ -14,29 +14,32 @@
   </a>
 </div>
 
-Karigo is an API framework that follows the [JSON:API specification](https://jsonapi.org/format).
+Karigo is an API service that follows the [JSON:API specification](https://jsonapi.org/format).
+
+The usual workflow is to run the binary first, then use the CLI to update the schema and business logic.
 
 ## State
 
 This is a work in progress. It is not possible to make a production API with this tool yet.
 
-## Concepts
+## Use cases
 
-Karigo handles resources defined by their type. It accepts and returns valid JSON:API document.
+### What Karigo can do
 
-### What is provided by the framework
-
- - Reading and writing valid JSON:API requests
- - Parse the URL (invluding its parameters)
- - Routing the URLs to the corresponding business logic
- - Provided default functions out-of-the-box if business logic is not necessary
+ - Read and write valid JSON:API requests
+ - Parse the URL (including its parameters)
+ - Route the endpoints to the corresponding business logic
+ - Provide basic validation rules
  - Save each transaction in an exposed ordered log
 
 ### What the user has to do
 
- - Define the types
- - Provide validation rules
+ - Run the service (`karigo run`)
+ - Define the types (names, attributes, and relationships)
+ - Provide more specific validation rules
  - Write the business logic
+
+## Concepts
 
 ### Type
 
@@ -53,7 +56,7 @@ A type has a name, attributes, and relationships.
    - Can be empty
    - Can have an inverse relationship
 
-### Resources
+### Resource
 
 A resource is an instance of a type, like a row in a table.
 
@@ -61,16 +64,23 @@ During a GET requests, the parameters are parsed and used in order to return the
 
 ### Log
 
-Each request is appended to an ordered log. An entry in the log is simply a list of keys associated to some values. A key is a resource's field that will be set to the associated value.
+The log is an ordered and append-only sequence of transactions.
 
-### Transactions
+Such a log makes a lot of tasks easier:
 
-Each request that modifies at least one resource needs to append a transaction to the log.
+ - Replicate and synchronize the data
+ - Replay the transactions to benchmark performance
+ - Trigger events when a resource, field, or type is modified
+ - Build a simple and powerful test suite
+
+### Transaction
+
+Each request modiying data results in a transaction appended to an ordered log. A transaction is a set of operations. An operation is the field of a resource and a value. Executing the operation means setting the resource's field to the value.
 
 ## Documentation
 
-Documentation will be provided when the API is stable.
+Documentation will be provided when the API is more stable.
 
 ## Contributing
 
-Contributions are **not** accepted at the moment.
+Contributions are not accepted at the moment.
