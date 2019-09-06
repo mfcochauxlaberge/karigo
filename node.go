@@ -1,7 +1,9 @@
 package karigo
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -152,6 +154,15 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	} else {
 		// Execute
 		tx(cp, ops)
+	}
+
+	// Add to journal
+	if cp.err == nil {
+		entry, err := json.Marshal(Entry(ops))
+		if err != nil {
+			cp.Fail(fmt.Errorf("karigo: could not marshal entry: %s", err))
+		}
+		err = n.log.Append(entry)
 	}
 
 	if cp.err != nil {
