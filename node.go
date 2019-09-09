@@ -145,6 +145,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		n.logger.Debug("DELETE request")
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
+	cp.ops = ops
 
 	doc := &jsonapi.Document{}
 
@@ -153,7 +154,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		handleSchemaChange(r, cp, n.schema)
 	} else {
 		// Execute
-		tx(cp, ops)
+		tx(cp)
 	}
 
 	// Add to journal
