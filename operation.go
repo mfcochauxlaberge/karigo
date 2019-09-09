@@ -17,14 +17,14 @@ type Op struct {
 
 type Entry []Op
 
-// Bytes ...
-func (e *Entry) Bytes() []byte {
-	payload := []byte{}
+// // Bytes ...
+// func (e *Entry) Bytes() []byte {
+// 	payload := []byte{}
 
-	for _, op := range e {
+// 	for _, op := range e {
 
-	}
-}
+// 	}
+// }
 
 // NewOpSet ...
 func NewOpSet(set, id, field string, v interface{}) Op {
