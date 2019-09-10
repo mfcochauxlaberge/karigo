@@ -4,14 +4,14 @@ import "github.com/mfcochauxlaberge/jsonapi"
 
 // Operations
 const (
-	OpSet = iota
-	OpAdd = iota
+	OpSet = '='
+	OpAdd = '&'
 )
 
 // Op ...
 type Op struct {
 	Key   Key // Set, ID, Field
-	Op    int
+	Op    byte
 	Value interface{}
 }
 
