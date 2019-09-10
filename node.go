@@ -163,7 +163,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		if err != nil {
 			cp.Fail(fmt.Errorf("karigo: could not marshal entry: %s", err))
 		}
-		err = n.log.Append(entry)
+		_ = n.log.Append(entry)
 	}
 
 	if cp.err != nil {
