@@ -1,6 +1,9 @@
 package memory
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // Journal ...
 type Journal struct {
@@ -11,6 +14,9 @@ type Journal struct {
 // Append ...
 func (j *Journal) Append(c []byte) error {
 	j.check()
+	if c == nil {
+		c = []byte{}
+	}
 	j.log = append(j.log, c)
 	return nil
 }
@@ -22,7 +28,7 @@ func (j *Journal) Last() (uint, []byte, error) {
 		last := j.start + uint(len(j.log)) - 1
 		return last, j.log[len(j.log)-1], nil
 	}
-	return 0, nil, nil
+	return 0, nil, errors.New("karigo: journal is empty")
 }
 
 // At ...
