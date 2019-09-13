@@ -48,24 +48,37 @@ func (j *Journal) At(i uint) ([]byte, error) {
 // It returns an error if i is greater than the newest index.
 func (j *Journal) Cut(i uint) error {
 	j.check()
-	if i > j.start+uint(len(j.log)) {
-
+	if len(j.log) == 0 {
+		return errors.New("journal is empty")
 	} else if i < j.start {
-		// Already cut
-		return nil
+		return fmt.Errorf("journal already cut at index %d or after", i)
+	} else if i > j.start+uint(len(j.log))-1 {
+		return fmt.Errorf("journal has no entry at index %d yet", i)
 	} else {
-
+		newLog := make([][]byte, 0, j.start+uint(len(j.log))-1-i)
+		for n := uint(0); n < uint(len(newLog)); n++ {
+			newLog[n] = j.log[n-j.start+2]
+		}
 	}
 	return nil
 }
 
 // Range returns a slice of entries from indexes n to s (inclusively).
 //
-// It returns an error if it can't return the ranger, whether it is because the
-// journal's history starts after n or s is greater than the newest index.
-func (j *Journal) Range(n uint, s uint) ([][]byte, error) {
+// It returns an error if it can't return the range, whether it is because the
+// journal's history starts after f or t is greater than the newest index.
+func (j *Journal) Range(f uint, t uint) ([][]byte, error) {
 	j.check()
-	// TODO
+	if len(j.log) == 0 {
+		return nil, errors.New("journal is empty")
+	} else if f < j.start {
+		return nil, fmt.Errorf("journal was cut after %d", f)
+	} else if t > j.start+uint(len(j.log))-1 {
+		return nil, fmt.Errorf("journal has no entry at index %d yet", t)
+	} else {
+		rang := make([][]byte, 0, t-f+1)
+		_ = copy(rang, j.log[f-j.start:t-j.start+1])
+	}
 	return [][]byte{}, nil
 }
 
