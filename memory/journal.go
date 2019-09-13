@@ -59,6 +59,8 @@ func (j *Journal) Cut(i uint) error {
 		for n := uint(0); n < uint(len(newLog)); n++ {
 			newLog[n] = j.log[n-j.start+2]
 		}
+		j.start = i + 1
+		j.log = newLog
 	}
 	return nil
 }
