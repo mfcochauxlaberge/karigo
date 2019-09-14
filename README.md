@@ -6,9 +6,19 @@
   <a href="https://travis-ci.com/mfcochauxlaberge/karigo">
     <img src="https://travis-ci.com/mfcochauxlaberge/karigo.svg?branch=master">
   </a>
+  <a href="https://goreportcard.com/report/github.com/mfcochauxlaberge/karigo">
+    <img src="https://goreportcard.com/badge/github.com/mfcochauxlaberge/karigo">
+  </a>
   <!-- <a href="https://codecov.io/gh/mfcochauxlaberge/karigo">
     <img src="https://codecov.io/gh/mfcochauxlaberge/karigo/branch/master/graph/badge.svg">
   </a> -->
+  <br>
+  <a href="https://github.com/mfcochauxlaberge/karigo/blob/master/go.mod">
+    <img src="https://img.shields.io/badge/go%20version-go1.12%2B-red">
+  </a>
+  <a href="https://github.com/mfcochauxlaberge/karigo/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/mfcochauxlaberge/karigo?color=a33">
+  </a>
   <a href="https://godoc.org/github.com/mfcochauxlaberge/karigo">
     <img src="https://godoc.org/github.com/golang/gddo?status.svg">
   </a>
