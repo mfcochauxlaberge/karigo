@@ -3,6 +3,7 @@ package memory
 import (
 	"errors"
 	"fmt"
+	"sync"
 )
 
 // Journal is a simple memory-based implementation of karigo.Journal.
@@ -12,20 +13,31 @@ import (
 type Journal struct {
 	log   [][]byte
 	start uint
+
+	m sync.Mutex
 }
 
 // Append appends c to the log.
 func (j *Journal) Append(c []byte) error {
+	j.m.Lock()
+	defer j.m.Unlock()
+
 	j.check()
 	if c == nil {
 		c = []byte{}
 	}
 	j.log = append(j.log, c)
+	if len(j.log) > 1 {
+		j.start++
+	}
 	return nil
 }
 
 // First returns the oldest known entry.
 func (j *Journal) First() (uint, []byte, error) {
+	j.m.Lock()
+	defer j.m.Unlock()
+
 	j.check()
 	if len(j.log) > 0 {
 		return j.start, j.log[0], nil
@@ -35,6 +47,9 @@ func (j *Journal) First() (uint, []byte, error) {
 
 // Last returns the newest entry.
 func (j *Journal) Last() (uint, []byte, error) {
+	j.m.Lock()
+	defer j.m.Unlock()
+
 	j.check()
 	if len(j.log) > 0 {
 		last := j.start + uint(len(j.log)) - 1
@@ -45,6 +60,9 @@ func (j *Journal) Last() (uint, []byte, error) {
 
 // At returns the entry indexed at i.
 func (j *Journal) At(i uint) ([]byte, error) {
+	j.m.Lock()
+	defer j.m.Unlock()
+
 	j.check()
 	if i < j.start || i > j.start+uint(len(j.log))-1 {
 		return nil, fmt.Errorf("karigo: index %d does not exist", i)
@@ -56,6 +74,9 @@ func (j *Journal) At(i uint) ([]byte, error) {
 //
 // It returns an error if i is greater than the newest index.
 func (j *Journal) Cut(i uint) error {
+	j.m.Lock()
+	defer j.m.Unlock()
+
 	j.check()
 	if len(j.log) == 0 {
 		return nil
@@ -75,6 +96,9 @@ func (j *Journal) Cut(i uint) error {
 // It returns an error if it can't return the range, whether it is because the
 // journal's history starts after f or t is greater than the newest index.
 func (j *Journal) Range(f uint, t uint) ([][]byte, error) {
+	j.m.Lock()
+	defer j.m.Unlock()
+
 	j.check()
 	if len(j.log) == 0 {
 		return nil, errors.New("journal is empty")
