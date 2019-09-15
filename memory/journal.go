@@ -24,6 +24,15 @@ func (j *Journal) Append(c []byte) error {
 	return nil
 }
 
+// First returns the oldest known entry.
+func (j *Journal) First() (uint, []byte, error) {
+	j.check()
+	if len(j.log) > 0 {
+		return j.start, j.log[0], nil
+	}
+	return 0, nil, errors.New("karigo: journal is empty")
+}
+
 // Last returns the newest entry.
 func (j *Journal) Last() (uint, []byte, error) {
 	j.check()
@@ -49,12 +58,8 @@ func (j *Journal) At(i uint) ([]byte, error) {
 func (j *Journal) Cut(i uint) error {
 	j.check()
 	if len(j.log) == 0 {
-		return errors.New("journal is empty")
-	} else if i < j.start {
-		return fmt.Errorf("journal already cut at index %d or after", i)
-	} else if i > j.start+uint(len(j.log))-1 {
-		return fmt.Errorf("journal has no entry at index %d yet", i)
-	} else {
+		return nil
+	} else if i >= j.start && i < j.start+uint(len(j.log)) {
 		newLog := make([][]byte, 0, j.start+uint(len(j.log))-1-i)
 		for n := uint(0); n < uint(len(newLog)); n++ {
 			newLog[n] = j.log[n-j.start+2]

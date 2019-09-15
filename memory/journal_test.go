@@ -1,17 +1,22 @@
-package memory
+package memory_test
 
 import (
 	"strconv"
 	"testing"
 
+	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/memory"
+
 	"github.com/stretchr/testify/assert"
 )
+
+var _ = (karigo.Journal)(nil)
 
 func TestJournalSource(t *testing.T) {
 	assert := assert.New(t)
 
 	// Empty journal
-	journal := &Journal{}
+	var journal karigo.Journal = &memory.Journal{}
 
 	v, last, err := journal.Last()
 	assert.Equal(uint(0), v)
@@ -62,27 +67,33 @@ func TestJournalSource(t *testing.T) {
 func TestJournalCut(t *testing.T) {
 	assert := assert.New(t)
 
-	journal := &Journal{}
-	assert.EqualError(journal.Cut(0), "journal is empty")
+	var journal karigo.Journal = &memory.Journal{}
+	assert.NoError(journal.Cut(0))
 
 	_ = journal.Append([]byte("0"))
 	v, entry, _ := journal.Last()
 	assert.Equal(uint(0), v)
 	assert.Equal([]byte("0"), entry)
 	assert.NoError(journal.Cut(0))
-	assert.EqualError(journal.Cut(0), "journal is empty")
+	assert.NoError(journal.Cut(0))
 
 	for i := 0; i < 100; i++ {
 		data := strconv.Itoa(i)
 		_ = journal.Append([]byte(data))
 	}
-	assert.EqualError(
-		journal.Cut(999),
-		"journal has no entry at index 999 yet",
-	)
-	_ = journal.Cut(10)
-	assert.EqualError(
-		journal.Cut(10),
-		"journal already cut at index 10 or after",
-	)
+
+	assert.NoError(journal.Cut(999))
+	v, entry, _ = journal.First()
+	assert.Equal(uint(0), v)
+	assert.Equal([]byte("0"), entry)
+
+	assert.NoError(journal.Cut(10))
+	v, entry, _ = journal.First()
+	assert.Equal(uint(11), v)
+	assert.Equal([]byte("11"), entry)
+
+	assert.NoError(journal.Cut(10))
+	v, entry, _ = journal.First()
+	assert.Equal(uint(11), v)
+	assert.Equal([]byte("11"), entry)
 }
