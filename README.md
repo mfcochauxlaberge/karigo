@@ -1,4 +1,4 @@
-# Karigo
+# karigo
 
 <div align="center" style="text-align: center;">
   <img src="assets/logo.png" height="120">
@@ -24,9 +24,9 @@
   </a>
 </div>
 
-Karigo is an API service that follows the [JSON:API specification](https://jsonapi.org/format).
+karigo is an API engine that follows the [JSON:API specification](https://jsonapi.org/format).
 
-Karigo is not a framework to build and run a binary. Karigo itself is the binary. When it is running for the first time, it always serves an empty API (no public schema and data). It then has to be customized using the CLI by adding types, validation, business logic, and more.
+karigo is not a framework to build and run a binary. karigo itself is the binary. When it is running for the first time, it always serves an empty API (no public schema and data). It then has to be customized using the CLI by adding types, validation, business logic, and more.
 
 ## State
 
@@ -34,7 +34,7 @@ This is a work in progress. It is not possible to make a production API with thi
 
 ## Use cases
 
-### What Karigo can do
+### What karigo can do
 
  - Read and write valid JSON:API requests
  - Parse the URL (including its parameters)
