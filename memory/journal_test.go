@@ -18,7 +18,7 @@ func TestJournalSource(t *testing.T) {
 	// Empty journal
 	var journal karigo.Journal = &memory.Journal{}
 
-	v, last, err := journal.Last()
+	v, last, err := journal.Newest()
 	assert.Equal(uint(0), v)
 	assert.Equal(([]byte)(nil), last)
 	assert.Error(err)
@@ -27,7 +27,7 @@ func TestJournalSource(t *testing.T) {
 	err = journal.Append([]byte("abc"))
 	assert.NoError(err)
 
-	v, last, err = journal.Last()
+	v, last, err = journal.Newest()
 	assert.Equal(uint(0), v)
 	assert.Equal([]byte("abc"), last)
 	assert.NoError(err)
@@ -36,7 +36,7 @@ func TestJournalSource(t *testing.T) {
 	err = journal.Append([]byte{})
 	assert.NoError(err)
 
-	v, last, err = journal.Last()
+	v, last, err = journal.Newest()
 	assert.Equal(uint(1), v)
 	assert.Equal([]byte{}, last)
 	assert.NoError(err)
@@ -45,7 +45,7 @@ func TestJournalSource(t *testing.T) {
 	err = journal.Append(nil)
 	assert.NoError(err)
 
-	v, last, err = journal.Last()
+	v, last, err = journal.Newest()
 	assert.Equal(uint(2), v)
 	assert.Equal([]byte{}, last)
 	assert.NoError(err)
@@ -71,7 +71,7 @@ func TestJournalCut(t *testing.T) {
 	assert.NoError(journal.Cut(0))
 
 	_ = journal.Append([]byte("0"))
-	v, entry, _ := journal.Last()
+	v, entry, _ := journal.Newest()
 	assert.Equal(uint(0), v)
 	assert.Equal([]byte("0"), entry)
 	assert.NoError(journal.Cut(0))
@@ -83,17 +83,12 @@ func TestJournalCut(t *testing.T) {
 	}
 
 	assert.NoError(journal.Cut(999))
-	v, entry, _ = journal.First()
-	assert.Equal(uint(0), v)
-	assert.Equal([]byte("0"), entry)
+	v, entry, _ = journal.Oldest()
+	assert.Equal(uint(99), v)
+	assert.Equal([]byte("99"), entry)
 
 	assert.NoError(journal.Cut(10))
-	v, entry, _ = journal.First()
-	assert.Equal(uint(11), v)
-	assert.Equal([]byte("11"), entry)
-
-	assert.NoError(journal.Cut(10))
-	v, entry, _ = journal.First()
-	assert.Equal(uint(11), v)
-	assert.Equal([]byte("11"), entry)
+	v, entry, _ = journal.Oldest()
+	assert.Equal(uint(99), v)
+	assert.Equal([]byte("99"), entry)
 }
