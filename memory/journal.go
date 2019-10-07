@@ -15,8 +15,13 @@ func (j *Journal) Append(c []byte) error {
 	return nil
 }
 
-// Last ...
-func (j *Journal) Last() (uint, []byte, error) {
+// Oldest ...
+func (j *Journal) Oldest() (uint, []byte, error) {
+	return 0, nil, nil
+}
+
+// Newest ...
+func (j *Journal) Newest() (uint, []byte, error) {
 	j.check()
 	if len(j.log) > 0 {
 		last := j.start + uint(len(j.log)) - 1
