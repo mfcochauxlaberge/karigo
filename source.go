@@ -11,6 +11,9 @@ type Source interface {
 	Resource(QueryRes) (jsonapi.Resource, error)
 	Collection(QueryCol) (jsonapi.Collection, error)
 	Apply([]Op) error
+
+	Commit() error
+	Rollback() error
 }
 
 // source is a thin convenient wrapper for a Source.

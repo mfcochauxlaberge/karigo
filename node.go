@@ -159,11 +159,13 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	// Add to journal
 	if cp.err == nil {
-		entry, err := json.Marshal(Entry(ops))
+		entry, err := json.Marshal(Entry(cp.ops))
 		if err != nil {
 			cp.Fail(fmt.Errorf("karigo: could not marshal entry: %s", err))
 		}
+		// TODO Handle errors.
 		_ = n.log.Append(entry)
+		_ = cp.commit()
 	}
 
 	if cp.err != nil {

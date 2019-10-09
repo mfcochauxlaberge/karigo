@@ -70,3 +70,13 @@ func (c *Checkpoint) Fail(err error) {
 	}
 	c.err = err
 }
+
+// commit ...
+func (c *Checkpoint) commit() error {
+	return c.node.main.src.Commit()
+}
+
+// rollback ...
+func (c *Checkpoint) rollback() error {
+	return c.node.main.src.Rollback()
+}
