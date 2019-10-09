@@ -156,6 +156,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	if cp.err != nil {
+		_ = cp.rollback()
+
 		// Handle error
 		var jaErr jsonapi.Error
 		switch cp.err {
@@ -166,6 +168,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
+		_ = cp.commit()
+
 		// Response payload
 		switch r.Method {
 		case GET:
