@@ -54,6 +54,9 @@ func (c *Checkpoint) Apply(ops []Op) {
 	if c.err == nil {
 		c.Check(c.node.apply(ops))
 	}
+	if c.err == nil {
+		c.ops = append(c.ops, ops...)
+	}
 }
 
 // Check ...
