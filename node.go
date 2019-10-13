@@ -2,6 +2,7 @@ package karigo
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -156,7 +157,11 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	if cp.err != nil {
-		_ = cp.rollback()
+		// Rollback
+		err = cp.rollback()
+		if err != nil {
+			panic(fmt.Errorf("could not rollback: %s", err))
+		}
 
 		// Handle error
 		var jaErr jsonapi.Error
@@ -168,7 +173,16 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
-		_ = cp.commit()
+		// Commit the transaction entry
+		err = n.log.Append(cp.ops.Bytes())
+		if err != nil {
+			panic(fmt.Errorf("could not append: %s", err))
+		}
+
+		err = cp.commit()
+		if err != nil {
+			panic(fmt.Errorf("could not commit: %s", err))
+		}
 
 		// Response payload
 		switch r.Method {
