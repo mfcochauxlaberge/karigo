@@ -144,7 +144,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		n.logger.Debug("DELETE request")
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
-	cp.ops = ops
+	cp.Apply(ops)
 
 	doc := &jsonapi.Document{}
 
