@@ -158,7 +158,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	if cp.err != nil {
-		_ = cp.rollback()
+		err = cp.rollback()
+		if err != nil {
+			panic(fmt.Errorf("could not rollback: %s", err))
+		}
 
 		// Handle error
 		var jaErr jsonapi.Error
@@ -175,9 +178,15 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		if err != nil {
 			cp.Fail(fmt.Errorf("karigo: could not marshal entry: %s", err))
 		}
-		_ = n.log.Append(entry)
+		err = n.log.Append(entry)
+		if err != nil {
+			panic(fmt.Errorf("could not append: %s", err))
+		}
 
-		_ = cp.commit()
+		err = cp.commit()
+		if err != nil {
+			panic(fmt.Errorf("could not commit: %s", err))
+		}
 
 		// Response payload
 		switch r.Method {
