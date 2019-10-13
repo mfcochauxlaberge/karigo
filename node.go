@@ -1,7 +1,6 @@
 package karigo
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
@@ -158,6 +157,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	if cp.err != nil {
+		// Rollback
 		err = cp.rollback()
 		if err != nil {
 			panic(fmt.Errorf("could not rollback: %s", err))
@@ -174,11 +174,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
 		// Commit the transaction entry
-		entry, err := json.Marshal(Entry(cp.ops))
-		if err != nil {
-			cp.Fail(fmt.Errorf("karigo: could not marshal entry: %s", err))
-		}
-		err = n.log.Append(entry)
+		err = n.log.Append(cp.ops.Bytes())
 		if err != nil {
 			panic(fmt.Errorf("could not append: %s", err))
 		}
