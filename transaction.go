@@ -4,6 +4,4 @@ package karigo
 type Tx func(*Checkpoint)
 
 // TxDefault ...
-func TxDefault(cp *Checkpoint, ops []Op) {
-	cp.Apply(ops)
-}
+func TxDefault(cp *Checkpoint) {}

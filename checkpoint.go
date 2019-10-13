@@ -14,7 +14,7 @@ type Checkpoint struct {
 	node *Node
 
 	version uint
-	ops     []Op
+	ops     Entry
 
 	err error
 }
@@ -54,6 +54,9 @@ func (c *Checkpoint) Apply(ops []Op) {
 	if c.err == nil {
 		c.Check(c.node.apply(ops))
 	}
+	if c.err == nil {
+		c.ops = append(c.ops, ops...)
+	}
 }
 
 // Check ...
@@ -69,4 +72,14 @@ func (c *Checkpoint) Fail(err error) {
 		err = errors.New("an error occurred")
 	}
 	c.err = err
+}
+
+// commit ...
+func (c *Checkpoint) commit() error {
+	return c.node.main.src.Commit()
+}
+
+// rollback ...
+func (c *Checkpoint) rollback() error {
+	return c.node.main.src.Rollback()
 }

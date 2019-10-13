@@ -1,18 +1,34 @@
 package karigo
 
-import "github.com/mfcochauxlaberge/jsonapi"
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/mfcochauxlaberge/jsonapi"
+)
 
 // Operations
 const (
-	OpSet = iota
-	OpAdd = iota
+	OpSet = '='
+	OpAdd = '&'
 )
 
 // Op ...
 type Op struct {
 	Key   Key // Set, ID, Field
-	Op    int
+	Op    byte
 	Value interface{}
+}
+
+type Entry []Op
+
+// Bytes ...
+func (e *Entry) Bytes() []byte {
+	b, err := json.Marshal(e)
+	if err != nil {
+		panic(fmt.Errorf("can't get Entry bytes: %s", err))
+	}
+	return b
 }
 
 // NewOpSet ...

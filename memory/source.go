@@ -155,6 +155,16 @@ func (s *Source) Apply(ops []karigo.Op) error {
 	return nil
 }
 
+// Commit ...
+func (s *Source) Commit() error {
+	return nil
+}
+
+// Rollback ...
+func (s *Source) Rollback() error {
+	return nil
+}
+
 func (s *Source) opSet(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s = %v\n", set, id, field, v)
 
