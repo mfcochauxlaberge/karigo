@@ -6,7 +6,7 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 
 	. "github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory"
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 )
 
 func TestNode(t *testing.T) {

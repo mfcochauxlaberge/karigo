@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory"
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 
 	"github.com/spf13/cobra"
 )
