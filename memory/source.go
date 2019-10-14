@@ -240,7 +240,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 func (s *Source) opAdd(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", set, id, field, v)
 
-	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).Get(field))
+	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).GetToMany(field))
 	curr = reflect.Append(curr, reflect.ValueOf(v))
 
 	typ := s.sets[set].Type
