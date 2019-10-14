@@ -180,7 +180,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 	} else if set == "0_attrs" {
 		if id != "" && field == "active" && v.(bool) {
 			// New attribute
-			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
+			setID := s.sets["0_attrs"].Resource(id, nil).GetToOne("set")
 			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
 			attrType, _ := jsonapi.GetAttrType(
 				s.sets["0_attrs"].Resource(id, nil).Get("type").(string),
