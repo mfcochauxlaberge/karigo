@@ -129,6 +129,11 @@ type log struct {
 type op struct {
 	ID string `json:"id" api:"0_ops"`
 
+	// Attributes
+	Key   string `json:"set" api:"attr"`
+	Op    string `json:"op" api:"attr"`
+	Value string `json:"value" api:"attr"`
+
 	// Relationships
 	Version string `json:"version" api:"rel,0_log,ops"`
 }

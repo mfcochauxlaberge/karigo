@@ -155,6 +155,16 @@ func (s *Source) Apply(ops []karigo.Op) error {
 	return nil
 }
 
+// Commit ...
+func (s *Source) Commit() error {
+	return nil
+}
+
+// Rollback ...
+func (s *Source) Rollback() error {
+	return nil
+}
+
 func (s *Source) opSet(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s = %v\n", set, id, field, v)
 
@@ -170,7 +180,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 	} else if set == "0_attrs" {
 		if id != "" && field == "active" && v.(bool) {
 			// New attribute
-			setID := s.sets["0_attrs"].Resource(id, nil).Get("set").(string)
+			setID := s.sets["0_attrs"].Resource(id, nil).GetToOne("set")
 			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
 			attrType, _ := jsonapi.GetAttrType(
 				s.sets["0_attrs"].Resource(id, nil).Get("type").(string),
@@ -230,7 +240,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 func (s *Source) opAdd(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", set, id, field, v)
 
-	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).Get(field))
+	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).GetToMany(field))
 	curr = reflect.Append(curr, reflect.ValueOf(v))
 
 	typ := s.sets[set].Type

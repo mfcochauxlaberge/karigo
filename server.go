@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/sirupsen/logrus"
-	"github.com/twinj/uuid"
 )
 
 // Server ...
@@ -47,7 +47,7 @@ func (s *Server) Run() {
 
 // ServeHTTP ...
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	requestID := uuid.NewV4().String()[:8]
+	requestID := uuid.New().String()[:8]
 
 	// Parse domain and port
 	domain, port := domainAndPort(r.Host)

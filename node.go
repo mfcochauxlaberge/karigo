@@ -2,11 +2,12 @@ package karigo
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/sirupsen/logrus"
-	"github.com/twinj/uuid"
 )
 
 // NewNode ...
@@ -96,7 +97,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		n.logger.Debug("GET request")
 	case POST:
 		n.logger.Debug("POST request")
-		id = uuid.NewV4().String()[:8]
+		id = uuid.New().String()[:8]
 		// TODO Do not hardcode the following condition.
 		if res.GetType().Name == "0_meta" {
 			id = res.GetID()
@@ -143,6 +144,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		n.logger.Debug("DELETE request")
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
+	cp.Apply(ops)
 
 	doc := &jsonapi.Document{}
 
@@ -151,10 +153,16 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		handleSchemaChange(r, cp, n.schema)
 	} else {
 		// Execute
-		tx(cp, ops)
+		tx(cp)
 	}
 
 	if cp.err != nil {
+		// Rollback
+		err = cp.rollback()
+		if err != nil {
+			panic(fmt.Errorf("could not rollback: %s", err))
+		}
+
 		// Handle error
 		var jaErr jsonapi.Error
 		switch cp.err {
@@ -165,6 +173,17 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
+		// Commit the transaction entry
+		err = n.log.Append(cp.ops.Bytes())
+		if err != nil {
+			panic(fmt.Errorf("could not append: %s", err))
+		}
+
+		err = cp.commit()
+		if err != nil {
+			panic(fmt.Errorf("could not commit: %s", err))
+		}
+
 		// Response payload
 		switch r.Method {
 		case GET:
