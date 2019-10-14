@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/sirupsen/logrus"
-	"github.com/twinj/uuid"
 )
 
 // NewNode ...
@@ -97,7 +97,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		n.logger.Debug("GET request")
 	case POST:
 		n.logger.Debug("POST request")
-		id = uuid.NewV4().String()[:8]
+		id = uuid.New().String()[:8]
 		// TODO Do not hardcode the following condition.
 		if res.GetType().Name == "0_meta" {
 			id = res.GetID()
