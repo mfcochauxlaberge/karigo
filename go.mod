@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/mfcochauxlaberge/jsonapi v0.14.1-0.20190902173233-55cc95e37028
+	github.com/mfcochauxlaberge/jsonapi v0.15.0
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.3
