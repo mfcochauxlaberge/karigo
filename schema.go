@@ -141,7 +141,7 @@ type op struct {
 	Version string `json:"version" api:"rel,0_log,ops"`
 }
 
-func handleSchemaChange(r *Request, cp *Checkpoint, s *jsonapi.Schema) {
+func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 	var (
 		res jsonapi.Resource
 		ops []Op
@@ -176,13 +176,27 @@ func handleSchemaChange(r *Request, cp *Checkpoint, s *jsonapi.Schema) {
 		// Can only be for activating or deactivating
 		// a set, attribute, or relationship.
 		if activate, ok := res.Get("active").(bool); activate && ok {
-			ops, err = activateSet(s, res)
+			switch r.URL.ResType {
+			case "0_sets":
+				ops, err = activateSet(s, res)
+			case "0_attributes":
+				ops, err = activateAttr(s, res)
+			case "0_relationships":
+				ops, err = activateRel(s, res)
+			}
 			cp.Check(err)
 			cp.Apply(ops)
 		}
 
 		if deactivate, ok := res.Get("active").(bool); !deactivate && ok {
-			ops, err = deactivateSet(s, res)
+			switch r.URL.ResType {
+			case "0_sets":
+				ops, err = deactivateSet(s, res)
+			case "0_attributes":
+				ops, err = deactivateAttr(s, res)
+			case "0_relationships":
+				ops, err = deactivateRel(s, res)
+			}
 			cp.Check(err)
 			cp.Apply(ops)
 		}
@@ -216,13 +230,13 @@ func validateSchemaChange(res jsonapi.Resource) error {
 }
 
 func addSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-	id := res.GetID()
+	id := res.Get("name").(string)
 	current := s.GetType(id)
 	if current.Name != "" {
 		return nil, fmt.Errorf("type %q already exists", id)
 	}
 
-	return NewOpAddSet(id), nil
+	return NewOpAddSet(res.Get("name").(string)), nil
 }
 
 func deleteSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {

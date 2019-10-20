@@ -150,7 +150,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	if r.isSchemaChange() {
 		// Handle schema change
-		handleSchemaChange(r, cp, n.schema)
+		handleSchemaChange(n.schema, r, cp)
 	} else {
 		// Execute
 		tx(cp)
