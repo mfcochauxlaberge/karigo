@@ -91,7 +91,14 @@ func NewOpAddSet(set string) []Op {
 		NewOpSet("0_sets", "", "id", set),
 		NewOpSet("0_sets", set, "name", set),
 		NewOpSet("0_sets", set, "version", 0),
-		NewOpSet("0_sets", set, "active", true),
+		NewOpSet("0_sets", set, "active", false),
+	}
+}
+
+// NewOpDelSet ...
+func NewOpDelSet(id string) []Op {
+	return []Op{
+		NewOpSet("0_sets", id, "id", ""),
 	}
 }
 

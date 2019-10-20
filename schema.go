@@ -222,8 +222,7 @@ func addSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
 		return nil, fmt.Errorf("type %q already exists", id)
 	}
 
-	ops := []Op{NewOpAddSet("0_sets", "", "id", id)}
-	return ops, nil
+	return NewOpAddSet(id), nil
 }
 
 func deleteSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
