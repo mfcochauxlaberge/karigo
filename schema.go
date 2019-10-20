@@ -172,7 +172,6 @@ func handleSchemaChange(r *Request, cp *Checkpoint, s *jsonapi.Schema) {
 			cp.Check(err)
 			cp.Apply(ops)
 		}
-
 	} else if r.Method == "PATCH" {
 		// Can only be for activating or deactivating
 		// a set, attribute, or relationship.
@@ -217,18 +216,23 @@ func validateSchemaChange(res jsonapi.Resource) error {
 }
 
 func addSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-	name := res.Get("name").(string)
-
-	current := s.GetType(name)
+	id := res.GetID()
+	current := s.GetType(id)
 	if current.Name != "" {
-		return nil, fmt.Errorf("type name %q already exists", name)
+		return nil, fmt.Errorf("type %q already exists", id)
 	}
 
-	ops := []Op{NewOpAdd("0_sets", "", "id", name)}
+	ops := []Op{NewOpAddSet("0_sets", "", "id", id)}
 	return ops, nil
 }
 
 func deleteSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
+	name := res.Get("name").(string)
+	current := s.GetType(name)
+	if current.Name == "" {
+		return nil, fmt.Errorf("type %q does not exist", name)
+	}
+
 	s.RemoveType(res.GetID())
 
 	ops := []Op{
@@ -239,7 +243,6 @@ func deleteSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
 			"",
 		),
 	}
-
 	return ops, nil
 }
 
