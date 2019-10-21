@@ -157,16 +157,31 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 
 	if r.Method == "POST" {
 		if res.GetType().Name == "0_sets" {
+			res.SetID(res.Get("name").(string))
+
 			// Add set
 			ops, err = addSet(s, res)
 			cp.Check(err)
 			cp.Apply(ops)
 		} else if res.GetType().Name == "0_attrs" {
+			res.SetID(res.GetToOne("set") + "_" + res.Get("name").(string))
+
 			// Add attribute
 			ops, err = addAttr(s, res)
 			cp.Check(err)
 			cp.Apply(ops)
 		} else if res.GetType().Name == "0_rels" {
+			_ = jsonapi.Rel{
+				FromType: "",
+				FromName: "",
+				ToOne:    false,
+				ToType:   "",
+				ToName:   "",
+				FromOne:  false,
+			}
+			res.SetID(res.GetToOne("from-set") + "_" + res.Get("name").(string))
+			res.SetID(res.GetToOne("to-set") + "_" + res.Get("name").(string))
+
 			// Add relationship
 			ops, err = addRel(s, res)
 			cp.Check(err)
