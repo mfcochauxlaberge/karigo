@@ -172,10 +172,10 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 			cp.Apply(ops)
 		} else if res.GetType().Name == "0_rels" {
 			_ = jsonapi.Rel{
-				FromType: "",
+				FromType: res.GetToOne("from-set"),
 				FromName: "",
 				ToOne:    false,
-				ToType:   "",
+				ToType:   res.GetToOne("to-set"),
 				ToName:   "",
 				FromOne:  false,
 			}
