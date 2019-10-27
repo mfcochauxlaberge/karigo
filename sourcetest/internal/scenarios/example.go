@@ -11,12 +11,14 @@ func init() {
 			Steps: []interface{}{
 				// Users
 				karigo.NewOpAddSet("users"),
+				karigo.NewOpActivateSet("users"),
 				karigo.NewOpAddAttr("users", "username", "string", false),
 				karigo.NewOpAddAttr("users", "password", "string", false),
 				karigo.NewOpAddAttr("users", "created-at", "time", false),
 
 				// Articles
 				karigo.NewOpAddSet("articles"),
+				karigo.NewOpActivateSet("articles"),
 				karigo.NewOpAddAttr("articles", "title", "string", false),
 				karigo.NewOpAddAttr("articles", "content", "string", false),
 				karigo.NewOpAddAttr("articles", "created-at", "string", false),
