@@ -149,25 +149,25 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 	if r.Method == "PATCH" {
 		// Can only be for activating or deactivating
 		// a set, attribute, or relationship.
-		if activate, ok := res.Get("active").(bool); activate && ok {
-			switch r.URL.ResType {
-			case "0_sets":
-				err = activateSet(s, res)
-			case "0_attrs":
-				err = activateAttr(s, res)
-			case "0_rels":
-				err = activateRel(s, res)
-			}
-		}
-
-		if deactivate, ok := res.Get("active").(bool); !deactivate && ok {
-			switch r.URL.ResType {
-			case "0_sets":
-				deactivateSet(s, res)
-			case "0_attrs":
-				deactivateAttr(s, res)
-			case "0_rels":
-				deactivateRel(s, res)
+		if active, ok := res.Get("active").(bool); ok {
+			if active {
+				switch r.URL.ResType {
+				case "0_sets":
+					err = activateSet(s, res)
+				case "0_attrs":
+					err = activateAttr(s, res)
+				case "0_rels":
+					err = activateRel(s, res)
+				}
+			} else {
+				switch r.URL.ResType {
+				case "0_sets":
+					deactivateSet(s, res)
+				case "0_attrs":
+					deactivateAttr(s, res)
+				case "0_rels":
+					deactivateRel(s, res)
+				}
 			}
 		}
 
