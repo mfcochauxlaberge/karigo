@@ -130,6 +130,30 @@ func NewOpAddAttr(set, name, typ string, null bool) []Op {
 	}
 }
 
+// NewOpDeleteAttr ...
+func NewOpDeleteAttr(set, name string) []Op {
+	id := set + "_" + name
+	return []Op{
+		NewOpSet("0_attrs", id, "id", ""),
+	}
+}
+
+// NewOpActivateAttr ...
+func NewOpActivateAttr(set, name string) []Op {
+	id := set + "_" + name
+	return []Op{
+		NewOpSet("0_attrs", id, "active", true),
+	}
+}
+
+// NewOpDeactivateAttr ...
+func NewOpDeactivateAttr(set, name string) []Op {
+	id := set + "_" + name
+	return []Op{
+		NewOpSet("0_attrs", id, "active", false),
+	}
+}
+
 // NewOpAddRel ...
 func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
 	id := fromSet + "_" + fromName
@@ -143,5 +167,29 @@ func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) [
 		NewOpSet("0_rels", id, "from-one", fromOne),
 		NewOpSet("0_rels", id, "active", true),
 		NewOpAdd("0_sets", fromSet, "rels", id),
+	}
+}
+
+// NewOpDeleteRel ...
+func NewOpDeleteRel(set, name string) []Op {
+	id := set + "_" + name
+	return []Op{
+		NewOpSet("0_attrs", id, "id", ""),
+	}
+}
+
+// NewOpActivateRel ...
+func NewOpActivateRel(set, name string) []Op {
+	id := set + "_" + name
+	return []Op{
+		NewOpSet("0_rels", id, "active", true),
+	}
+}
+
+// NewOpDeactivateRel ...
+func NewOpDeactivateRel(set, name string) []Op {
+	id := set + "_" + name
+	return []Op{
+		NewOpSet("0_rels", id, "active", false),
 	}
 }
