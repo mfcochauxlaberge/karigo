@@ -8,7 +8,6 @@ func init() {
 			Name: "first_entry",
 			Steps: []interface{}{
 				karigo.NewOpAddSet("type_name"),
-				karigo.NewOpActivateSet("type_name"),
 			},
 		},
 	)
