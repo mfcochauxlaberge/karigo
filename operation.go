@@ -125,7 +125,7 @@ func NewOpAddAttr(set, name, typ string, null bool) []Op {
 		NewOpSet("0_attrs", id, "type", typ),
 		NewOpSet("0_attrs", id, "null", null),
 		NewOpSet("0_attrs", id, "set", set),
-		NewOpSet("0_attrs", id, "active", true),
+		NewOpSet("0_attrs", id, "active", false),
 		NewOpAdd("0_sets", set, "attrs", id),
 	}
 }
@@ -165,7 +165,7 @@ func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) [
 		NewOpSet("0_rels", id, "to-set", toSet),
 		NewOpSet("0_rels", id, "to-name", toName),
 		NewOpSet("0_rels", id, "from-one", fromOne),
-		NewOpSet("0_rels", id, "active", true),
+		NewOpSet("0_rels", id, "active", false),
 		NewOpAdd("0_sets", fromSet, "rels", id),
 	}
 }
