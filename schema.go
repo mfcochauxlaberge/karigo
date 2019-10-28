@@ -138,4 +138,82 @@ type op struct {
 	Version string `json:"version" api:"rel,0_log,ops"`
 }
 
-func handleSchemaChange(r *Request, cp *Checkpoint, s *jsonapi.Schema) {}
+func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
+	var (
+		res jsonapi.Resource
+		err error
+	)
+
+	res, _ = r.Doc.Data.(jsonapi.Resource)
+
+	if r.Method == "PATCH" {
+		// Can only be for activating or deactivating
+		// a set, attribute, or relationship.
+		if active, ok := res.Get("active").(bool); ok {
+			if active {
+				switch r.URL.ResType {
+				case "0_sets":
+					err = activateSet(s, res)
+				case "0_attrs":
+					err = activateAttr(s, res)
+				case "0_rels":
+					err = activateRel(s, res)
+				}
+			} else {
+				switch r.URL.ResType {
+				case "0_sets":
+					deactivateSet(s, res)
+				case "0_attrs":
+					deactivateAttr(s, res)
+				case "0_rels":
+					deactivateRel(s, res)
+				}
+			}
+		}
+
+		cp.Check(err)
+	}
+}
+
+func activateSet(s *jsonapi.Schema, res jsonapi.Resource) error {
+	err := s.AddType(jsonapi.Type{
+		Name: res.Get("name").(string),
+	})
+
+	return err
+}
+
+func deactivateSet(s *jsonapi.Schema, res jsonapi.Resource) {
+	s.RemoveType(res.GetID())
+}
+
+func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) error {
+	err := s.AddAttr(res.GetToOne("set"), jsonapi.Attr{
+		Name:     res.Get("name").(string),
+		Type:     res.Get("type").(int),
+		Nullable: res.Get("nullable").(bool),
+	})
+	return err
+}
+
+func deactivateAttr(s *jsonapi.Schema, res jsonapi.Resource) {
+	s.RemoveAttr(res.GetToOne("set"), res.Get("Name").(string))
+}
+
+func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
+	rel := jsonapi.Rel{
+		FromType: res.GetToOne("from-set"),
+		FromName: res.Get("from-name").(string),
+		ToOne:    res.Get("to-one").(bool),
+		ToType:   res.GetToOne("to-type"),
+		ToName:   res.Get("to-name").(string),
+		FromOne:  res.Get("from-one").(bool),
+	}
+	rel.Normalize()
+	err := s.AddRel(res.GetToOne("set"), rel)
+	return err
+}
+
+func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {
+	s.RemoveRel(res.Get("from-type").(string), res.Get("name").(string))
+}

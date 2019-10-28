@@ -28,6 +28,7 @@ func TestNode(t *testing.T) {
 	_ = src.Reset() // TODO Necessary?
 
 	_ = src.Apply(NewOpAddSet("things"))
+	_ = src.Apply(NewOpActivateSet("things"))
 
 	// Journal
 	journal := &memory.Journal{}

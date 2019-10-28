@@ -190,4 +190,4 @@
 0_sets.users.version=0
 users.abc123.articles=
 users.abc123.password=
-users.abc123.username=
+users.abc123.username=mafiaboy
