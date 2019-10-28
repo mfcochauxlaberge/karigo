@@ -1,8 +1,6 @@
 package karigo
 
 import (
-	"fmt"
-
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -141,183 +139,84 @@ type op struct {
 }
 
 func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
-	// var (
-	// 	res jsonapi.Resource
-	// 	ops []Op
-	// 	err error
-	// )
+	var (
+		res jsonapi.Resource
+		ops []Op
+		err error
+	)
 
-	// res, _ = r.Doc.Data.(jsonapi.Resource)
+	res, _ = r.Doc.Data.(jsonapi.Resource)
 
-	// err = validateSchemaChange(res)
-	// if err != nil {
-	// 	cp.Check(err)
-	// }
+	if r.Method == "PATCH" {
+		// Can only be for activating or deactivating
+		// a set, attribute, or relationship.
+		if activate, ok := res.Get("active").(bool); activate && ok {
+			switch r.URL.ResType {
+			case "0_sets":
+				err = activateSet(s, res)
+			case "0_attrs":
+				err = activateAttr(s, res)
+			case "0_rels":
+				err = activateRel(s, res)
+			}
+			cp.Check(err)
+			cp.Apply(ops)
+		}
 
-	// if r.Method == "POST" {
-	// 	if res.GetType().Name == "0_sets" {
-	// 		res.SetID(res.Get("name").(string))
-
-	// 		// Add set
-	// 		ops, err = addSet(s, res)
-	// 		cp.Check(err)
-	// 		cp.Apply(ops)
-	// 	} else if res.GetType().Name == "0_attrs" {
-	// 		res.SetID(res.GetToOne("set") + "_" + res.Get("name").(string))
-
-	// 		// Add attribute
-	// 		ops, err = addAttr(s, res)
-	// 		cp.Check(err)
-	// 		cp.Apply(ops)
-	// 	} else if res.GetType().Name == "0_rels" {
-	// 		_ = jsonapi.Rel{
-	// 			FromType: res.GetToOne("from-set"),
-	// 			FromName: "",
-	// 			ToOne:    false,
-	// 			ToType:   res.GetToOne("to-set"),
-	// 			ToName:   "",
-	// 			FromOne:  false,
-	// 		}
-	// 		res.SetID(res.GetToOne("from-set") + "_" + res.Get("name").(string))
-	// 		res.SetID(res.GetToOne("to-set") + "_" + res.Get("name").(string))
-
-	// 		// Add relationship
-	// 		ops, err = addRel(s, res)
-	// 		cp.Check(err)
-	// 		cp.Apply(ops)
-	// 	}
-	// } else if r.Method == "PATCH" {
-	// 	// Can only be for activating or deactivating
-	// 	// a set, attribute, or relationship.
-	// 	if activate, ok := res.Get("active").(bool); activate && ok {
-	// 		switch r.URL.ResType {
-	// 		case "0_sets":
-	// 			ops, err = activateSet(s, res)
-	// 		case "0_attributes":
-	// 			ops, err = activateAttr(s, res)
-	// 		case "0_relationships":
-	// 			ops, err = activateRel(s, res)
-	// 		}
-	// 		cp.Check(err)
-	// 		cp.Apply(ops)
-	// 	}
-
-	// 	if deactivate, ok := res.Get("active").(bool); !deactivate && ok {
-	// 		switch r.URL.ResType {
-	// 		case "0_sets":
-	// 			ops, err = deactivateSet(s, res)
-	// 		case "0_attributes":
-	// 			ops, err = deactivateAttr(s, res)
-	// 		case "0_relationships":
-	// 			ops, err = deactivateRel(s, res)
-	// 		}
-	// 		cp.Check(err)
-	// 		cp.Apply(ops)
-	// 	}
-	// } else if r.Method == "DELETE" {
-	// 	currRes := cp.Resource(QueryRes{
-	// 		Set:    res.GetType().Name,
-	// 		ID:     res.GetID(),
-	// 		Fields: []string{"active"},
-	// 	})
-
-	// 	if currRes.GetID() == "" {
-	// 		cp.Fail(errors.New("schema element does not exist"))
-	// 	}
-
-	// 	if active, _ := currRes.Get("active").(bool); !active {
-	// 		// Only possible is active is false
-	// 		ops, err = deleteSet(s, res)
-	// 		cp.Check(err)
-	// 		cp.Apply(ops)
-	// 	} else {
-	// 		cp.Fail(errors.New("schema element is still active"))
-	// 	}
-	// }
-}
-
-// func validateSchemaChange(res jsonapi.Resource) error {
-// 	if res.Get("name") == "" {
-// 		return fmt.Errorf("karigo: %q is not a valid JSON:API name", res.Get("name"))
-// 	}
-// 	return nil
-// }
-
-func addSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-	id := res.Get("name").(string)
-	current := s.GetType(id)
-	if current.Name != "" {
-		return nil, fmt.Errorf("type %q already exists", id)
+		if deactivate, ok := res.Get("active").(bool); !deactivate && ok {
+			switch r.URL.ResType {
+			case "0_sets":
+				deactivateSet(s, res)
+			case "0_attrs":
+				deactivateAttr(s, res)
+			case "0_rels":
+				deactivateRel(s, res)
+			}
+			cp.Check(err)
+			cp.Apply(ops)
+		}
 	}
-
-	return NewOpAddSet(res.Get("name").(string)), nil
 }
 
-// func deleteSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	name := res.Get("name").(string)
-// 	current := s.GetType(name)
-// 	if current.Name == "" {
-// 		return nil, fmt.Errorf("type %q does not exist", name)
-// 	}
+func activateSet(s *jsonapi.Schema, res jsonapi.Resource) error {
+	err := s.AddType(jsonapi.Type{
+		Name: res.Get("name").(string),
+	})
 
-// 	s.RemoveType(res.GetID())
+	return err
+}
 
-// 	ops := []Op{
-// 		NewOpSet(
-// 			res.GetType().Name,
-// 			res.GetID(),
-// 			"id",
-// 			"",
-// 		),
-// 	}
-// 	return ops, nil
-// }
+func deactivateSet(s *jsonapi.Schema, res jsonapi.Resource) {
+	s.RemoveType(res.GetID())
+}
 
-// func activateSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	typ := jsonapi.Type{
-// 		Name: res.Get("name").(string),
-// 	}
+func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) error {
+	err := s.AddAttr(res.GetToOne("set"), jsonapi.Attr{
+		Name:     res.Get("name").(string),
+		Type:     res.Get("type").(int),
+		Nullable: res.Get("nullable").(bool),
+	})
+	return err
+}
 
-// 	err := s.AddType(typ)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func deactivateAttr(s *jsonapi.Schema, res jsonapi.Resource) {
+	s.RemoveAttr(res.GetToOne("set"), res.Get("Name").(string))
+}
 
-// 	return []Op{}, nil
-// }
+func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
+	rel := jsonapi.Rel{
+		FromType: res.GetToOne("from-set"),
+		FromName: res.Get("from-name").(string),
+		ToOne:    res.Get("to-one").(bool),
+		ToType:   res.GetToOne("to-type"),
+		ToName:   res.Get("to-name").(string),
+		FromOne:  res.Get("from-one").(bool),
+	}
+	rel.Normalize()
+	err := s.AddRel(res.GetToOne("set"), rel)
+	return err
+}
 
-// func deactivateSet(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func addAttr(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func deleteAttr(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func deactivateAttr(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func addRel(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func deleteRel(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func activateRel(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
-
-// func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) ([]Op, error) {
-// 	return []Op{}, nil
-// }
+func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {
+	s.RemoveRel(res.Get("from-type").(string), res.Get("name").(string))
+}
