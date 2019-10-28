@@ -141,7 +141,6 @@ type op struct {
 func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 	var (
 		res jsonapi.Resource
-		ops []Op
 		err error
 	)
 
@@ -159,8 +158,6 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 			case "0_rels":
 				err = activateRel(s, res)
 			}
-			cp.Check(err)
-			cp.Apply(ops)
 		}
 
 		if deactivate, ok := res.Get("active").(bool); !deactivate && ok {
@@ -172,9 +169,9 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 			case "0_rels":
 				deactivateRel(s, res)
 			}
-			cp.Check(err)
-			cp.Apply(ops)
 		}
+
+		cp.Check(err)
 	}
 }
 
