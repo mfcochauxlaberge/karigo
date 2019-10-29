@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/memory"
@@ -23,7 +24,8 @@ var cmdRun = &cobra.Command{
 
 		// Server
 		server := &karigo.Server{
-			Nodes: map[string]*karigo.Node{},
+			Nodes:  map[string]*karigo.Node{},
+			Writer: os.Stdout,
 		}
 
 		src := &memory.Source{}

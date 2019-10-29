@@ -3,6 +3,7 @@ package karigo
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -17,6 +18,7 @@ import (
 type Server struct {
 	Nodes map[string]*Node
 
+	Writer io.Writer
 	logger *logrus.Logger
 }
 
@@ -31,6 +33,7 @@ func (s *Server) Run() {
 	}
 	// s.logger.Formatter = &logrus.JSONFormatter{}
 	s.logger.SetLevel(logrus.DebugLevel)
+	s.logger.SetOutput(s.Writer)
 
 	s.logger.WithField("event", "server_start").Info("Server has started")
 
