@@ -146,6 +146,8 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 
 	res, _ = r.Doc.Data.(jsonapi.Resource)
 
+	err = validateChangeChange(s, res)
+
 	if r.Method == "PATCH" {
 		// Can only be for activating or deactivating
 		// a set, attribute, or relationship.
@@ -173,6 +175,10 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 
 		cp.Check(err)
 	}
+}
+
+func validateChangeChange(s *jsonapi.Schema, res jsonapi.Resource) error {
+	return nil
 }
 
 func activateSet(s *jsonapi.Schema, res jsonapi.Resource) error {
