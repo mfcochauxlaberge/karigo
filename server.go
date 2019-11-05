@@ -59,6 +59,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"event":  "read_request",
 		"domain": domain,
 		"port":   port,
+		"method": r.Method,
+		"url":    r.URL.String(),
 	}).Info("New request incoming")
 
 	// Find node from domain
