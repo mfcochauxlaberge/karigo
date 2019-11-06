@@ -104,9 +104,15 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	case POST:
 		n.logger.Debug("POST request")
 		id = uuid.New().String()[:8]
-		// TODO Do not hardcode the following condition.
+		// TODO Do not hardcode the following conditions. It can
+		// be handled in a much better way.
 		if res.GetType().Name == "0_meta" {
 			id = res.GetID()
+		} else if res.GetType().Name == "0_sets" {
+			id = res.Get("name").(string)
+			ops = NewOpAddSet(id)
+		} else {
+			ops = NewOpInsert(res)
 		}
 		found, _ := n.resource(0, QueryRes{
 			Set:    res.GetType().Name,
@@ -116,7 +122,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		if found != nil {
 			cp.Fail(errors.New("id already used"))
 		}
-		ops = NewOpInsert(res)
 	case PATCH:
 		n.logger.Debug("PATCH request")
 		id = res.GetID()
