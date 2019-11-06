@@ -68,13 +68,19 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	var (
 		res jsonapi.Resource
 		id  string
+		doc = &jsonapi.Document{}
 		err error
 	)
 
 	if r.Method == POST || r.Method == PATCH {
 		r.Doc, err = jsonapi.Unmarshal(r.Body, n.schema)
-		if err != nil {
-			panic(err)
+		if jaerr, ok := err.(jsonapi.Error); ok {
+			doc.Data = jaerr
+			return doc
+		} else if err != nil {
+			jaerr = jsonapi.NewErrInternalServerError()
+			jaerr.Detail = err.Error()
+			doc.Data = jaerr
 		}
 	}
 
@@ -145,8 +151,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
 	cp.Apply(ops)
-
-	doc := &jsonapi.Document{}
 
 	if r.isSchemaChange() {
 		// Handle schema change
