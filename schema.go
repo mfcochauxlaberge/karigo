@@ -153,7 +153,7 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 			if active {
 				switch r.URL.ResType {
 				case "0_sets":
-					err = activateSet(s, res)
+					err = activateSet(s, res.GetID())
 				case "0_attrs":
 					err = activateAttr(s, res)
 				case "0_rels":
@@ -175,11 +175,10 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 	}
 }
 
-func activateSet(s *jsonapi.Schema, res jsonapi.Resource) error {
+func activateSet(s *jsonapi.Schema, name string) error {
 	err := s.AddType(jsonapi.Type{
-		Name: res.Get("name").(string),
+		Name: name,
 	})
-
 	return err
 }
 
