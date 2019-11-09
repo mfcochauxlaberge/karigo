@@ -3,6 +3,7 @@ package karigo
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -21,7 +22,7 @@ type Server struct {
 }
 
 // Run ...
-func (s *Server) Run() {
+func (s *Server) Run(port uint) {
 	// Logger
 	s.logger = logrus.New()
 	s.logger.Formatter = &logrus.TextFormatter{
@@ -39,7 +40,7 @@ func (s *Server) Run() {
 	}
 
 	// Listen and serve
-	err := http.ListenAndServe(":8080", s)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), s)
 	if err != http.ErrServerClosed {
 		panic(err)
 	}

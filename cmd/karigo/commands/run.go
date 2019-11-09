@@ -14,7 +14,7 @@ var cmdRun = &cobra.Command{
 	Short: "Run the server",
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
-			port = 8080
+			port uint = 8080
 		)
 
 		fmt.Printf("Loading...")
@@ -35,6 +35,6 @@ var cmdRun = &cobra.Command{
 			server.Nodes[domain] = node
 		}
 
-		server.Run()
+		server.Run(port)
 	},
 }
