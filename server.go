@@ -117,7 +117,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	doc := node.Handle(req)
 
 	// Marshal response
-	pl, err := jsonapi.Marshal(doc, url)
+	pl, err := jsonapi.MarshalDocument(doc, url)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte("500 Internal Server Error"))

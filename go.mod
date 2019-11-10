@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/google/uuid v1.1.1
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/mfcochauxlaberge/jsonapi v0.15.0
+	github.com/mfcochauxlaberge/jsonapi v0.16.0
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5

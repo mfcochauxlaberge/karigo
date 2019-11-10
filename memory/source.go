@@ -25,7 +25,7 @@ func (s *Source) Reset() error {
 
 	types := map[string]*jsonapi.Type{}
 	for _, typ := range karigo.FirstSchema().Types {
-		ctyp := jsonapi.CopyType(typ)
+		ctyp := typ.Copy()
 		types[ctyp.Name] = &ctyp
 	}
 
@@ -39,7 +39,7 @@ func (s *Source) Reset() error {
 
 	// Types and attributes
 	for _, typ := range types {
-		typ := jsonapi.CopyType(*typ)
+		typ := typ.Copy()
 
 		attrIDs := []string{}
 		relIDs := []string{}
@@ -48,7 +48,7 @@ func (s *Source) Reset() error {
 				attrIDs = append(attrIDs, typ.Name+"_"+attr.Name)
 			} else if rel, ok := typ.Rels[field]; ok {
 				if rel.FromType+rel.FromName ==
-					rel.Inverse().FromType+rel.Inverse().FromName {
+					rel.Invert().FromType+rel.Invert().FromName {
 					relIDs = append(relIDs, typ.Name+"_"+rel.FromName)
 				}
 			}
