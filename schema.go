@@ -155,8 +155,16 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 				case "0_sets":
 					err = activateSet(s, res.GetID())
 				case "0_attrs":
+					res = cp.Resource(QueryRes{
+						Set: "0_attrs",
+						ID:  res.GetID(),
+					})
 					err = activateAttr(s, res)
 				case "0_rels":
+					res = cp.Resource(QueryRes{
+						Set: "0_rels",
+						ID:  res.GetID(),
+					})
 					err = activateRel(s, res)
 				}
 			} else {
@@ -187,10 +195,11 @@ func deactivateSet(s *jsonapi.Schema, res jsonapi.Resource) {
 }
 
 func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) error {
+	typ, null := jsonapi.GetAttrType(res.Get("type").(string))
 	err := s.AddAttr(res.GetToOne("set"), jsonapi.Attr{
 		Name:     res.Get("name").(string),
-		Type:     res.Get("type").(int),
-		Nullable: res.Get("nullable").(bool),
+		Type:     typ,
+		Nullable: null,
 	})
 	return err
 }
@@ -208,9 +217,18 @@ func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
 		ToName:   res.Get("to-name").(string),
 		FromOne:  res.Get("from-one").(bool),
 	}
-	rel.Normalize()
-	err := s.AddRel(res.GetToOne("set"), rel)
-	return err
+	rel = rel.Normalize()
+
+	err := s.AddRel(res.GetToOne("from-set"), rel)
+	if err != nil {
+		return err
+	}
+	err = s.AddRel(res.GetToOne("to-set"), rel.Invert())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {

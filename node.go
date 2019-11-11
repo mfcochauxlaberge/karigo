@@ -123,6 +123,24 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		} else if res.GetType().Name == "0_sets" {
 			id = res.Get("name").(string)
 			ops = NewOpAddSet(id)
+		} else if res.GetType().Name == "0_attrs" {
+			ops = NewOpAddAttr(
+				res.GetToOne("set"),
+				res.Get("name").(string),
+				res.Get("type").(string),
+				res.Get("null").(bool),
+			)
+			id = ops[0].Value.(string)
+		} else if res.GetType().Name == "0_rels" {
+			ops = NewOpAddRel(
+				res.GetToOne("from-set"),
+				res.Get("from-name").(string),
+				res.GetToOne("to-set"),
+				res.Get("to-name").(string),
+				res.Get("to-one").(bool),
+				res.Get("from-one").(bool),
+			)
+			id = ops[0].Value.(string)
 		} else {
 			ops = NewOpInsert(res)
 		}

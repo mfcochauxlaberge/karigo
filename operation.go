@@ -174,6 +174,14 @@ func NewOpDeactivateAttr(set, name string) []Op {
 // NewOpAddRel ...
 func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
 	id := fromSet + "_" + fromName
+	if toSet != "" {
+		id2 := toSet + "_" + toName
+		if id < id2 {
+			id = id + "_" + id2
+		} else {
+			id = id2 + "_" + id
+		}
+	}
 	return []Op{
 		NewOpSet("0_rels", "", "id", id),
 		NewOpSet("0_rels", id, "from-name", fromName),
