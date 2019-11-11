@@ -20,6 +20,23 @@ type Op struct {
 	Value interface{}
 }
 
+// String ...
+func (o Op) String() string {
+	id := o.Key.ID
+	if id == "" {
+		id = "_"
+	}
+
+	return fmt.Sprintf(
+		"%s.%s.%s %v %v",
+		o.Key.Set,
+		id,
+		o.Key.Field,
+		o.Op,
+		o.Value,
+	)
+}
+
 type Entry []Op
 
 // Bytes ...
