@@ -32,7 +32,7 @@ func (o Op) String() string {
 		o.Key.Set,
 		id,
 		o.Key.Field,
-		o.Op,
+		string(o.Op),
 		o.Value,
 	)
 }
