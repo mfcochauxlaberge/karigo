@@ -1,6 +1,7 @@
 package karigo
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
@@ -74,14 +75,25 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	if r.Method == POST || r.Method == PATCH {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
-		if jaerr, ok := err.(jsonapi.Error); ok {
-			doc.Data = jaerr
-			return doc
-		} else if err != nil {
-			jaerr = jsonapi.NewErrInternalServerError()
-			jaerr.Detail = err.Error()
-			doc.Data = jaerr
+	}
+	if r.Method == PATCH {
+		frame := struct {
+			Data json.RawMessage
+		}{}
+		err = json.Unmarshal(r.Body, &frame)
+		if err == nil {
+			res, err = jsonapi.UnmarshalPartialResource(frame.Data, n.schema)
 		}
+		r.Doc.Data = res
+	}
+	if jaerr, ok := err.(jsonapi.Error); ok {
+		doc.Data = jaerr
+		return doc
+	} else if err != nil {
+		jaerr = jsonapi.NewErrInternalServerError()
+		jaerr.Detail = err.Error()
+		doc.Data = jaerr
+		return doc
 	}
 
 	if r.Doc != nil && r.Doc.Data != nil {
