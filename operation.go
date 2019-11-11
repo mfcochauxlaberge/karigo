@@ -204,8 +204,7 @@ func NewOpDeleteRel(set, name string) []Op {
 }
 
 // NewOpActivateRel ...
-func NewOpActivateRel(set, name string) []Op {
-	id := set + "_" + name
+func NewOpActivateRel(id string) []Op {
 	return []Op{
 		NewOpSet("0_rels", id, "active", true),
 	}
