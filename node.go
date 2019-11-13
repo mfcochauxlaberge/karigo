@@ -68,7 +68,6 @@ func (n *Node) Run() error {
 func (n *Node) Handle(r *Request) *jsonapi.Document {
 	var (
 		res jsonapi.Resource
-		id  string
 		doc = &jsonapi.Document{}
 		err error
 	)
@@ -120,11 +119,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 		// TODO Do not hardcode the following conditions. It can
 		// be handled in a much better way.
-		if res.GetType().Name == "0_meta" {
-			id = res.GetID()
-		} else if res.GetType().Name == "0_sets" {
-			id = res.Get("name").(string)
-			ops = NewOpAddSet(id)
+		if res.GetType().Name == "0_sets" {
+			res.SetID(res.Get("name").(string))
+			ops = NewOpAddSet(res.GetID())
 		} else if res.GetType().Name == "0_attrs" {
 			ops = NewOpAddAttr(
 				res.GetToOne("set"),
@@ -132,7 +129,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				res.Get("type").(string),
 				res.Get("null").(bool),
 			)
-			id = ops[0].Value.(string)
+			res.SetID(ops[0].Value.(string))
 		} else if res.GetType().Name == "0_rels" {
 			ops = NewOpAddRel(
 				res.GetToOne("from-set"),
@@ -142,13 +139,13 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				res.Get("to-one").(bool),
 				res.Get("from-one").(bool),
 			)
-			id = ops[0].Value.(string)
+			res.SetID(ops[0].Value.(string))
 		} else {
 			ops = NewOpInsert(res)
 		}
 		found, _ := n.resource(0, QueryRes{
 			Set:    res.GetType().Name,
-			ID:     id,
+			ID:     res.GetID(),
 			Fields: []string{"id"},
 		})
 		if found != nil {
@@ -156,12 +153,11 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	case PATCH:
 		n.logger.Debug("PATCH request")
-		id = res.GetID()
 		ops = []Op{}
 		for _, attr := range res.Attrs() {
 			ops = append(ops, NewOpSet(
 				r.URL.ResType,
-				id,
+				res.GetID(),
 				attr.Name,
 				res.Get(attr.Name),
 			))
@@ -170,14 +166,14 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			if rel.ToOne {
 				ops = append(ops, NewOpSet(
 					r.URL.ResType,
-					id,
+					res.GetID(),
 					rel.FromName,
 					res.GetToOne(rel.FromName),
 				))
 			} else {
 				ops = append(ops, NewOpSet(
 					r.URL.ResType,
-					id,
+					res.GetID(),
 					rel.FromName,
 					res.GetToMany(rel.FromName),
 				))
@@ -243,7 +239,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			}
 		case POST, PATCH:
 			qry := NewQueryRes(r.URL)
-			qry.ID = id
+			qry.ID = res.GetID()
 			res := cp.Resource(qry)
 			doc.Data = res
 		case DELETE:
