@@ -115,7 +115,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		n.logger.Debug("GET request")
 	case POST:
 		n.logger.Debug("POST request")
-		id = uuid.New().String()[:8]
+		if res.GetID() == "" {
+			res.SetID(uuid.New().String()[:8])
+		}
 		// TODO Do not hardcode the following conditions. It can
 		// be handled in a much better way.
 		if res.GetType().Name == "0_meta" {
