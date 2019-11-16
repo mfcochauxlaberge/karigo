@@ -1,8 +1,16 @@
 linters:
   enable:
+    - bodyclose
     - deadcode
+    - depguard
+    - dogsled
     - dupl
     - errcheck
+    - gochecknoglobals
+    - gochecknoinits
+    - gocritic
+    - gofmt
+    - goimports
     - golint
     - gosec
     - gosimple
@@ -22,6 +30,8 @@ linters:
     - unparam
     - unused
     - varcheck
+    - whitespace
+    - wsl
 
 linters-settings:
   lll:
@@ -37,3 +47,11 @@ issues:
     - source: ^func
       linters:
         - lll
+
+    - source: ^var update =
+      linters:
+        - gochecknoglobals
+
+    - source: cobra.Command
+      linters:
+        - gochecknoglobals
