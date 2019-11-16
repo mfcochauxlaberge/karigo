@@ -57,7 +57,6 @@ type Node struct {
 func (n *Node) Run() error {
 	// n.Lock()
 	// n.Unlock()
-
 	// Handle events
 	for {
 		select {}
@@ -75,16 +74,20 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	if r.Method == POST || r.Method == PATCH {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
 	}
+
 	if r.Method == PATCH {
 		frame := struct {
 			Data json.RawMessage
 		}{}
+
 		err = json.Unmarshal(r.Body, &frame)
 		if err == nil {
 			res, err = jsonapi.UnmarshalPartialResource(frame.Data, n.schema)
 		}
+
 		r.Doc.Data = res
 	}
+
 	if jaerr, ok := err.(jsonapi.Error); ok {
 		doc.Data = jaerr
 		return doc
@@ -114,15 +117,17 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		n.logger.Debug("GET request")
 	case POST:
 		n.logger.Debug("POST request")
+
 		if res.GetID() == "" {
 			res.SetID(uuid.New().String()[:8])
 		}
 		// TODO Do not hardcode the following conditions. It can
 		// be handled in a much better way.
-		if res.GetType().Name == "0_sets" {
+		switch res.GetType().Name {
+		case "0_sets":
 			res.SetID(res.Get("name").(string))
 			ops = NewOpAddSet(res.GetID())
-		} else if res.GetType().Name == "0_attrs" {
+		case "0_attrs":
 			ops = NewOpAddAttr(
 				res.GetToOne("set"),
 				res.Get("name").(string),
@@ -130,7 +135,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				res.Get("null").(bool),
 			)
 			res.SetID(ops[0].Value.(string))
-		} else if res.GetType().Name == "0_rels" {
+		case "0_rels":
 			ops = NewOpAddRel(
 				res.GetToOne("from-set"),
 				res.Get("from-name").(string),
@@ -140,20 +145,24 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				res.Get("from-one").(bool),
 			)
 			res.SetID(ops[0].Value.(string))
-		} else {
+		default:
 			ops = NewOpInsert(res)
 		}
+
 		found, _ := n.resource(0, QueryRes{
 			Set:    res.GetType().Name,
 			ID:     res.GetID(),
 			Fields: []string{"id"},
 		})
+
 		if found != nil {
 			cp.Fail(errors.New("id already used"))
 		}
 	case PATCH:
 		n.logger.Debug("PATCH request")
+
 		ops = []Op{}
+
 		for _, attr := range res.Attrs() {
 			ops = append(ops, NewOpSet(
 				r.URL.ResType,
@@ -162,6 +171,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				res.Get(attr.Name),
 			))
 		}
+
 		for _, rel := range res.Rels() {
 			if rel.ToOne {
 				ops = append(ops, NewOpSet(
@@ -181,8 +191,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	case DELETE:
 		n.logger.Debug("DELETE request")
+
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
+
 	cp.Apply(ops)
 
 	if r.isSchemaChange() {
@@ -202,12 +214,14 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		// Handle error
 		var jaErr jsonapi.Error
+
 		switch cp.err {
 		case ErrNotImplemented:
 			jaErr = jsonapi.NewErrNotImplemented()
 		default:
 			jaErr = jsonapi.NewErrInternalServerError()
 		}
+
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
 		// Commit the transaction entry
@@ -250,17 +264,15 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 }
 
 // resource ...
+// TODO Validate the query?
 func (n *Node) resource(_ uint, qry QueryRes) (jsonapi.Resource, error) {
-	// TODO Validate the query?
-
 	return n.main.src.Resource(qry)
 }
 
 // collection ...
+// TODO Validate the query?
+// TODO Complete the sorting rule
 func (n *Node) collection(_ uint, qry QueryCol) (jsonapi.Collection, error) {
-	// TODO Validate the query?
-	// TODO Complete the sorting rule
-
 	return n.main.src.Collection(qry)
 }
 
@@ -270,5 +282,6 @@ func (n *Node) apply(ops []Op) error {
 	if err != nil {
 		return errors.New("karigo: an operation could not be executed")
 	}
+
 	return nil
 }

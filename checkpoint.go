@@ -54,6 +54,7 @@ func (c *Checkpoint) Apply(ops []Op) {
 	if c.err == nil {
 		c.Check(c.node.apply(ops))
 	}
+
 	if c.err == nil {
 		c.ops = append(c.ops, ops...)
 	}
@@ -71,6 +72,7 @@ func (c *Checkpoint) Fail(err error) {
 	if err == nil {
 		err = errors.New("an error occurred")
 	}
+
 	c.err = err
 }
 

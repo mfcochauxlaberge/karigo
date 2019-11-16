@@ -12,6 +12,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -21,6 +22,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -30,6 +32,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -39,6 +42,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -48,6 +52,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -57,6 +62,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -187,6 +193,7 @@ func activateSet(s *jsonapi.Schema, name string) error {
 	err := s.AddType(jsonapi.Type{
 		Name: name,
 	})
+
 	return err
 }
 
@@ -201,6 +208,7 @@ func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) error {
 		Type:     typ,
 		Nullable: null,
 	})
+
 	return err
 }
 
@@ -223,6 +231,7 @@ func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
 	if err != nil {
 		return err
 	}
+
 	err = s.AddRel(res.GetToOne("to-set"), rel.Invert())
 	if err != nil {
 		return err

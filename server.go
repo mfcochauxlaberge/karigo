@@ -69,11 +69,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		node *Node
 		ok   bool
 	)
+
 	if node, ok = s.Nodes[domain]; !ok {
 		logger.WithField("event", "unknown_domain").Warn("App not found from domain")
 		w.WriteHeader(http.StatusNotFound)
 		logger.WithField("event", "set_http_status_code").Warn("See HTTP status code")
 		logger.WithField("event", "send_response").Warn("Send response")
+
 		return
 	}
 
@@ -86,6 +88,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
 		w.WriteHeader(http.StatusInternalServerError)
+
 		return
 	}
 
@@ -122,6 +125,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte("500 Internal Server Error"))
 	}
+
 	if r.Method == DELETE && len(doc.Errors) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -144,6 +148,7 @@ func domainAndPort(host string) (string, int) {
 		port int
 		err  error
 	)
+
 	if len(fragments) > 1 {
 		port, err = strconv.Atoi(fragments[1])
 		if err != nil {
