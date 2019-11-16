@@ -79,8 +79,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		frame := struct {
 			Data json.RawMessage
 		}{}
-		err = json.Unmarshal(r.Body, &frame)
 
+		err = json.Unmarshal(r.Body, &frame)
 		if err == nil {
 			res, err = jsonapi.UnmarshalPartialResource(frame.Data, n.schema)
 		}
