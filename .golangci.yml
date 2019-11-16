@@ -51,7 +51,13 @@ issues:
     - source: ^var update =
       linters:
         - gochecknoglobals
-
-    - source: cobra.Command
+    
+    - path: sourcetest
       linters:
         - gochecknoglobals
+        - gochecknoinits
+
+    - path: cmd/karigo/commands
+      linters:
+        - gochecknoglobals
+        - gochecknoinits

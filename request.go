@@ -28,5 +28,6 @@ func (r *Request) isSchemaChange() bool {
 			return true
 		}
 	}
+
 	return false
 }

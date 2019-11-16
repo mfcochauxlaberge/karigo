@@ -93,13 +93,16 @@ func Test(t *testing.T, src karigo.Source) error {
 				// Add a key for each relationsip.
 				for _, rel := range res.Rels() {
 					key := fmt.Sprintf("%s.%s.%s", id, res.GetID(), rel.FromName)
+
 					var r string
+
 					if rel.ToOne {
 						r = res.GetToOne(rel.FromName)
 					} else {
 						rs := res.GetToMany(rel.FromName)
 						r = strings.Join(rs, ",")
 					}
+
 					keys = append(keys, fmt.Sprintf("%s=%s", key, r))
 				}
 			}
@@ -111,26 +114,29 @@ func Test(t *testing.T, src karigo.Source) error {
 		// Golden file
 		filename := strings.Replace(scenario.Name, " ", "_", -1) + ".txt"
 		path := filepath.Join("testdata", "goldenfiles", "scenarios", filename)
+
 		if !*update {
 			// Retrieve the expected result from file
 			contents, _ := ioutil.ReadFile(path)
 			expected := []string{}
+
 			for _, key := range strings.Split(string(contents), "\n") {
 				if key != "" {
 					expected = append(expected, key)
 				}
 			}
+
 			assert.Equal(expected, keys, scenario.Name)
 		} else {
 			dst := &bytes.Buffer{}
 			for _, key := range keys {
 				_, _ = fmt.Fprintln(dst, key)
 			}
+
 			// TODO Figure out whether 0644 is okay or not.
 			err = ioutil.WriteFile(path, dst.Bytes(), 0644)
 			assert.NoError(err)
 		}
-
 	}
 
 	return nil

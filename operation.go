@@ -45,6 +45,7 @@ func (e *Entry) Bytes() []byte {
 	if err != nil {
 		panic(fmt.Errorf("can't get Entry bytes: %s", err))
 	}
+
 	return b
 }
 
@@ -96,6 +97,7 @@ func NewOpInsert(res jsonapi.Resource) []Op {
 		} else {
 			op = NewOpSet(set, id, rel.FromName, res.GetToMany(rel.FromName))
 		}
+
 		ops = append(ops, op)
 	}
 
@@ -136,6 +138,7 @@ func NewOpDeactivateSet(set string) []Op {
 // NewOpAddAttr ...
 func NewOpAddAttr(set, name, typ string, null bool) []Op {
 	id := set + "_" + name
+
 	return []Op{
 		NewOpSet("0_attrs", "", "id", id),
 		NewOpSet("0_attrs", id, "name", name),
@@ -150,6 +153,7 @@ func NewOpAddAttr(set, name, typ string, null bool) []Op {
 // NewOpDeleteAttr ...
 func NewOpDeleteAttr(set, name string) []Op {
 	id := set + "_" + name
+
 	return []Op{
 		NewOpSet("0_attrs", id, "id", ""),
 	}
@@ -158,6 +162,7 @@ func NewOpDeleteAttr(set, name string) []Op {
 // NewOpActivateAttr ...
 func NewOpActivateAttr(set, name string) []Op {
 	id := set + "_" + name
+
 	return []Op{
 		NewOpSet("0_attrs", id, "active", true),
 	}
@@ -166,6 +171,7 @@ func NewOpActivateAttr(set, name string) []Op {
 // NewOpDeactivateAttr ...
 func NewOpDeactivateAttr(set, name string) []Op {
 	id := set + "_" + name
+
 	return []Op{
 		NewOpSet("0_attrs", id, "active", false),
 	}
@@ -174,6 +180,7 @@ func NewOpDeactivateAttr(set, name string) []Op {
 // NewOpAddRel ...
 func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
 	id := fromSet + "_" + fromName
+
 	if toSet != "" {
 		id2 := toSet + "_" + toName
 		if id < id2 {
@@ -182,6 +189,7 @@ func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) [
 			id = id2 + "_" + id
 		}
 	}
+
 	return []Op{
 		NewOpSet("0_rels", "", "id", id),
 		NewOpSet("0_rels", id, "from-name", fromName),
@@ -198,6 +206,7 @@ func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) [
 // NewOpDeleteRel ...
 func NewOpDeleteRel(set, name string) []Op {
 	id := set + "_" + name
+
 	return []Op{
 		NewOpSet("0_attrs", id, "id", ""),
 	}
@@ -213,6 +222,7 @@ func NewOpActivateRel(id string) []Op {
 // NewOpDeactivateRel ...
 func NewOpDeactivateRel(set, name string) []Op {
 	id := set + "_" + name
+
 	return []Op{
 		NewOpSet("0_rels", id, "active", false),
 	}
