@@ -33,7 +33,7 @@ issues:
     - path: doc.go
       linters:
         - lll
-    
+
     - source: ^func
       linters:
         - lll
