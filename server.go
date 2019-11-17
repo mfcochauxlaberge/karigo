@@ -3,43 +3,39 @@ package karigo
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 // Server ...
 type Server struct {
 	Nodes map[string]*Node
 
-	logger *logrus.Logger
+	logger zerolog.Logger
 }
 
 // Run ...
-func (s *Server) Run() {
+func (s *Server) Run(port uint) {
 	// Logger
-	s.logger = logrus.New()
-	s.logger.Formatter = &logrus.TextFormatter{
-		FullTimestamp:    true,
-		TimestampFormat:  "2006-01-02 15:04:05",
-		QuoteEmptyFields: true,
-	}
-	// s.logger.Formatter = &logrus.JSONFormatter{}
-	s.logger.SetLevel(logrus.DebugLevel)
+	s.logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+	s.logger = s.logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 
-	s.logger.WithField("event", "server_start").Info("Server has started")
+	s.logger.Info().Str("event", "server_start")
 
 	for _, node := range s.Nodes {
 		node.logger = s.logger
 	}
 
 	// Listen and serve
-	err := http.ListenAndServe(":8080", s)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), s)
 	if err != http.ErrServerClosed {
 		panic(err)
 	}
@@ -53,36 +49,51 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	domain, port := domainAndPort(r.Host)
 
 	// Populate logger with rid
-	logger := s.logger.WithField("rid", requestID)
+	logger := s.logger.With().Str("rid", requestID).Logger()
 
-	logger.WithFields(logrus.Fields{
-		"event":  "read_request",
-		"domain": domain,
-		"port":   port,
-	}).Info("New request incoming")
+	defer func() {
+		// This is for separating the requests in
+		// the logger's output. It is useful for
+		// debugging in the early stages of this
+		// project, but it should be removed
+		// eventually.
+		fmt.Println()
+	}()
+
+	logger.Info().
+		Str("event", "read_request").
+		Str("domain", domain).
+		Int("port", port).
+		Str("method", r.Method).
+		Str("url", r.URL.String()).
+		Msg("Incoming request")
 
 	// Find node from domain
 	var (
 		node *Node
 		ok   bool
 	)
+
 	if node, ok = s.Nodes[domain]; !ok {
-		logger.WithField("event", "unknown_domain").Warn("App not found from domain")
-		w.WriteHeader(http.StatusNotFound)
-		logger.WithField("event", "set_http_status_code").Warn("See HTTP status code")
-		logger.WithField("event", "send_response").Warn("Send response")
+		logger.Info().
+			Str("event", "unknown_domain").
+			Msg("App not found from domain")
+
+		_ = sendResponse(w, http.StatusNotFound, nil, logger)
+
 		return
 	}
-
-	logger.WithFields(logrus.Fields{
-		"app": node.Name,
-	}).Debug("App found")
 
 	// Parse URL
 	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
 	if err != nil {
-		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
-		w.WriteHeader(http.StatusInternalServerError)
+		logger.
+			Err(err).
+			Str("url", r.URL.String()).
+			Msg("Invalid URL")
+
+		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
+
 		return
 	}
 
@@ -91,15 +102,18 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		url.Params.PageSize = 10
 	}
 
-	logger.WithFields(logrus.Fields{
-		"event": "parse_url",
-		"url":   url.String(),
-	}).Debug("URL parsed")
+	logger.Debug().
+		Str("event", "parse_url").
+		Str("url", url.UnescapedString()).
+		Msg("URL parsed")
 
 	// Build request
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		logger.Err(err).Send()
+
+		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
+
 		return
 	}
 
@@ -108,19 +122,36 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Method: r.Method,
 		URL:    url,
 		Body:   body,
+		Logger: logger,
 	}
 
 	// Send request to node
 	doc := node.Handle(req)
 
-	// Marshal response
-	pl, err := jsonapi.Marshal(doc, url)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte("500 Internal Server Error"))
+	if doc == nil {
+		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
+
+		return
 	}
+
+	// Marshal response
+	pl, err := jsonapi.MarshalDocument(doc, url)
+	if err != nil {
+		logger.Err(err).Send()
+
+		_ = sendResponse(
+			w,
+			http.StatusInternalServerError,
+			[]byte("500 Internal Server Error"),
+			logger,
+		)
+
+		return
+	}
+
 	if r.Method == DELETE && len(doc.Errors) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		_ = sendResponse(w, http.StatusNoContent, nil, logger)
+
 		return
 	}
 
@@ -129,7 +160,25 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_ = json.Indent(out, pl, "", "\t")
 
 	// Send response
-	_, _ = w.Write(out.Bytes())
+	_ = sendResponse(w, http.StatusOK, out.Bytes(), logger)
+}
+
+func sendResponse(w http.ResponseWriter, code int, body []byte, logger zerolog.Logger) error {
+	var err error
+
+	w.WriteHeader(code)
+
+	if len(body) != 0 {
+		_, err = w.Write(body)
+	}
+
+	logger.Info().
+		Str("event", "send_response").
+		Int("status_code", code).
+		Str("status_code_text", http.StatusText(code)).
+		Msg("Send response")
+
+	return err
 }
 
 func domainAndPort(host string) (string, int) {
@@ -141,6 +190,7 @@ func domainAndPort(host string) (string, int) {
 		port int
 		err  error
 	)
+
 	if len(fragments) > 1 {
 		port, err = strconv.Atoi(fragments[1])
 		if err != nil {

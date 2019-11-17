@@ -1,5 +1,3 @@
-# karigo
-
 <div align="center" style="text-align: center;">
   <img src="assets/logo.png" height="120">
   <br>
@@ -23,6 +21,8 @@
     <img src="https://godoc.org/github.com/golang/gddo?status.svg">
   </a>
 </div>
+
+# karigo
 
 karigo is an API engine that follows the [JSON:API specification](https://jsonapi.org/format).
 

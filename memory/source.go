@@ -24,8 +24,9 @@ func (s *Source) Reset() error {
 	defer s.Unlock()
 
 	types := map[string]*jsonapi.Type{}
+
 	for _, typ := range karigo.FirstSchema().Types {
-		ctyp := jsonapi.CopyType(typ)
+		ctyp := typ.Copy()
 		types[ctyp.Name] = &ctyp
 	}
 
@@ -39,16 +40,17 @@ func (s *Source) Reset() error {
 
 	// Types and attributes
 	for _, typ := range types {
-		typ := jsonapi.CopyType(*typ)
+		typ := typ.Copy()
 
 		attrIDs := []string{}
 		relIDs := []string{}
+
 		for _, field := range typ.Fields() {
 			if attr, ok := typ.Attrs[field]; ok {
 				attrIDs = append(attrIDs, typ.Name+"_"+attr.Name)
 			} else if rel, ok := typ.Rels[field]; ok {
 				if rel.FromType+rel.FromName ==
-					rel.Inverse().FromType+rel.Inverse().FromName {
+					rel.Invert().FromType+rel.Invert().FromName {
 					relIDs = append(relIDs, typ.Name+"_"+rel.FromName)
 				}
 			}
@@ -120,6 +122,7 @@ func (s *Source) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
 
 	// BelongsToFilter
 	var ids []string
+
 	if qry.BelongsToFilter.ID != "" {
 		res := s.sets[qry.BelongsToFilter.Type].Resource(qry.BelongsToFilter.ID, []string{})
 		ids = res.GetToMany(qry.BelongsToFilter.Name)
@@ -167,9 +170,9 @@ func (s *Source) Rollback() error {
 
 func (s *Source) opSet(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s = %v\n", set, id, field, v)
-
 	// Type change
-	if set == "0_sets" {
+	switch set {
+	case "0_sets":
 		if id != "" && field == "active" && v.(bool) {
 			// New set
 			s.sets[id] = &jsonapi.SoftCollection{}
@@ -177,7 +180,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 				Name: id,
 			})
 		}
-	} else if set == "0_attrs" {
+	case "0_attrs":
 		if id != "" && field == "active" && v.(bool) {
 			// New attribute
 			setID := s.sets["0_attrs"].Resource(id, nil).GetToOne("set")
@@ -191,7 +194,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 				Nullable: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
 			})
 		}
-	} else if set == "0_rels" {
+	case "0_rels":
 		if id != "" && field == "active" && v.(bool) {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).GetToOne("from-set")
@@ -207,7 +210,8 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 		}
 	}
 
-	if id != "" && field != "id" {
+	switch {
+	case id != "" && field != "id":
 		// Set a field
 		typ := s.sets[set].Type
 		for _, attr := range typ.Attrs {
@@ -215,6 +219,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 				s.sets[set].Resource(id, nil).Set(field, v)
 			}
 		}
+
 		for _, rel := range typ.Rels {
 			if rel.FromName == field {
 				if rel.ToOne {
@@ -224,22 +229,18 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 				}
 			}
 		}
-	} else if id == "" && field == "id" {
+	case id == "" && field == "id":
 		// Create a resource
 		typ := s.sets[set].Type
 		s.sets[set].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
-	} else if id != "" && field == "id" && v.(string) == "" {
+	case id != "" && field == "id" && v.(string) == "":
 		// Delete a resource
 		s.sets[set].Remove(id)
-		// } else {
-		// Should not happen
-		// TODO Should this code path be reported?
 	}
 }
 
 func (s *Source) opAdd(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", set, id, field, v)
-
 	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).GetToMany(field))
 	curr = reflect.Append(curr, reflect.ValueOf(v))
 
@@ -249,6 +250,7 @@ func (s *Source) opAdd(set, id, field string, v interface{}) {
 			s.sets[set].Resource(id, nil).Set(field, v)
 		}
 	}
+
 	for _, rel := range typ.Rels {
 		if rel.FromName == field {
 			if rel.ToOne {
@@ -271,6 +273,7 @@ func makeSoftResource(typ *jsonapi.Type, id string, vals map[string]interface{})
 				sr.Set(f, v)
 			}
 		}
+
 		for _, rel := range typ.Rels {
 			if rel.FromName == f {
 				if rel.ToOne {

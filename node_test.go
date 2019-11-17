@@ -35,6 +35,7 @@ func TestNode(t *testing.T) {
 
 	// Node
 	node := NewNode(journal, src)
+
 	go func() { _ = node.Run() }()
 
 	url, err := jsonapi.NewURLFromRaw(schema, "/things")
@@ -47,6 +48,7 @@ func TestNode(t *testing.T) {
 		URL:    url,
 	}
 	res := node.Handle(req)
+
 	if len(res.Errors) > 0 {
 		t.Errorf("At least one error occurred: %v\n", err)
 	}
