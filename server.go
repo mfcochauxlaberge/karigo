@@ -51,13 +51,22 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Populate logger with rid
 	logger := s.logger.With().Str("rid", requestID).Logger()
 
+	defer func() {
+		// This is for separating the requests in
+		// the logger's output. It is useful for
+		// debugging in the early stages of this
+		// project, but it should be removed
+		// eventually.
+		fmt.Println()
+	}()
+
 	logger.Info().
 		Str("event", "read_request").
 		Str("domain", domain).
 		Int("port", port).
 		Str("method", r.Method).
 		Str("url", r.URL.String()).
-		Msg("New request incoming")
+		Msg("Incoming request")
 
 	// Find node from domain
 	var (
@@ -66,7 +75,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if node, ok = s.Nodes[domain]; !ok {
-		logger.Warn().
+		logger.Info().
 			Str("event", "unknown_domain").
 			Msg("App not found from domain")
 
@@ -74,10 +83,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	logger.Debug().
-		Str("app", node.Name).
-		Msg("App found")
 
 	// Parse URL
 	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
@@ -99,7 +104,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug().
 		Str("event", "parse_url").
-		Str("url", url.String()).
+		Str("url", url.UnescapedString()).
 		Msg("URL parsed")
 
 	// Build request
@@ -115,6 +120,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Method: r.Method,
 		URL:    url,
 		Body:   body,
+		Logger: logger,
 	}
 
 	// Send request to node

@@ -71,8 +71,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		err error
 	)
 
-	logger := n.logger
-
 	if r.Method == POST || r.Method == PATCH {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
 	}
@@ -109,17 +107,12 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		ops:  []Op{},
 	}
 
-	logger.Debug().Msgf("Node %s received a request", n.Name)
-
 	tx := TxDefault
 	ops := []Op{}
 	// Prepare transaction
 	switch r.Method {
 	case GET:
-		logger.Debug().Msg("GET request")
 	case POST:
-		logger.Debug().Msg("POST request")
-
 		if res.GetID() == "" {
 			res.SetID(uuid.New().String()[:8])
 		}
@@ -161,8 +154,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			cp.Fail(errors.New("id already used"))
 		}
 	case PATCH:
-		logger.Debug().Msg("PATCH request")
-
 		ops = []Op{}
 
 		for _, attr := range res.Attrs() {
@@ -192,8 +183,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			}
 		}
 	case DELETE:
-		logger.Debug().Msg("DELETE request")
-
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
 
@@ -205,6 +194,12 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	} else {
 		// Execute
 		tx(cp)
+	}
+
+	for _, op := range ops {
+		r.Logger.Debug().
+			Str("op", op.String()).
+			Msg("Operation")
 	}
 
 	if cp.err != nil {
