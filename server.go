@@ -6,34 +6,29 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 // Server ...
 type Server struct {
 	Nodes map[string]*Node
 
-	logger *logrus.Logger
+	logger zerolog.Logger
 }
 
 // Run ...
 func (s *Server) Run(port uint) {
 	// Logger
-	s.logger = logrus.New()
-	s.logger.Formatter = &logrus.TextFormatter{
-		FullTimestamp:    true,
-		TimestampFormat:  "2006-01-02 15:04:05",
-		QuoteEmptyFields: true,
-	}
-	// s.logger.Formatter = &logrus.JSONFormatter{}
-	s.logger.SetLevel(logrus.DebugLevel)
+	s.logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+	s.logger = s.logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 
-	s.logger.WithField("event", "server_start").Info("Server has started")
+	s.logger.Info().Str("event", "server_start")
 
 	for _, node := range s.Nodes {
 		node.logger = s.logger
@@ -54,15 +49,15 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	domain, port := domainAndPort(r.Host)
 
 	// Populate logger with rid
-	logger := s.logger.WithField("rid", requestID)
+	logger := s.logger.With().Str("rid", requestID).Logger()
 
-	logger.WithFields(logrus.Fields{
-		"event":  "read_request",
-		"domain": domain,
-		"port":   port,
-		"method": r.Method,
-		"url":    r.URL.String(),
-	}).Info("New request incoming")
+	logger.Info().
+		Str("event", "read_request").
+		Str("domain", domain).
+		Int("port", port).
+		Str("method", r.Method).
+		Str("url", r.URL.String()).
+		Msg("New request incoming")
 
 	// Find node from domain
 	var (
@@ -71,22 +66,31 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if node, ok = s.Nodes[domain]; !ok {
-		logger.WithField("event", "unknown_domain").Warn("App not found from domain")
+		logger.Warn().
+			Str("event", "unknown_domain").
+			Msg("App not found from domain")
+
 		w.WriteHeader(http.StatusNotFound)
-		logger.WithField("event", "set_http_status_code").Warn("See HTTP status code")
-		logger.WithField("event", "send_response").Warn("Send response")
+		logger.Warn().
+			Str("event", "send_response").
+			Int("status_code", http.StatusNotFound).
+			Msg("Send response")
 
 		return
 	}
 
-	logger.WithFields(logrus.Fields{
-		"app": node.Name,
-	}).Debug("App found")
+	logger.Debug().
+		Str("app", node.Name).
+		Msg("App found")
 
 	// Parse URL
 	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
 	if err != nil {
-		s.logger.WithError(err).WithField("url", r.URL.String()).Warn("Invalid URL")
+		errlogger := logger.With().Err(err).Logger()
+		errlogger.Warn().
+			Str("url", r.URL.String()).
+			Msg("Invalid URL")
+
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -97,10 +101,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		url.Params.PageSize = 10
 	}
 
-	logger.WithFields(logrus.Fields{
-		"event": "parse_url",
-		"url":   url.String(),
-	}).Debug("URL parsed")
+	logger.Debug().
+		Str("event", "parse_url").
+		Str("url", url.String()).
+		Msg("URL parsed")
 
 	// Build request
 	body, err := ioutil.ReadAll(r.Body)

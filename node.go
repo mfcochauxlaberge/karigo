@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 // NewNode ...
@@ -25,7 +25,7 @@ func NewNode(journal Journal, src Source) *Node {
 		err:      make(chan error),
 		shutdown: make(chan bool),
 
-		logger: logrus.New(),
+		logger: zerolog.Logger{},
 	}
 
 	return node
@@ -49,7 +49,7 @@ type Node struct {
 	shutdown chan bool
 
 	// Internal
-	logger *logrus.Logger
+	logger zerolog.Logger
 	sync.Mutex
 }
 
@@ -70,6 +70,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		doc = &jsonapi.Document{}
 		err error
 	)
+
+	logger := n.logger
 
 	if r.Method == POST || r.Method == PATCH {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
@@ -107,16 +109,16 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		ops:  []Op{},
 	}
 
-	n.logger.Debugf("Node %s received a request", n.Name)
+	logger.Debug().Msgf("Node %s received a request", n.Name)
 
 	tx := TxDefault
 	ops := []Op{}
 	// Prepare transaction
 	switch r.Method {
 	case GET:
-		n.logger.Debug("GET request")
+		logger.Debug().Msg("GET request")
 	case POST:
-		n.logger.Debug("POST request")
+		logger.Debug().Msg("POST request")
 
 		if res.GetID() == "" {
 			res.SetID(uuid.New().String()[:8])
@@ -159,7 +161,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			cp.Fail(errors.New("id already used"))
 		}
 	case PATCH:
-		n.logger.Debug("PATCH request")
+		logger.Debug().Msg("PATCH request")
 
 		ops = []Op{}
 
@@ -190,7 +192,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			}
 		}
 	case DELETE:
-		n.logger.Debug("DELETE request")
+		logger.Debug().Msg("DELETE request")
 
 		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
