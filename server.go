@@ -70,11 +70,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Str("event", "unknown_domain").
 			Msg("App not found from domain")
 
-		w.WriteHeader(http.StatusNotFound)
-		logger.Warn().
-			Str("event", "send_response").
-			Int("status_code", http.StatusNotFound).
-			Msg("Send response")
+		_ = sendResponse(w, http.StatusNotFound, nil, logger)
 
 		return
 	}
@@ -91,7 +87,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Str("url", r.URL.String()).
 			Msg("Invalid URL")
 
-		w.WriteHeader(http.StatusInternalServerError)
+		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
 
 		return
 	}
@@ -109,7 +105,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Build request
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
+
 		return
 	}
 
@@ -126,12 +123,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Marshal response
 	pl, err := jsonapi.MarshalDocument(doc, url)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = w.Write([]byte("500 Internal Server Error"))
+		_ = sendResponse(
+			w,
+			http.StatusInternalServerError,
+			[]byte("500 Internal Server Error"),
+			logger,
+		)
+
+		return
 	}
 
 	if r.Method == DELETE && len(doc.Errors) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		_ = sendResponse(w, http.StatusNoContent, nil, logger)
+
 		return
 	}
 
@@ -140,7 +144,25 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_ = json.Indent(out, pl, "", "\t")
 
 	// Send response
-	_, _ = w.Write(out.Bytes())
+	_ = sendResponse(w, http.StatusOK, out.Bytes(), logger)
+}
+
+func sendResponse(w http.ResponseWriter, code int, body []byte, logger zerolog.Logger) error {
+	var err error
+
+	w.WriteHeader(code)
+
+	if len(body) != 0 {
+		_, err = w.Write(body)
+	}
+
+	logger.Info().
+		Str("event", "send_response").
+		Int("status_code", code).
+		Str("status_code_text", http.StatusText(code)).
+		Msg("Send response")
+
+	return err
 }
 
 func domainAndPort(host string) (string, int) {
