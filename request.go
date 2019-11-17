@@ -14,11 +14,13 @@ const (
 
 // Request ...
 type Request struct {
-	ID     string
+	ID string
+
 	Method string
 	URL    *jsonapi.URL
-	Doc    *jsonapi.Document
-	Body   []byte
+
+	Body []byte
+	Doc  *jsonapi.Document
 }
 
 func (r *Request) isSchemaChange() bool {
