@@ -128,6 +128,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Send request to node
 	doc := node.Handle(req)
 
+	if doc == nil {
+		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
+
+		return
+	}
+
 	// Marshal response
 	pl, err := jsonapi.MarshalDocument(doc, url)
 	if err != nil {
