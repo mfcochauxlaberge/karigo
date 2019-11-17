@@ -234,7 +234,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	if cp.err != nil {
 		r.Logger.
 			Err(cp.err).
-			Send()
+			Msg("Transaction failed")
 
 		// Rollback
 		err = cp.rollback()
