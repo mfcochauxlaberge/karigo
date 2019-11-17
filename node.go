@@ -71,8 +71,32 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		err error
 	)
 
+	defer func() {
+		if p := recover(); p != nil {
+			var err error
+
+			switch e := p.(type) {
+			case string:
+				err = errors.New(e)
+			case jsonapi.Error:
+				err = e
+			case error:
+				err = e
+			}
+
+			r.Logger.
+				Err(err).
+				Str("abc", "123").
+				Int("def", 42).
+				Msg("Panic")
+		}
+	}()
+
 	if r.Method == POST || r.Method == PATCH {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
+		if err != nil {
+			r.Logger.Err(err).Msg("Could not unmarshal document")
+		}
 	}
 
 	if r.Method == PATCH {
@@ -83,6 +107,11 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		err = json.Unmarshal(r.Body, &frame)
 		if err == nil {
 			res, err = jsonapi.UnmarshalPartialResource(frame.Data, n.schema)
+			if err != nil {
+				r.Logger.
+					Err(err).
+					Msg("Could not partially unmarshal reosurce")
+			}
 		}
 
 		r.Doc.Data = res
@@ -203,6 +232,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	if cp.err != nil {
+		r.Logger.
+			Err(cp.err).
+			Send()
+
 		// Rollback
 		err = cp.rollback()
 		if err != nil {

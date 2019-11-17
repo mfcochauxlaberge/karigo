@@ -87,8 +87,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Parse URL
 	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
 	if err != nil {
-		errlogger := logger.With().Err(err).Logger()
-		errlogger.Warn().
+		logger.
+			Err(err).
 			Str("url", r.URL.String()).
 			Msg("Invalid URL")
 
@@ -110,6 +110,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Build request
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		logger.Err(err).Send()
+
 		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
 
 		return
@@ -129,6 +131,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Marshal response
 	pl, err := jsonapi.MarshalDocument(doc, url)
 	if err != nil {
+		logger.Err(err).Send()
+
 		_ = sendResponse(
 			w,
 			http.StatusInternalServerError,
