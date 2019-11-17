@@ -221,7 +221,7 @@ func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
 		FromType: res.GetToOne("from-set"),
 		FromName: res.Get("from-name").(string),
 		ToOne:    res.Get("to-one").(bool),
-		ToType:   res.GetToOne("to-type"),
+		ToType:   res.GetToOne("to-set"),
 		ToName:   res.Get("to-name").(string),
 		FromOne:  res.Get("from-one").(bool),
 	}
