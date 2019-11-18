@@ -51,7 +51,7 @@ func TestKarigo(t *testing.T) {
 				"type": "0_meta"
 			}
 		}
-		`))
+	`))
 	expect := `
 		{
 			"data": {
