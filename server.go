@@ -65,7 +65,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Str("domain", domain).
 		Int("port", port).
 		Str("method", r.Method).
-		Str("url", r.URL.String()).
+		Str("endpoint", r.URL.String()).
 		Msg("Incoming request")
 
 	// Find node from domain
