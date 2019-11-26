@@ -12,7 +12,7 @@
   </a> -->
   <br>
   <a href="https://github.com/mfcochauxlaberge/karigo/blob/master/go.mod">
-    <img src="https://img.shields.io/badge/go%20version-1.11%2B-%2300acd7">
+    <img src="https://img.shields.io/badge/go%20version-1.12%2B-%2300acd7">
   </a>
   <a href="https://github.com/mfcochauxlaberge/karigo/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/mfcochauxlaberge/karigo?color=a33">
