@@ -1,0 +1,140 @@
+POST /0_meta
+
+200 OK
+Content-Length: 317
+Content-Type: text/plain; charset=utf-8
+Date: Abc, 01 Def 2345 67:89:01 GMT
+
+{
+	"data": {
+		"attributes": {
+			"value": "some value"
+		},
+		"id": "some-key",
+		"links": {
+			"self": "/0_meta/some-key"
+		},
+		"relationships": {},
+		"type": "0_meta"
+	},
+	"jsonapi": {
+		"version": "1.0"
+	},
+	"links": {
+		"self": "/0_meta?fields%5B0_meta%5D=value\u0026page%5Bsize%5D=10\u0026sort=value%2Cid"
+	}
+}
+
+##################################################
+
+GET /0_meta/some-key
+
+200 OK
+Content-Length: 282
+Content-Type: text/plain; charset=utf-8
+Date: Abc, 01 Def 2345 67:89:01 GMT
+
+{
+	"data": {
+		"attributes": {
+			"value": "some value"
+		},
+		"id": "some-key",
+		"links": {
+			"self": "/0_meta/some-key"
+		},
+		"relationships": {},
+		"type": "0_meta"
+	},
+	"jsonapi": {
+		"version": "1.0"
+	},
+	"links": {
+		"self": "/0_meta/some-key?fields%5B0_meta%5D=value"
+	}
+}
+
+##################################################
+
+PATCH /0_meta/some-key
+
+200 OK
+Content-Length: 285
+Content-Type: text/plain; charset=utf-8
+Date: Abc, 01 Def 2345 67:89:01 GMT
+
+{
+	"data": {
+		"attributes": {
+			"value": "value changed"
+		},
+		"id": "some-key",
+		"links": {
+			"self": "/0_meta/some-key"
+		},
+		"relationships": {},
+		"type": "0_meta"
+	},
+	"jsonapi": {
+		"version": "1.0"
+	},
+	"links": {
+		"self": "/0_meta/some-key?fields%5B0_meta%5D=value"
+	}
+}
+
+##################################################
+
+GET /0_meta/some-key
+
+200 OK
+Content-Length: 285
+Content-Type: text/plain; charset=utf-8
+Date: Abc, 01 Def 2345 67:89:01 GMT
+
+{
+	"data": {
+		"attributes": {
+			"value": "value changed"
+		},
+		"id": "some-key",
+		"links": {
+			"self": "/0_meta/some-key"
+		},
+		"relationships": {},
+		"type": "0_meta"
+	},
+	"jsonapi": {
+		"version": "1.0"
+	},
+	"links": {
+		"self": "/0_meta/some-key?fields%5B0_meta%5D=value"
+	}
+}
+
+##################################################
+
+DELETE /0_meta/some-key
+
+204 No Content
+Date: Abc, 01 Def 2345 67:89:01 GMT
+
+##################################################
+
+GET /0_meta/some-key
+
+200 OK
+Content-Length: 124
+Content-Type: text/plain; charset=utf-8
+Date: Abc, 01 Def 2345 67:89:01 GMT
+
+{
+	"data": null,
+	"jsonapi": {
+		"version": "1.0"
+	},
+	"links": {
+		"self": "/0_meta/some-key?fields%5B0_meta%5D=value"
+	}
+}
+
