@@ -163,7 +163,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	if r.Method == POST || r.Method == PATCH {
 		if r.URL.ResType == "0_meta" {
 			if res, ok := r.Doc.Data.(jsonapi.Resource); ok {
-				if pw, _ := res.Get("value").(string); pw != "" {
+				if pw, _ := res.Get("value").(string); pw != "" && res.GetID() == "password" {
 					npw, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
 					if err != nil {
 						jaerr := jsonapi.NewErrInternalServerError()

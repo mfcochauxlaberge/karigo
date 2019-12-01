@@ -113,6 +113,20 @@ func TestKarigo(t *testing.T) {
 						{
 							"data": {
 								"attributes": {
+									"value": "some value"
+								},
+								"id": "some-key",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
 									"value": "p@ssw0rd"
 								},
 								"id": "password",
@@ -127,9 +141,23 @@ func TestKarigo(t *testing.T) {
 						{
 							"data": {
 								"attributes": {
-									"value": "some value"
+									"value": "no password, rejected"
 								},
-								"id": "some-key",
+								"id": "another-key",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "another value"
+								},
+								"id": "another-key",
 								"type": "0_meta"
 							}
 						}
@@ -141,13 +169,27 @@ func TestKarigo(t *testing.T) {
 						{
 							"data": {
 								"attributes": {
-									"value": "another value"
+									"value": "no password, reject"
 								},
-								"id": "some-key",
+								"id": "another-key",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "PATCH",
+					path:   "/0_meta/password",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "value changed"
+								},
+								"id": "another-key",
 								"type": "0_meta"
 							},
 							"meta": {
-								"password": "p@ssw0rd",
+								"password": "p@ssw0rd"
 							}
 						}
 					`,
@@ -157,7 +199,17 @@ func TestKarigo(t *testing.T) {
 					payload: `
 						{
 							"meta": {
-								"password": "p@ssw0rd",
+								"password": "wrongpassword"
+							}
+						}
+					`,
+				}, {
+					method: "DELETE",
+					path:   "/0_meta/password",
+					payload: `
+						{
+							"meta": {
+								"password": "p@ssw0rd"
 							}
 						}
 					`,
