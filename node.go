@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/rs/zerolog"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // NewNode ...
@@ -134,6 +135,48 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	cp := &Checkpoint{
 		node: n,
 		ops:  []Op{},
+	}
+
+	// Check password is correct if request is writing (non-GET).
+	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
+		pwRes, _ := n.main.src.Resource(QueryRes{
+			Set:    "0_sets",
+			ID:     "password",
+			Fields: []string{"value"},
+		})
+		if pwRes != nil {
+			if hashed, _ := pwRes.Get("value").(string); hashed != "" {
+				if pw, _ := r.Doc.Meta["password"].(string); pw != "" {
+					err = bcrypt.CompareHashAndPassword([]byte(hashed), []byte(pw))
+					if err != nil {
+						// jaerr := jsonapi.NewErrForbidden()
+						// doc.Data = jaerr
+						doc.Data = jsonapi.NewErrForbidden()
+						return doc
+					}
+				}
+			}
+		}
+	}
+
+	// Hash password if it's being updated.
+	if r.Method == POST || r.Method == PATCH {
+		if r.URL.ResType == "0_meta" {
+			if res, ok := r.Doc.Data.(jsonapi.Resource); ok {
+				if pw, _ := res.Get("value").(string); pw != "" {
+					npw, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+					if err != nil {
+						jaerr := jsonapi.NewErrInternalServerError()
+						jaerr.Detail = err.Error()
+						doc.Data = jaerr
+
+						return doc
+					}
+
+					res.Set("value", string(npw))
+				}
+			}
+		}
 	}
 
 	tx := TxDefault

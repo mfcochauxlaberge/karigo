@@ -103,6 +103,66 @@ func TestKarigo(t *testing.T) {
 					path:   "/0_meta/some-key",
 				},
 			},
+		}, {
+			name: "basic security with password in meta",
+			requests: []request{
+				{
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "p@ssw0rd"
+								},
+								"id": "password",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "some value"
+								},
+								"id": "some-key",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "PATCH",
+					path:   "/0_meta/password",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "another value"
+								},
+								"id": "some-key",
+								"type": "0_meta"
+							},
+							"meta": {
+								"password": "p@ssw0rd",
+							}
+						}
+					`,
+				}, {
+					method: "DELETE",
+					path:   "/0_meta/password",
+					payload: `
+						{
+							"meta": {
+								"password": "p@ssw0rd",
+							}
+						}
+					`,
+				},
+			},
 		},
 	}
 

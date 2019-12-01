@@ -1,14 +1,14 @@
 POST /0_meta
 
 200 OK
-Content-Length: 317
+Content-Length: 367
 Content-Type: text/plain; charset=utf-8
 Date: Abc, 01 Def 2345 67:89:01 GMT
 
 {
 	"data": {
 		"attributes": {
-			"value": "some value"
+			"value": "$2a$10$JQsXw7CVgBhc7oK1LGAg8.TaH0Choo5VLoHFfsQqw0FFuaxbuqMvO"
 		},
 		"id": "some-key",
 		"links": {
@@ -30,14 +30,14 @@ Date: Abc, 01 Def 2345 67:89:01 GMT
 GET /0_meta/some-key
 
 200 OK
-Content-Length: 282
+Content-Length: 332
 Content-Type: text/plain; charset=utf-8
 Date: Abc, 01 Def 2345 67:89:01 GMT
 
 {
 	"data": {
 		"attributes": {
-			"value": "some value"
+			"value": "$2a$10$JQsXw7CVgBhc7oK1LGAg8.TaH0Choo5VLoHFfsQqw0FFuaxbuqMvO"
 		},
 		"id": "some-key",
 		"links": {
@@ -59,14 +59,14 @@ Date: Abc, 01 Def 2345 67:89:01 GMT
 PATCH /0_meta/some-key
 
 200 OK
-Content-Length: 285
+Content-Length: 332
 Content-Type: text/plain; charset=utf-8
 Date: Abc, 01 Def 2345 67:89:01 GMT
 
 {
 	"data": {
 		"attributes": {
-			"value": "value changed"
+			"value": "$2a$10$SwfbtpQEKPnp8oafXKDVNeFq9i6IDBl6sG9YK6FXrFiDOEkQZybMG"
 		},
 		"id": "some-key",
 		"links": {
@@ -88,14 +88,14 @@ Date: Abc, 01 Def 2345 67:89:01 GMT
 GET /0_meta/some-key
 
 200 OK
-Content-Length: 285
+Content-Length: 332
 Content-Type: text/plain; charset=utf-8
 Date: Abc, 01 Def 2345 67:89:01 GMT
 
 {
 	"data": {
 		"attributes": {
-			"value": "value changed"
+			"value": "$2a$10$SwfbtpQEKPnp8oafXKDVNeFq9i6IDBl6sG9YK6FXrFiDOEkQZybMG"
 		},
 		"id": "some-key",
 		"links": {
