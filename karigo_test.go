@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -22,6 +23,11 @@ import (
 )
 
 var update = flag.Bool("update-golden-files", false, "update the golden files")
+
+var (
+	regexHash = regexp.MustCompile(`\$2[ayb]\$.{56}`)
+	regexUUID = regexp.MustCompile(`[0123456789abcdef-]{36}`)
+)
 
 func TestMain(m *testing.M) {
 	if *update {
@@ -327,6 +333,8 @@ func do(method, host, path string, body []byte) (int, []byte, []byte, error) {
 		dst := &bytes.Buffer{}
 		err = json.Indent(dst, resBody, "", "\t")
 		resBody = dst.Bytes()
+		resBody = regexHash.ReplaceAll(resBody, []byte("_HASH_"))
+		resBody = regexUUID.ReplaceAll(resBody, []byte("00000000-0000-0000-0000-000000000000"))
 	}
 
 	return res.StatusCode, buildSortedHeader(res.Header), resBody, err
