@@ -165,17 +165,20 @@ func TestKarigo(t *testing.T) {
 								},
 								"id": "another-key",
 								"type": "0_meta"
+							},
+							"meta": {
+								"password": "p@ssw0rd"
 							}
 						}
 					`,
 				}, {
 					method: "PATCH",
-					path:   "/0_meta/password",
+					path:   "/0_meta/another-key",
 					payload: `
 						{
 							"data": {
 								"attributes": {
-									"value": "no password, reject"
+									"value": "no password, rejected"
 								},
 								"id": "another-key",
 								"type": "0_meta"
@@ -184,12 +187,12 @@ func TestKarigo(t *testing.T) {
 					`,
 				}, {
 					method: "PATCH",
-					path:   "/0_meta/password",
+					path:   "/0_meta/another-key",
 					payload: `
 						{
 							"data": {
 								"attributes": {
-									"value": "value changed"
+									"value": "new value"
 								},
 								"id": "another-key",
 								"type": "0_meta"
@@ -199,6 +202,9 @@ func TestKarigo(t *testing.T) {
 							}
 						}
 					`,
+				}, {
+					method: "GET",
+					path:   "/0_meta/another-key",
 				}, {
 					method: "DELETE",
 					path:   "/0_meta/password",

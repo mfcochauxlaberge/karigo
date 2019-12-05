@@ -140,20 +140,31 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	// Check password is correct if request is writing (non-GET).
 	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
 		pwRes, _ := n.main.src.Resource(QueryRes{
-			Set:    "0_sets",
+			Set:    "0_meta",
 			ID:     "password",
 			Fields: []string{"value"},
 		})
+		fmt.Printf("pwres: %v\n", pwRes)
 		if pwRes != nil {
-			if hashed, _ := pwRes.Get("value").(string); hashed != "" {
-				if pw, _ := r.Doc.Meta["password"].(string); pw != "" {
-					err = bcrypt.CompareHashAndPassword([]byte(hashed), []byte(pw))
-					if err != nil {
-						// jaerr := jsonapi.NewErrForbidden()
-						// doc.Data = jaerr
-						doc.Data = jsonapi.NewErrForbidden()
-						return doc
-					}
+			if hash, _ := pwRes.Get("value").(string); hash != "" {
+				fmt.Printf("hash: %v\n", hash)
+				fmt.Printf("r.Doc: %v\n", r.Doc)
+				if r.Doc.Meta != nil {
+					// Temporary. Maybe the Meta field should
+					// never be nil?
+					r.Doc.Meta = map[string]interface{}{}
+				}
+				pw, _ := r.Doc.Meta["password"].(string)
+				err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw))
+				fmt.Printf("pw: %v\n", pw)
+				if err != nil {
+					fmt.Printf("refused...\n")
+					// jaerr := jsonapi.NewErrForbidden()
+					// doc.Data = jaerr
+					doc.Errors = []jsonapi.Error{jsonapi.NewErrForbidden()}
+					return doc
+				} else {
+					fmt.Printf("accepted!\n")
 				}
 			}
 		}
