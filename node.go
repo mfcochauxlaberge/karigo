@@ -93,7 +93,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	}()
 
-	if r.Method == POST || r.Method == PATCH {
+	if len(r.Body) > 0 {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
 		if err != nil {
 			r.Logger.Err(err).Msg("Could not unmarshal document")
@@ -144,27 +144,24 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			ID:     "password",
 			Fields: []string{"value"},
 		})
-		fmt.Printf("pwres: %v\n", pwRes)
 		if pwRes != nil {
 			if hash, _ := pwRes.Get("value").(string); hash != "" {
-				fmt.Printf("hash: %v\n", hash)
-				fmt.Printf("r.Doc: %v\n", r.Doc)
-				if r.Doc.Meta != nil {
+				if r.Doc.Meta == nil {
 					// Temporary. Maybe the Meta field should
 					// never be nil?
 					r.Doc.Meta = map[string]interface{}{}
 				}
+
 				pw, _ := r.Doc.Meta["password"].(string)
+
 				err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw))
-				fmt.Printf("pw: %v\n", pw)
 				if err != nil {
 					fmt.Printf("refused...\n")
 					// jaerr := jsonapi.NewErrForbidden()
 					// doc.Data = jaerr
 					doc.Errors = []jsonapi.Error{jsonapi.NewErrForbidden()}
+
 					return doc
-				} else {
-					fmt.Printf("accepted!\n")
 				}
 			}
 		}
