@@ -123,6 +123,18 @@ Date: Abc, 01 Def 2345 67:89:01 GMT
 
 GET /0_meta/some-key
 
-204 No Content
+200 OK
+Content-Length: 124
+Content-Type: text/plain; charset=utf-8
 Date: Abc, 01 Def 2345 67:89:01 GMT
+
+{
+	"data": null,
+	"jsonapi": {
+		"version": "1.0"
+	},
+	"links": {
+		"self": "/0_meta/some-key?fields%5B0_meta%5D=value"
+	}
+}
 

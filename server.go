@@ -165,8 +165,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(doc.Errors) > 0 {
 		fromStr, _ := strconv.ParseInt(doc.Errors[0].Status, 10, 64)
 		status = int(fromStr)
-	} else if doc.Data == nil {
-		status = http.StatusNoContent
 	}
 
 	_ = sendResponse(w, status, out.Bytes(), logger)
