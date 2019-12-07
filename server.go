@@ -160,7 +160,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_ = json.Indent(out, pl, "", "\t")
 
 	// Send response
-	_ = sendResponse(w, http.StatusOK, out.Bytes(), logger)
+	status := http.StatusOK
+
+	if len(doc.Errors) > 0 {
+		fromStr, _ := strconv.ParseInt(doc.Errors[0].Status, 10, 64)
+		status = int(fromStr)
+	}
+
+	_ = sendResponse(w, status, out.Bytes(), logger)
 }
 
 func sendResponse(w http.ResponseWriter, code int, body []byte, logger zerolog.Logger) error {

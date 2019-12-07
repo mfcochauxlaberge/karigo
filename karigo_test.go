@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -22,6 +23,11 @@ import (
 )
 
 var update = flag.Bool("update-golden-files", false, "update the golden files")
+
+var (
+	regexHash = regexp.MustCompile(`\$2[ayb]\$.{56}`)
+	regexUUID = regexp.MustCompile(`[0123456789abcdef-]{36}`)
+)
 
 func TestMain(m *testing.M) {
 	if *update {
@@ -101,6 +107,124 @@ func TestKarigo(t *testing.T) {
 				}, {
 					method: "GET",
 					path:   "/0_meta/some-key",
+				},
+			},
+		}, {
+			name: "basic security with password in meta",
+			requests: []request{
+				{
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "some value"
+								},
+								"id": "some-key",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "p@ssw0rd"
+								},
+								"id": "password",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "no password, rejected"
+								},
+								"id": "another-key",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "POST",
+					path:   "/0_meta",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "another value"
+								},
+								"id": "another-key",
+								"type": "0_meta"
+							},
+							"meta": {
+								"password": "p@ssw0rd"
+							}
+						}
+					`,
+				}, {
+					method: "PATCH",
+					path:   "/0_meta/another-key",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "no password, rejected"
+								},
+								"id": "another-key",
+								"type": "0_meta"
+							}
+						}
+					`,
+				}, {
+					method: "PATCH",
+					path:   "/0_meta/another-key",
+					payload: `
+						{
+							"data": {
+								"attributes": {
+									"value": "new value"
+								},
+								"id": "another-key",
+								"type": "0_meta"
+							},
+							"meta": {
+								"password": "p@ssw0rd"
+							}
+						}
+					`,
+				}, {
+					method: "GET",
+					path:   "/0_meta/another-key",
+				}, {
+					method: "DELETE",
+					path:   "/0_meta/password",
+					payload: `
+						{
+							"meta": {
+								"password": "wrongpassword"
+							}
+						}
+					`,
+				}, {
+					method: "DELETE",
+					path:   "/0_meta/password",
+					payload: `
+						{
+							"meta": {
+								"password": "p@ssw0rd"
+							}
+						}
+					`,
 				},
 			},
 		},
@@ -215,6 +339,8 @@ func do(method, host, path string, body []byte) (int, []byte, []byte, error) {
 		dst := &bytes.Buffer{}
 		err = json.Indent(dst, resBody, "", "\t")
 		resBody = dst.Bytes()
+		resBody = regexHash.ReplaceAll(resBody, []byte("_HASH_"))
+		resBody = regexUUID.ReplaceAll(resBody, []byte("00000000-0000-0000-0000-000000000000"))
 	}
 
 	return res.StatusCode, buildSortedHeader(res.Header), resBody, err

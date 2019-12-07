@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/rs/zerolog"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // NewNode ...
@@ -92,7 +93,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	}()
 
-	if r.Method == POST || r.Method == PATCH {
+	if len(r.Body) > 0 {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
 		if err != nil {
 			r.Logger.Err(err).Msg("Could not unmarshal document")
@@ -134,6 +135,56 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	cp := &Checkpoint{
 		node: n,
 		ops:  []Op{},
+	}
+
+	// Check password is correct if request is writing (non-GET).
+	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
+		pwRes, _ := n.main.src.Resource(QueryRes{
+			Set:    "0_meta",
+			ID:     "password",
+			Fields: []string{"value"},
+		})
+		if pwRes != nil {
+			if hash, _ := pwRes.Get("value").(string); hash != "" {
+				if r.Doc.Meta == nil {
+					// Temporary. Maybe the Meta field should
+					// never be nil?
+					r.Doc.Meta = map[string]interface{}{}
+				}
+
+				pw, _ := r.Doc.Meta["password"].(string)
+
+				err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw))
+				if err != nil {
+					fmt.Printf("refused...\n")
+					// jaerr := jsonapi.NewErrForbidden()
+					// doc.Data = jaerr
+					doc.Errors = []jsonapi.Error{jsonapi.NewErrForbidden()}
+
+					return doc
+				}
+			}
+		}
+	}
+
+	// Hash password if it's being updated.
+	if r.Method == POST || r.Method == PATCH {
+		if r.URL.ResType == "0_meta" {
+			if res, ok := r.Doc.Data.(jsonapi.Resource); ok {
+				if pw, _ := res.Get("value").(string); pw != "" && res.GetID() == "password" {
+					npw, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+					if err != nil {
+						jaerr := jsonapi.NewErrInternalServerError()
+						jaerr.Detail = err.Error()
+						doc.Data = jaerr
+
+						return doc
+					}
+
+					res.Set("value", string(npw))
+				}
+			}
+		}
 	}
 
 	tx := TxDefault
