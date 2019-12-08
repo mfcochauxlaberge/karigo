@@ -6,5 +6,5 @@ type ComparisonError struct {
 }
 
 func (e ComparisonError) Error() string {
-	return "output and file content are different"
+	return "output and file are different"
 }
