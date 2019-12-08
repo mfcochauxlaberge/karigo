@@ -60,15 +60,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Populate logger with rid
 	logger := s.logger.With().Str("rid", requestID).Logger()
 
-	defer func() {
-		// This is for separating the requests in
-		// the logger's output. It is useful for
-		// debugging in the early stages of this
-		// project, but it should be removed
-		// eventually.
-		fmt.Println()
-	}()
-
 	logger.Info().
 		Str("event", "read_request").
 		Str("domain", domain).

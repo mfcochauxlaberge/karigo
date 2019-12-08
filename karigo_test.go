@@ -265,6 +265,8 @@ func TestKarigo(t *testing.T) {
 func startServer() string {
 	server := karigo.NewServer()
 
+	server.DisableLogger()
+
 	src := &memory.Source{}
 	_ = src.Reset()
 	node := karigo.NewNode(&memory.Journal{}, src)
