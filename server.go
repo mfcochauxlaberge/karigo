@@ -16,6 +16,18 @@ import (
 	"github.com/rs/zerolog"
 )
 
+func NewServer() *Server {
+	s := &Server{
+		Nodes: map[string]*Node{},
+	}
+
+	s.logger = s.logger.
+		Output(zerolog.ConsoleWriter{Out: os.Stdout}).
+		With().Timestamp().Logger()
+
+	return s
+}
+
 // Server ...
 type Server struct {
 	Nodes map[string]*Node
@@ -25,10 +37,6 @@ type Server struct {
 
 // Run ...
 func (s *Server) Run(port uint) {
-	// Logger
-	s.logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
-	s.logger = s.logger.Output(zerolog.ConsoleWriter{Out: os.Stdout})
-
 	s.logger.Info().Str("event", "server_start")
 
 	for _, node := range s.Nodes {

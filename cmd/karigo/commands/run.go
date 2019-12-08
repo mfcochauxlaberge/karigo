@@ -22,9 +22,7 @@ var cmdRun = &cobra.Command{
 		fmt.Printf("Listening on port %d...\n", port)
 
 		// Server
-		server := &karigo.Server{
-			Nodes: map[string]*karigo.Node{},
-		}
+		server := karigo.NewServer()
 
 		src := &memory.Source{}
 		_ = src.Reset()

@@ -263,9 +263,7 @@ func TestKarigo(t *testing.T) {
 }
 
 func startServer() string {
-	server := &karigo.Server{
-		Nodes: map[string]*karigo.Node{},
-	}
+	server := karigo.NewServer()
 
 	src := &memory.Source{}
 	_ = src.Reset()
