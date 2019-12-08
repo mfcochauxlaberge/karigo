@@ -79,6 +79,8 @@ func (r *Runner) Prepare() error {
 //
 // In update mode, the file is created instead of being compared.
 func (r *Runner) Test(path string, content []byte) error {
+	path = filepath.Join(r.Directory, path)
+
 	for _, filter := range r.Filters {
 		content = filter(content)
 	}

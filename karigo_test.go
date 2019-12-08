@@ -251,7 +251,7 @@ func TestKarigo(t *testing.T) {
 
 		// Golden file
 		filename := strings.Replace(test.name, " ", "_", -1)
-		path := filepath.Join("testdata", "goldenfiles", "replays", filename)
+		path := filepath.Join("goldenfiles", "replays", filename)
 
 		err := runner.Test(path, out)
 		assert.NoError(err, test.name)
