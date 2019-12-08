@@ -85,8 +85,6 @@ func (r *Runner) Test(path string, content []byte) error {
 		content = filter(content)
 	}
 
-	fmt.Printf("Content:\n%s\n", string(content))
-
 	if r.Update {
 		// Make sure the necessary directories exist.
 		dir, _ := filepath.Split(path)
@@ -107,7 +105,7 @@ func (r *Runner) Test(path string, content []byte) error {
 			return nil
 		}
 
-		if bytes.Equal(file, content) {
+		if !bytes.Equal(file, content) {
 			return ComparisonError{}
 		}
 	}
