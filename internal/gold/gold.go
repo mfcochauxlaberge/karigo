@@ -94,7 +94,7 @@ func (r *Runner) Test(path string, content []byte) error {
 			return fmt.Errorf("gold: could not create directory: %w", err)
 		}
 
-		err = ioutil.WriteFile(path, content, os.ModePerm)
+		err = ioutil.WriteFile(path, content, 0644)
 		if err != nil {
 			return fmt.Errorf("gold: could not write file: %w", err)
 		}
