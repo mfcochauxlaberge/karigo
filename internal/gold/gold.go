@@ -91,12 +91,12 @@ func (r *Runner) Test(path string, content []byte) error {
 
 		err := os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
-			return fmt.Errorf("gold: could not create directory: %w", err)
+			return fmt.Errorf("gold: could not create directory: %s", err)
 		}
 
 		err = ioutil.WriteFile(path, content, 0644)
 		if err != nil {
-			return fmt.Errorf("gold: could not write file: %w", err)
+			return fmt.Errorf("gold: could not write file: %s", err)
 		}
 	} else {
 		// Compare the file with the given content.
