@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -168,6 +169,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = sendResponse(w, status, out.Bytes(), logger)
+}
+
+func (s *Server) DisableLogger(w io.Writer) {
+	s.logger = zerolog.Nop()
+}
+
+func (s *Server) SetOutput(w io.Writer) {
+	s.logger = s.logger.Output(w)
 }
 
 func sendResponse(w http.ResponseWriter, code int, body []byte, logger zerolog.Logger) error {
