@@ -179,7 +179,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_ = sendResponse(w, status, out.Bytes(), logger)
 }
 
-func (s *Server) DisableLogger(w io.Writer) {
+func (s *Server) DisableLogger() {
 	s.logger = zerolog.Nop()
 }
 
