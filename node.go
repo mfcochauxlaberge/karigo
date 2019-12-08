@@ -156,7 +156,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 				err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw))
 				if err != nil {
-					fmt.Printf("refused...\n")
 					// jaerr := jsonapi.NewErrForbidden()
 					// doc.Data = jaerr
 					doc.Errors = []jsonapi.Error{jsonapi.NewErrForbidden()}
