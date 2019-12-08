@@ -2,14 +2,11 @@ package karigo_test
 
 import (
 	"bytes"
-	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -17,41 +14,29 @@ import (
 	"time"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/internal/gold"
 	"github.com/mfcochauxlaberge/karigo/memory"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var update = flag.Bool("update-golden-files", false, "update the golden files")
-
-var (
-	regexHash = regexp.MustCompile(`\$2[ayb]\$.{56}`)
-	regexUUID = regexp.MustCompile(`[0123456789abcdef-]{36}`)
-)
+var runner *gold.Runner
 
 func TestMain(m *testing.M) {
-	if *update {
-		err := os.RemoveAll("testdata")
-		if err != nil {
-			panic(err)
-		}
+	// Runner
+	runner = gold.NewRunner("testdata")
 
-		err = os.Mkdir(filepath.Join("testdata"), os.ModePerm)
-		if err != nil {
-			panic(err)
-		}
+	runner.Filters = append(runner.Filters,
+		gold.FilterBcryptHashes,
+		gold.FilterUUIDs,
+	)
 
-		err = os.Mkdir(filepath.Join("testdata", "goldenfiles"), os.ModePerm)
-		if err != nil {
-			panic(err)
-		}
-
-		err = os.Mkdir(filepath.Join("testdata", "goldenfiles", "replays"), os.ModePerm)
-		if err != nil {
-			panic(err)
-		}
+	err := runner.Prepare()
+	if err != nil {
+		panic(err)
 	}
 
+	// Execution
 	os.Exit(m.Run())
 }
 
@@ -268,17 +253,8 @@ func TestKarigo(t *testing.T) {
 		filename := strings.Replace(test.name, " ", "_", -1)
 		path := filepath.Join("testdata", "goldenfiles", "replays", filename)
 
-		if !*update {
-			// Retrieve the expected result from a file
-			expected, err := ioutil.ReadFile(path)
-			assert.NoError(err, test.name)
-			assert.Equal(string(expected), string(out), test.name)
-		} else {
-			// Write the result to a file
-			// TODO Figure out whether 0644 is okay or not.
-			err := ioutil.WriteFile(path, out, 0644)
-			assert.NoError(err)
-		}
+		err := runner.Test(path, out)
+		assert.NoError(err, test.name)
 	}
 }
 
@@ -336,11 +312,7 @@ func do(method, host, path string, body []byte) (int, []byte, []byte, error) {
 
 	// Format response body
 	if len(resBody) > 0 {
-		dst := &bytes.Buffer{}
-		err = json.Indent(dst, resBody, "", "\t")
-		resBody = dst.Bytes()
-		resBody = regexHash.ReplaceAll(resBody, []byte("_HASH_"))
-		resBody = regexUUID.ReplaceAll(resBody, []byte("00000000-0000-0000-0000-000000000000"))
+		resBody = gold.FilterFormatJSON(resBody)
 	}
 
 	return res.StatusCode, buildSortedHeader(res.Header), resBody, err
