@@ -48,7 +48,7 @@ issues:
       linters:
         - lll
 
-    - source: ^var update =
+    - source: var runner \*gold.Runner
       linters:
         - gochecknoglobals
 
