@@ -254,7 +254,11 @@ func TestKarigo(t *testing.T) {
 		path := filepath.Join("goldenfiles", "replays", filename)
 
 		err := runner.Test(path, out)
-		assert.NoError(err, test.name)
+		if _, ok := err.(gold.ComparisonError); ok {
+			assert.Fail("file is different", test.name)
+		} else if err != nil {
+			panic(err)
+		}
 	}
 }
 

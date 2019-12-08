@@ -85,18 +85,20 @@ func (r *Runner) Test(path string, content []byte) error {
 		content = filter(content)
 	}
 
+	fmt.Printf("Content:\n%s\n", string(content))
+
 	if r.Update {
 		// Make sure the necessary directories exist.
 		dir, _ := filepath.Split(path)
 
 		err := os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
-			return err
+			return fmt.Errorf("gold: could not create directory: %w", err)
 		}
 
-		err = ioutil.WriteFile(path, content, 0644)
+		err = ioutil.WriteFile(path, content, os.ModePerm)
 		if err != nil {
-			return err
+			return fmt.Errorf("gold: could not write file: %w", err)
 		}
 	} else {
 		// Compare the file with the given content.
@@ -106,7 +108,7 @@ func (r *Runner) Test(path string, content []byte) error {
 		}
 
 		if bytes.Equal(file, content) {
-			return fmt.Errorf("file %s is different", path)
+			return ComparisonError{}
 		}
 	}
 
