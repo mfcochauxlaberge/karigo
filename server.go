@@ -173,6 +173,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func sendResponse(w http.ResponseWriter, code int, body []byte, logger zerolog.Logger) error {
 	var err error
 
+	w.Header().Add("Content-Type", "application/vnd.api+json")
+
 	w.WriteHeader(code)
 
 	if len(body) != 0 {
