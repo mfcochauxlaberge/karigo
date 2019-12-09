@@ -7,8 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{}
-
 // Execute ...
 func Execute() {
 	rootCmd.AddCommand(
@@ -22,3 +20,5 @@ func Execute() {
 		os.Exit(1)
 	}
 }
+
+var rootCmd = &cobra.Command{}
