@@ -4,6 +4,7 @@ POST /0_meta
 Content-Length: 317
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
+Vary: Origin
 
 {
 	"data": {
@@ -33,6 +34,7 @@ GET /0_meta/some-key
 Content-Length: 282
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
+Vary: Origin
 
 {
 	"data": {
@@ -62,6 +64,7 @@ PATCH /0_meta/some-key
 Content-Length: 285
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
+Vary: Origin
 
 {
 	"data": {
@@ -91,6 +94,7 @@ GET /0_meta/some-key
 Content-Length: 285
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
+Vary: Origin
 
 {
 	"data": {
@@ -119,6 +123,7 @@ DELETE /0_meta/some-key
 204 No Content
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
+Vary: Origin
 
 ##################################################
 
@@ -128,6 +133,7 @@ GET /0_meta/some-key
 Content-Length: 124
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
+Vary: Origin
 
 {
 	"data": null,

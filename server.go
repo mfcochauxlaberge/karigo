@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
+	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 )
 
@@ -43,8 +44,15 @@ func (s *Server) Run(port uint) {
 		node.logger = s.logger
 	}
 
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PATCH", "DELETE"},
+	})
+
+	handler := c.Handler(s)
+
 	// Listen and serve
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), s)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), handler)
 	if err != http.ErrServerClosed {
 		panic(err)
 	}
