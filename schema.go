@@ -4,6 +4,73 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
+// MainSchema ...
+func MainSchema() *jsonapi.Schema {
+	schema := &jsonapi.Schema{}
+
+	typ, err := jsonapi.BuildType(meta{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(set{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(attr{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(rel{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(log{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(op{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	return schema
+}
+
 // FirstSchema ...
 func FirstSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
@@ -69,6 +136,53 @@ func FirstSchema() *jsonapi.Schema {
 	}
 
 	return schema
+}
+
+// server ...
+type server struct {
+	ID string `json:"id" api:"0_servers"`
+
+	// Attributes
+	// Name    string `json:"name" api:"attr"`
+	Address string `json:"address" api:"attr"`
+
+	// Relationships
+	Nodes []string `json:"nodes" api:"rel,0_nodes,server"`
+}
+
+// node ...
+type node struct {
+	ID string `json:"id" api:"0_nodes"`
+
+	// Attributes
+	Address string `json:"address" api:"attr"`
+
+	// Relationships
+	Server string `json:"server" api:"rel,0_servers,nodes"`
+	API    string `json:"api" api:"rel,0_apis,nodes"`
+}
+
+// api ...
+type api struct {
+	ID string `json:"id" api:"0_apis"`
+
+	// Attributes
+	// Address string `json:"address" api:"attr"`
+
+	// Relationships
+	Nodes   []string `json:"nodes" api:"rel,0_nodes,api"`
+	Domains []string `json:"domains" api:"rel,0_domains,api"`
+}
+
+// domain ...
+type domain struct {
+	ID string `json:"id" api:"0_domains"`
+
+	// Attributes
+	Address string `json:"address" api:"attr"`
+
+	// Relationships
+	API string `json:"api" api:"rel,0_apis,domains"`
 }
 
 // meta ...
