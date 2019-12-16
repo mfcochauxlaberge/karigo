@@ -34,8 +34,7 @@ func NewNode(journal Journal, src Source) *Node {
 
 // Node ...
 type Node struct {
-	Name    string
-	Domains []string
+	Name string
 
 	// Run
 	log  Journal

@@ -4,8 +4,8 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
-// MainSchema ...
-func MainSchema() *jsonapi.Schema {
+// ClusterSchema ...
+func ClusterSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
 
 	typ, err := jsonapi.BuildType(meta{})
@@ -18,7 +18,7 @@ func MainSchema() *jsonapi.Schema {
 		panic(err)
 	}
 
-	typ, err = jsonapi.BuildType(set{})
+	typ, err = jsonapi.BuildType(server{})
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func MainSchema() *jsonapi.Schema {
 		panic(err)
 	}
 
-	typ, err = jsonapi.BuildType(attr{})
+	typ, err = jsonapi.BuildType(node{})
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +38,7 @@ func MainSchema() *jsonapi.Schema {
 		panic(err)
 	}
 
-	typ, err = jsonapi.BuildType(rel{})
+	typ, err = jsonapi.BuildType(api{})
 	if err != nil {
 		panic(err)
 	}
@@ -48,17 +48,7 @@ func MainSchema() *jsonapi.Schema {
 		panic(err)
 	}
 
-	typ, err = jsonapi.BuildType(log{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(op{})
+	typ, err = jsonapi.BuildType(domain{})
 	if err != nil {
 		panic(err)
 	}
@@ -256,6 +246,40 @@ type op struct {
 
 	// Relationships
 	Version string `json:"version" api:"rel,0_log,ops"`
+}
+
+// schemaToOps returns a slice of operations necessary to recreate the schema.
+func schemaToOps(schema *jsonapi.Schema) []Op {
+	ops := []Op{}
+
+	for _, typ := range schema.Types {
+		// Add set
+		ops = append(ops, NewOpAddSet(typ.Name)...)
+
+		// Add attributes
+		for _, attr := range typ.Attrs {
+			ops = append(ops, NewOpAddAttr(
+				typ.Name,
+				attr.Name,
+				jsonapi.GetAttrTypeString(attr.Type, false),
+				attr.Nullable,
+			)...)
+		}
+
+		// Add relationships
+		for _, rel := range typ.Rels {
+			ops = append(ops, NewOpAddRel(
+				rel.FromType,
+				rel.FromName,
+				rel.ToType,
+				rel.ToName,
+				rel.ToOne,
+				rel.FromOne,
+			)...)
+		}
+	}
+
+	return ops
 }
 
 func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
