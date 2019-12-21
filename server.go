@@ -11,9 +11,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mfcochauxlaberge/karigo/memory"
+
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
-	"github.com/mfcochauxlaberge/karigo/memory"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 )
