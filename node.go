@@ -86,7 +86,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			}
 
 			r.Logger.
-				Err(err).
+				Info().
+				Str("err", err.Error()).
 				Msg("Panic")
 		}
 	}()
@@ -94,7 +95,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	if len(r.Body) > 0 {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
 		if err != nil {
-			r.Logger.Err(err).Msg("Could not unmarshal document")
+			r.Logger.
+				Debug().
+				Str("error", err.Error()).
+				Msg("Could not unmarshal document")
 		}
 	}
 
@@ -108,7 +112,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			res, err = jsonapi.UnmarshalPartialResource(frame.Data, n.schema)
 			if err != nil {
 				r.Logger.
-					Err(err).
+					Debug().
+					Str("error", err.Error()).
 					Msg("Could not partially unmarshal resource")
 			}
 		}
@@ -281,7 +286,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	if cp.err != nil {
 		r.Logger.
-			Err(cp.err).
+			Debug().
+			Str("error", cp.err.Error()).
 			Msg("Transaction failed")
 
 		// Rollback
