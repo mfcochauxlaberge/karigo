@@ -109,7 +109,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			if err != nil {
 				r.Logger.
 					Err(err).
-					Msg("Could not partially unmarshal reosurce")
+					Msg("Could not partially unmarshal resource")
 			}
 		}
 
