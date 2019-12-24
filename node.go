@@ -87,8 +87,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 			r.Logger.
 				Err(err).
-				Str("abc", "123").
-				Int("def", 42).
 				Msg("Panic")
 		}
 	}()
