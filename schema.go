@@ -248,8 +248,8 @@ type op struct {
 	Version string `json:"version" api:"rel,0_log,ops"`
 }
 
-// schemaToOps returns a slice of operations necessary to recreate the schema.
-func schemaToOps(schema *jsonapi.Schema) []Op {
+// SchemaToOps returns a slice of operations necessary to recreate the schema.
+func SchemaToOps(schema *jsonapi.Schema) []Op {
 	ops := []Op{}
 
 	for _, typ := range schema.Types {

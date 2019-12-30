@@ -346,6 +346,23 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	return doc
 }
 
+// AddSource adds a source to the node.
+//
+// name is currently ignored and only one source can be added. Adding a second
+// source simply overrides the first one.
+//
+// TODO Add support for multiple sources.
+func (n *Node) AddSource(name string, s Source) {
+	n.main = source{
+		src: s,
+	}
+}
+
+// RegisterJournal ...
+func (n *Node) RegisterJournal(j Journal) {
+	n.log = j
+}
+
 // resource ...
 // TODO Validate the query?
 func (n *Node) resource(_ uint, qry QueryRes) (jsonapi.Resource, error) {

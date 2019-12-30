@@ -11,8 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mfcochauxlaberge/karigo/memory"
-
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/rs/cors"
@@ -46,22 +44,6 @@ func (s *Server) Run(port uint) {
 		s.Nodes = map[string]*Node{}
 	}
 
-	// Add cluster control node
-	ctlNode := &Node{
-		Name: "0_ctl_node_1",
-		main: source{src: &memory.Source{}},
-		log:  &memory.Journal{},
-	}
-	s.Nodes[ctlNode.Name] = ctlNode
-
-	// Add empty cluster schema to node
-	sc := ClusterSchema()
-	ops := schemaToOps(sc)
-	err := ctlNode.apply(ops)
-	if err != nil {
-		panic(err)
-	}
-
 	for _, node := range s.Nodes {
 		node.logger = s.logger
 	}
@@ -74,7 +56,7 @@ func (s *Server) Run(port uint) {
 	handler := c.Handler(s)
 
 	// Listen and serve
-	err = http.ListenAndServe(fmt.Sprintf(":%d", port), handler)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), handler)
 	if err != http.ErrServerClosed {
 		panic(err)
 	}

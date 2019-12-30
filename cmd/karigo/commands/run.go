@@ -20,8 +20,27 @@ var cmdRun = &cobra.Command{
 		// Server
 		server := karigo.NewServer()
 
-		src := &memory.Source{}
+		var src karigo.Source
+		src = &memory.Source{}
 		_ = src.Reset()
+
+		// Add cluster control node
+		ctlNode := &karigo.Node{
+			Name: "0_ctl_node_1",
+		}
+		ctlNode.AddSource("main", src)
+		ctlNode.RegisterJournal(&memory.Journal{})
+
+		// Add empty cluster schema to node
+		sc := karigo.ClusterSchema()
+		ops := karigo.SchemaToOps(sc)
+		err := ctlNode.apply(ops)
+		if err != nil {
+			panic(err)
+		}
+
+		// Register node
+		server.Nodes[ctlNode.Name] = ctlNode
 
 		server.Run(*port)
 	},
