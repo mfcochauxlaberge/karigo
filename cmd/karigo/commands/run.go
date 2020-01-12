@@ -3,8 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory"
+	"github.com/mfcochauxlaberge/karigo/cmd/karigo/util"
 
 	"github.com/spf13/cobra"
 )
@@ -17,30 +16,7 @@ var cmdRun = &cobra.Command{
 		fmt.Printf(" done.\n")
 		fmt.Printf("Listening on port %d...\n", *port)
 
-		// Server
-		server := karigo.NewServer()
-
-		var src karigo.Source
-		src = &memory.Source{}
-		_ = src.Reset()
-
-		// Add cluster control node
-		ctlNode := &karigo.Node{
-			Name: "0_ctl_node_1",
-		}
-		ctlNode.AddSource("main", src)
-		ctlNode.RegisterJournal(&memory.Journal{})
-
-		// Add empty cluster schema to node
-		sc := karigo.ClusterSchema()
-		ops := karigo.SchemaToOps(sc)
-		err := ctlNode.apply(ops)
-		if err != nil {
-			panic(err)
-		}
-
-		// Register node
-		server.Nodes[ctlNode.Name] = ctlNode
+		server := util.CreateServer()
 
 		server.Run(*port)
 	},

@@ -376,8 +376,8 @@ func (n *Node) collection(_ uint, qry QueryCol) (jsonapi.Collection, error) {
 	return n.main.src.Collection(qry)
 }
 
-// apply ...
-func (n *Node) apply(ops []Op) error {
+// Apply ...
+func (n *Node) Apply(ops []Op) error {
 	err := n.main.src.Apply(ops)
 	if err != nil {
 		return errors.New("karigo: an operation could not be executed")

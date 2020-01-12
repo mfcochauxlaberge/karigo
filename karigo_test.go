@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/cmd/karigo/util"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
 	"github.com/mfcochauxlaberge/karigo/memory"
 
@@ -263,7 +264,7 @@ func TestKarigo(t *testing.T) {
 }
 
 func startServer() string {
-	server := karigo.NewServer()
+	server := util.CreateServer()
 
 	server.DisableLogger()
 
