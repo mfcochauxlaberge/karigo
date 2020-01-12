@@ -13,10 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/cmd/karigo/util"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
-	"github.com/mfcochauxlaberge/karigo/memory"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -267,13 +265,6 @@ func startServer() string {
 	server := util.CreateServer()
 
 	server.DisableLogger()
-
-	src := &memory.Source{}
-	_ = src.Reset()
-	node := karigo.NewNode(&memory.Journal{}, src)
-	node.Name = "test"
-
-	server.Nodes[node.Name] = node
 
 	port := findFreePort()
 
