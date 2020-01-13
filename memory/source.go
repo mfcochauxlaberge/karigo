@@ -51,7 +51,7 @@ func (s *Source) Reset() error {
 			} else if rel, ok := typ.Rels[field]; ok {
 				if rel.FromType+rel.FromName ==
 					rel.Invert().FromType+rel.Invert().FromName {
-					relIDs = append(relIDs, typ.Name+"_"+rel.FromName)
+					relIDs = append(relIDs, rel.String())
 				}
 			}
 		}
@@ -88,7 +88,7 @@ func (s *Source) Reset() error {
 	for _, rel := range karigo.FirstSchema().Rels() {
 		s.sets["0_rels"].Add(makeSoftResource(
 			types["0_rels"],
-			rel.FromType+"_"+rel.FromName,
+			rel.String(),
 			map[string]interface{}{
 				"from-name": rel.FromName,
 				"to-one":    rel.ToOne,

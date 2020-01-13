@@ -181,7 +181,7 @@ func NewOpDeactivateAttr(set, name string) []Op {
 func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
 	id := fromSet + "_" + fromName
 
-	if toSet != "" {
+	if toName != "" {
 		id2 := toSet + "_" + toName
 		if id < id2 {
 			id = id + "_" + id2
@@ -204,9 +204,7 @@ func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) [
 }
 
 // NewOpDeleteRel ...
-func NewOpDeleteRel(set, name string) []Op {
-	id := set + "_" + name
-
+func NewOpDeleteRel(id string) []Op {
 	return []Op{
 		NewOpSet("0_attrs", id, "id", ""),
 	}
@@ -220,9 +218,7 @@ func NewOpActivateRel(id string) []Op {
 }
 
 // NewOpDeactivateRel ...
-func NewOpDeactivateRel(set, name string) []Op {
-	id := set + "_" + name
-
+func NewOpDeactivateRel(id string) []Op {
 	return []Op{
 		NewOpSet("0_rels", id, "active", false),
 	}
