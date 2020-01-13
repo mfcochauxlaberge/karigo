@@ -4,63 +4,6 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
-// ClusterSchema ...
-func ClusterSchema() *jsonapi.Schema {
-	schema := &jsonapi.Schema{}
-
-	typ, err := jsonapi.BuildType(meta{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(server{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(node{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(api{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(domain{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	return schema
-}
-
 // FirstSchema ...
 func FirstSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
@@ -116,6 +59,53 @@ func FirstSchema() *jsonapi.Schema {
 	}
 
 	typ, err = jsonapi.BuildType(op{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	return schema
+}
+
+// ClusterSchema ...
+func ClusterSchema() *jsonapi.Schema {
+	schema := &jsonapi.Schema{}
+
+	typ, err := jsonapi.BuildType(server{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(node{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(api{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(domain{})
 	if err != nil {
 		panic(err)
 	}
@@ -255,6 +245,7 @@ func SchemaToOps(schema *jsonapi.Schema) []Op {
 	for _, typ := range schema.Types {
 		// Add set
 		ops = append(ops, NewOpAddSet(typ.Name)...)
+		ops = append(ops, NewOpActivateSet(typ.Name)...)
 
 		// Add attributes
 		for _, attr := range typ.Attrs {
@@ -264,6 +255,7 @@ func SchemaToOps(schema *jsonapi.Schema) []Op {
 				jsonapi.GetAttrTypeString(attr.Type, false),
 				attr.Nullable,
 			)...)
+			ops = append(ops, NewOpActivateAttr(typ.Name, attr.Name)...)
 		}
 
 		// Add relationships
@@ -276,6 +268,13 @@ func SchemaToOps(schema *jsonapi.Schema) []Op {
 				rel.ToOne,
 				rel.FromOne,
 			)...)
+
+			relID := rel.FromType + "_" + rel.FromName
+			if rel.ToName != "" {
+				relID += "_" + rel.ToType + "_" + rel.ToName
+			}
+
+			ops = append(ops, NewOpActivateRel(relID)...)
 		}
 	}
 
@@ -380,4 +379,49 @@ func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
 
 func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {
 	s.RemoveRel(res.Get("from-type").(string), res.Get("name").(string))
+}
+
+func handleClusterChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
+	// var (
+	// 	res jsonapi.Resource
+	// 	err error
+	// )
+
+	// res, _ = r.Doc.Data.(jsonapi.Resource)
+
+	// if r.Method == "PATCH" {
+	// 	// Can only be for activating or deactivating
+	// 	// a set, attribute, or relationship.
+	// 	if active, ok := res.Get("active").(bool); ok {
+	// 		if active {
+	// 			switch r.URL.ResType {
+	// 			case "0_sets":
+	// 				err = activateSet(s, res.GetID())
+	// 			case "0_attrs":
+	// 				res = cp.Resource(QueryRes{
+	// 					Set: "0_attrs",
+	// 					ID:  res.GetID(),
+	// 				})
+	// 				err = activateAttr(s, res)
+	// 			case "0_rels":
+	// 				res = cp.Resource(QueryRes{
+	// 					Set: "0_rels",
+	// 					ID:  res.GetID(),
+	// 				})
+	// 				err = activateRel(s, res)
+	// 			}
+	// 		} else {
+	// 			switch r.URL.ResType {
+	// 			case "0_sets":
+	// 				deactivateSet(s, res)
+	// 			case "0_attrs":
+	// 				deactivateAttr(s, res)
+	// 			case "0_rels":
+	// 				deactivateRel(s, res)
+	// 			}
+	// 		}
+	// 	}
+
+	// 	cp.Check(err)
+	// }
 }
