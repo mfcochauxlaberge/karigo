@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 
@@ -173,7 +174,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 	// Type change
 	switch set {
 	case "0_sets":
-		if id != "" && field == "active" && v.(bool) {
+		if id == "" && field == "id" {
 			// New set
 			s.sets[id] = &jsonapi.SoftCollection{}
 			s.sets[id].SetType(&jsonapi.Type{
@@ -181,8 +182,11 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			})
 		}
 	case "0_attrs":
-		if id != "" && field == "active" && v.(bool) {
+		if id == "" && field == "id" {
 			// New attribute
+			fmt.Printf("MFDEBUG id: %v\n", id)
+			fmt.Printf("MFDEBUG s.sets[\"0_attrs\"]: %v\n", s.sets["0_attrs"])
+			fmt.Printf("MFDEBUG s.sets[\"0_attrs\"]: %v\n", s.sets["0_attrs"].Resource(id, nil))
 			setID := s.sets["0_attrs"].Resource(id, nil).GetToOne("set")
 			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
 			attrType, _ := jsonapi.GetAttrType(
@@ -195,7 +199,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			})
 		}
 	case "0_rels":
-		if id != "" && field == "active" && v.(bool) {
+		if id == "" && field == "id" {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).GetToOne("from-set")
 			relName := s.sets["0_rels"].Resource(id, nil).Get("from-name").(string)
