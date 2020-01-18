@@ -278,7 +278,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		tx(cp)
 	}
 
-	for _, op := range ops {
+	for _, op := range cp.ops {
 		r.Logger.Debug().
 			Str("op", op.String()).
 			Msg("Operation")
