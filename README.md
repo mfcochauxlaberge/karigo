@@ -39,7 +39,7 @@ This is a work in progress. It is not possible to make a production API with thi
  - Read and write valid JSON:API requests
  - Parse the URL (including its parameters)
  - Route the endpoints to the corresponding business logic
- - Provide basic validation rules
+ - Provide basic validation rules (mostly type checking)
  - Save each transaction in an exposed ordered log
 
 ### What the user has to do

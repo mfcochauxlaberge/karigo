@@ -381,47 +381,47 @@ func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {
 	s.RemoveRel(res.Get("from-type").(string), res.Get("name").(string))
 }
 
-func handleClusterChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
-	// var (
-	// 	res jsonapi.Resource
-	// 	err error
-	// )
+// func handleClusterChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
+// var (
+// 	res jsonapi.Resource
+// 	err error
+// )
 
-	// res, _ = r.Doc.Data.(jsonapi.Resource)
+// res, _ = r.Doc.Data.(jsonapi.Resource)
 
-	// if r.Method == "PATCH" {
-	// 	// Can only be for activating or deactivating
-	// 	// a set, attribute, or relationship.
-	// 	if active, ok := res.Get("active").(bool); ok {
-	// 		if active {
-	// 			switch r.URL.ResType {
-	// 			case "0_sets":
-	// 				err = activateSet(s, res.GetID())
-	// 			case "0_attrs":
-	// 				res = cp.Resource(QueryRes{
-	// 					Set: "0_attrs",
-	// 					ID:  res.GetID(),
-	// 				})
-	// 				err = activateAttr(s, res)
-	// 			case "0_rels":
-	// 				res = cp.Resource(QueryRes{
-	// 					Set: "0_rels",
-	// 					ID:  res.GetID(),
-	// 				})
-	// 				err = activateRel(s, res)
-	// 			}
-	// 		} else {
-	// 			switch r.URL.ResType {
-	// 			case "0_sets":
-	// 				deactivateSet(s, res)
-	// 			case "0_attrs":
-	// 				deactivateAttr(s, res)
-	// 			case "0_rels":
-	// 				deactivateRel(s, res)
-	// 			}
-	// 		}
-	// 	}
+// if r.Method == "PATCH" {
+// 	// Can only be for activating or deactivating
+// 	// a set, attribute, or relationship.
+// 	if active, ok := res.Get("active").(bool); ok {
+// 		if active {
+// 			switch r.URL.ResType {
+// 			case "0_sets":
+// 				err = activateSet(s, res.GetID())
+// 			case "0_attrs":
+// 				res = cp.Resource(QueryRes{
+// 					Set: "0_attrs",
+// 					ID:  res.GetID(),
+// 				})
+// 				err = activateAttr(s, res)
+// 			case "0_rels":
+// 				res = cp.Resource(QueryRes{
+// 					Set: "0_rels",
+// 					ID:  res.GetID(),
+// 				})
+// 				err = activateRel(s, res)
+// 			}
+// 		} else {
+// 			switch r.URL.ResType {
+// 			case "0_sets":
+// 				deactivateSet(s, res)
+// 			case "0_attrs":
+// 				deactivateAttr(s, res)
+// 			case "0_rels":
+// 				deactivateRel(s, res)
+// 			}
+// 		}
+// 	}
 
-	// 	cp.Check(err)
-	// }
-}
+// 	cp.Check(err)
+// }
+// }

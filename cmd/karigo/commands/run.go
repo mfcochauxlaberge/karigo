@@ -16,8 +16,8 @@ var cmdRun = &cobra.Command{
 		fmt.Printf(" done.\n")
 		fmt.Printf("Listening on port %d...\n", *port)
 
+		// Server
 		server := util.CreateServer()
-
 		server.Run(*port)
 	},
 }

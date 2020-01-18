@@ -14,22 +14,13 @@ func CreateServer() *karigo.Server {
 
 	// Add cluster control node
 	ctlNode := karigo.NewNode(&memory.Journal{}, src)
-	ctlNode.Name = "0_ctl_node_1"
+	ctlNode.Name = "main_node"
 
-	// First chema
-	sc := karigo.FirstSchema()
+	// Cluster control schema
+	sc := karigo.ClusterSchema()
 	ops := karigo.SchemaToOps(sc)
 
 	err := ctlNode.Apply(ops)
-	if err != nil {
-		panic(err)
-	}
-
-	// Cluster control schema
-	sc = karigo.ClusterSchema()
-	ops = karigo.SchemaToOps(sc)
-
-	err = ctlNode.Apply(ops)
 	if err != nil {
 		panic(err)
 	}

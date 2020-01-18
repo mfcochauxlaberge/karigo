@@ -263,7 +263,6 @@ func TestKarigo(t *testing.T) {
 
 func startServer() string {
 	server := util.CreateServer()
-
 	server.DisableLogger()
 
 	port := findFreePort()

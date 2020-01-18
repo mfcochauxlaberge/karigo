@@ -1,8 +1,6 @@
 package karigo_test
 
 import (
-	"fmt"
-	"math/rand"
 	"testing"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -49,12 +47,8 @@ func TestNode(t *testing.T) {
 		Method: "GET",
 		URL:    url,
 	}
-	rnd := rand.Uint32()
-	fmt.Printf("start %d\n", rnd)
 	res := node.Handle(req)
-	fmt.Printf("done %d\n", rnd)
 
-	fmt.Printf("res: %v\n", res)
 	if len(res.Errors) > 0 {
 		t.Errorf("At least one error occurred: %v\n", err)
 	}
