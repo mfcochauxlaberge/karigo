@@ -11,6 +11,7 @@ type Checkpoint struct {
 	Res jsonapi.Resource
 	Inc map[string]jsonapi.Resource
 
+	tx   Tx
 	node *Node
 
 	ops Entry
@@ -24,7 +25,7 @@ func (c *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
 		return nil
 	}
 
-	res, err := c.node.resource(0, qry)
+	res, err := c.tx.Resource(qry)
 	if err != nil {
 		c.Check(err)
 		return nil
@@ -39,7 +40,7 @@ func (c *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 		return nil
 	}
 
-	col, err := c.node.collection(0, qry)
+	col, err := c.tx.Collection(qry)
 	if err != nil {
 		c.Check(err)
 		return nil
@@ -51,7 +52,7 @@ func (c *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 // Apply ...
 func (c *Checkpoint) Apply(ops []Op) {
 	if c.err == nil {
-		c.Check(c.node.apply(ops))
+		c.Check(c.tx.Apply(ops))
 	}
 
 	if c.err == nil {
@@ -77,10 +78,10 @@ func (c *Checkpoint) Fail(err error) {
 
 // commit ...
 func (c *Checkpoint) commit() error {
-	return c.node.main.src.Commit()
+	return c.tx.Commit()
 }
 
 // rollback ...
 func (c *Checkpoint) rollback() error {
-	return c.node.main.src.Rollback()
+	return c.tx.Rollback()
 }

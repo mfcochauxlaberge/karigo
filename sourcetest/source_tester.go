@@ -33,16 +33,18 @@ func Test(t *testing.T, src karigo.Source) error {
 			return err
 		}
 
+		tx, _ := src.NewTx()
+
 		// Run each step
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
 			case karigo.Op:
-				err := src.Apply([]karigo.Op{s})
+				err := tx.Apply([]karigo.Op{s})
 				if err != nil {
 					return err
 				}
 			case []karigo.Op:
-				err := src.Apply(s)
+				err := tx.Apply(s)
 				if err != nil {
 					return err
 				}
@@ -56,7 +58,7 @@ func Test(t *testing.T, src karigo.Source) error {
 		keys := []string{}
 
 		// Keys
-		sets, err := src.Collection(karigo.QueryCol{
+		sets, err := tx.Collection(karigo.QueryCol{
 			Set:        "0_sets",
 			Sort:       []string{"id"},
 			PageNumber: 0,
@@ -70,7 +72,7 @@ func Test(t *testing.T, src karigo.Source) error {
 			set := sets.At(i)
 			id := set.GetID()
 
-			col, err := src.Collection(karigo.QueryCol{
+			col, err := tx.Collection(karigo.QueryCol{
 				Set:        id,
 				Sort:       []string{"id"},
 				PageNumber: 0,
