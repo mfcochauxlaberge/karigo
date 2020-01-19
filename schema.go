@@ -12,6 +12,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -21,6 +22,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -30,6 +32,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -39,6 +42,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -48,6 +52,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -57,6 +62,7 @@ func FirstSchema() *jsonapi.Schema {
 	if err != nil {
 		panic(err)
 	}
+
 	err = schema.AddType(typ)
 	if err != nil {
 		panic(err)
@@ -80,6 +86,7 @@ type set struct {
 	// Attributes
 	Name    string `json:"name" api:"attr"`
 	Version uint   `json:"version" api:"attr"`
+	Created bool   `json:"created" api:"attr"`
 	Active  bool   `json:"active" api:"attr"`
 
 	// Relationships
@@ -92,10 +99,11 @@ type attr struct {
 	ID string `json:"id" api:"0_attrs"`
 
 	// Attributes
-	Name   string `json:"name" api:"attr"`
-	Type   string `json:"type" api:"attr"`
-	Null   bool   `json:"null" api:"attr"`
-	Active bool   `json:"active" api:"attr"`
+	Name    string `json:"name" api:"attr"`
+	Type    string `json:"type" api:"attr"`
+	Null    bool   `json:"null" api:"attr"`
+	Created bool   `json:"created" api:"attr"`
+	Active  bool   `json:"active" api:"attr"`
 
 	// Relationships
 	Set string `json:"set" api:"rel,0_sets,attrs"`
@@ -110,6 +118,7 @@ type rel struct {
 	ToOne    bool   `json:"to-one" api:"attr"`
 	ToName   string `json:"to-name" api:"attr"`
 	FromOne  bool   `json:"from-one" api:"attr"`
+	Created  bool   `json:"created" api:"attr"`
 	Active   bool   `json:"active" api:"attr"`
 
 	// Relationships
@@ -153,10 +162,18 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 			if active {
 				switch r.URL.ResType {
 				case "0_sets":
-					err = activateSet(s, res)
+					err = activateSet(s, res.GetID())
 				case "0_attrs":
+					res = cp.Resource(QueryRes{
+						Set: "0_attrs",
+						ID:  res.GetID(),
+					})
 					err = activateAttr(s, res)
 				case "0_rels":
+					res = cp.Resource(QueryRes{
+						Set: "0_rels",
+						ID:  res.GetID(),
+					})
 					err = activateRel(s, res)
 				}
 			} else {
@@ -175,9 +192,9 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 	}
 }
 
-func activateSet(s *jsonapi.Schema, res jsonapi.Resource) error {
+func activateSet(s *jsonapi.Schema, name string) error {
 	err := s.AddType(jsonapi.Type{
-		Name: res.Get("name").(string),
+		Name: name,
 	})
 
 	return err
@@ -188,11 +205,13 @@ func deactivateSet(s *jsonapi.Schema, res jsonapi.Resource) {
 }
 
 func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) error {
+	typ, null := jsonapi.GetAttrType(res.Get("type").(string))
 	err := s.AddAttr(res.GetToOne("set"), jsonapi.Attr{
 		Name:     res.Get("name").(string),
-		Type:     res.Get("type").(int),
-		Nullable: res.Get("nullable").(bool),
+		Type:     typ,
+		Nullable: null,
 	})
+
 	return err
 }
 
@@ -205,13 +224,23 @@ func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
 		FromType: res.GetToOne("from-set"),
 		FromName: res.Get("from-name").(string),
 		ToOne:    res.Get("to-one").(bool),
-		ToType:   res.GetToOne("to-type"),
+		ToType:   res.GetToOne("to-set"),
 		ToName:   res.Get("to-name").(string),
 		FromOne:  res.Get("from-one").(bool),
 	}
-	rel.Normalize()
-	err := s.AddRel(res.GetToOne("set"), rel)
-	return err
+	rel = rel.Normalize()
+
+	err := s.AddRel(res.GetToOne("from-set"), rel)
+	if err != nil {
+		return err
+	}
+
+	err = s.AddRel(res.GetToOne("to-set"), rel.Invert())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {

@@ -33,16 +33,18 @@ func Test(t *testing.T, src karigo.Source) error {
 			return err
 		}
 
+		tx, _ := src.NewTx()
+
 		// Run each step
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
 			case karigo.Op:
-				err := src.Apply([]karigo.Op{s})
+				err := tx.Apply([]karigo.Op{s})
 				if err != nil {
 					return err
 				}
 			case []karigo.Op:
-				err := src.Apply(s)
+				err := tx.Apply(s)
 				if err != nil {
 					return err
 				}
@@ -56,7 +58,7 @@ func Test(t *testing.T, src karigo.Source) error {
 		keys := []string{}
 
 		// Keys
-		sets, err := src.Collection(karigo.QueryCol{
+		sets, err := tx.Collection(karigo.QueryCol{
 			Set:        "0_sets",
 			Sort:       []string{"id"},
 			PageNumber: 0,
@@ -70,7 +72,7 @@ func Test(t *testing.T, src karigo.Source) error {
 			set := sets.At(i)
 			id := set.GetID()
 
-			col, err := src.Collection(karigo.QueryCol{
+			col, err := tx.Collection(karigo.QueryCol{
 				Set:        id,
 				Sort:       []string{"id"},
 				PageNumber: 0,
@@ -93,13 +95,16 @@ func Test(t *testing.T, src karigo.Source) error {
 				// Add a key for each relationsip.
 				for _, rel := range res.Rels() {
 					key := fmt.Sprintf("%s.%s.%s", id, res.GetID(), rel.FromName)
+
 					var r string
+
 					if rel.ToOne {
 						r = res.GetToOne(rel.FromName)
 					} else {
 						rs := res.GetToMany(rel.FromName)
 						r = strings.Join(rs, ",")
 					}
+
 					keys = append(keys, fmt.Sprintf("%s=%s", key, r))
 				}
 			}
@@ -111,26 +116,29 @@ func Test(t *testing.T, src karigo.Source) error {
 		// Golden file
 		filename := strings.Replace(scenario.Name, " ", "_", -1) + ".txt"
 		path := filepath.Join("testdata", "goldenfiles", "scenarios", filename)
+
 		if !*update {
 			// Retrieve the expected result from file
 			contents, _ := ioutil.ReadFile(path)
 			expected := []string{}
+
 			for _, key := range strings.Split(string(contents), "\n") {
 				if key != "" {
 					expected = append(expected, key)
 				}
 			}
+
 			assert.Equal(expected, keys, scenario.Name)
 		} else {
 			dst := &bytes.Buffer{}
 			for _, key := range keys {
 				_, _ = fmt.Fprintln(dst, key)
 			}
+
 			// TODO Figure out whether 0644 is okay or not.
 			err = ioutil.WriteFile(path, dst.Bytes(), 0644)
 			assert.NoError(err)
 		}
-
 	}
 
 	return nil
