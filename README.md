@@ -85,7 +85,7 @@ Such a log makes a lot of tasks easier:
 
 ### Transaction
 
-Each request modiying data results in a transaction appended to an ordered log. A transaction is a set of operations. An operation is the field of a resource and a value. Executing the operation means setting the resource's field to the value.
+Each request modifying data results in a transaction appended to an ordered log. A transaction is a set of operations. An operation is the field of a resource and a value. Executing the operation means setting the resource's field to the value.
 
 ## Documentation
 
