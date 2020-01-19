@@ -21,7 +21,7 @@ func NewNode(journal Journal, src Source) *Node {
 		},
 
 		schema: FirstSchema(),
-		// funcs: map[string]Tx{},
+		// funcs: map[string]Action{},
 
 		err:      make(chan error),
 		shutdown: make(chan bool),
@@ -43,7 +43,7 @@ type Node struct {
 
 	// Schema
 	schema *jsonapi.Schema
-	// funcs  map[string]Tx
+	// funcs  map[string]Action
 
 	// Channels
 	err      chan error
@@ -189,9 +189,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	}
 
-	tx := TxDefault
+	execute := ActionDefault
 	ops := []Op{}
-	// Prepare transaction
+	// Prepare action
 	switch r.Method {
 	case GET:
 	case POST:
@@ -275,7 +275,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		handleSchemaChange(n.schema, r, cp)
 	} else {
 		// Execute
-		tx(cp)
+		execute(cp)
 	}
 
 	for _, op := range cp.ops {
@@ -288,7 +288,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		r.Logger.
 			Debug().
 			Str("error", cp.err.Error()).
-			Msg("Transaction failed")
+			Msg("Action failed")
 
 		// Rollback
 		err = cp.rollback()
@@ -308,7 +308,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
-		// Commit the transaction entry
+		// Commit the entry
 		err = n.log.Append(cp.ops.Bytes())
 		if err != nil {
 			panic(fmt.Errorf("could not append: %s", err))
