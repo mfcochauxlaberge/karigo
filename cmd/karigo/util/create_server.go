@@ -17,13 +17,13 @@ func CreateServer() *karigo.Server {
 	ctlNode.Name = "main_node"
 
 	// Cluster control schema
-	sc := karigo.ClusterSchema()
-	ops := karigo.SchemaToOps(sc)
+	// sc := karigo.ClusterSchema()
+	// ops := karigo.SchemaToOps(sc)
 
-	err := ctlNode.Apply(ops)
-	if err != nil {
-		panic(err)
-	}
+	// err := ctlNode.Apply(ops)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// Register node
 	server.Nodes["127.0.0.1"] = ctlNode

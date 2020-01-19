@@ -1,7 +1,7 @@
 POST /0_meta
 
 200 OK
-Content-Length: 317
+Content-Length: 294
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
 Vary: Origin
@@ -15,7 +15,6 @@ Vary: Origin
 		"links": {
 			"self": "/0_meta/some-key"
 		},
-		"relationships": {},
 		"type": "0_meta"
 	},
 	"jsonapi": {
@@ -31,7 +30,7 @@ Vary: Origin
 GET /0_meta/some-key
 
 200 OK
-Content-Length: 282
+Content-Length: 259
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
 Vary: Origin
@@ -45,7 +44,6 @@ Vary: Origin
 		"links": {
 			"self": "/0_meta/some-key"
 		},
-		"relationships": {},
 		"type": "0_meta"
 	},
 	"jsonapi": {
@@ -61,7 +59,7 @@ Vary: Origin
 PATCH /0_meta/some-key
 
 200 OK
-Content-Length: 285
+Content-Length: 262
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
 Vary: Origin
@@ -75,7 +73,6 @@ Vary: Origin
 		"links": {
 			"self": "/0_meta/some-key"
 		},
-		"relationships": {},
 		"type": "0_meta"
 	},
 	"jsonapi": {
@@ -91,7 +88,7 @@ Vary: Origin
 GET /0_meta/some-key
 
 200 OK
-Content-Length: 285
+Content-Length: 262
 Content-Type: application/vnd.api+json
 Date: Abc, 01 Def 2345 67:89:01 GMT
 Vary: Origin
@@ -105,7 +102,6 @@ Vary: Origin
 		"links": {
 			"self": "/0_meta/some-key"
 		},
-		"relationships": {},
 		"type": "0_meta"
 	},
 	"jsonapi": {

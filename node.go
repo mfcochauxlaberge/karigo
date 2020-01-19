@@ -21,7 +21,7 @@ func NewNode(journal Journal, src Source) *Node {
 		},
 
 		schema: FirstSchema(),
-		// funcs: map[string]Tx{},
+		// funcs: map[string]Action{},
 
 		err:      make(chan error),
 		shutdown: make(chan bool),
@@ -42,7 +42,7 @@ type Node struct {
 
 	// Schema
 	schema *jsonapi.Schema
-	// funcs  map[string]Tx
+	// funcs  map[string]Action
 
 	// Channels
 	err      chan error
@@ -134,14 +134,17 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		res, _ = r.Doc.Data.(jsonapi.Resource)
 	}
 
+	tx, _ := n.main.src.NewTx()
+
 	cp := &Checkpoint{
+		tx:   tx,
 		node: n,
 		ops:  []Op{},
 	}
 
 	// Check password is correct if request is writing (non-GET).
 	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
-		pwRes, _ := n.main.src.Resource(QueryRes{
+		pwRes, _ := cp.tx.Resource(QueryRes{
 			Set:    "0_meta",
 			ID:     "password",
 			Fields: []string{"value"},
@@ -188,9 +191,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	}
 
-	tx := TxDefault
+	execute := ActionDefault
 	ops := []Op{}
-	// Prepare transaction
+	// Prepare action
 	switch r.Method {
 	case GET:
 	case POST:
@@ -225,7 +228,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			ops = NewOpInsert(res)
 		}
 
-		found, _ := n.resource(0, QueryRes{
+		found, _ := cp.tx.Resource(QueryRes{
 			Set:    res.GetType().Name,
 			ID:     res.GetID(),
 			Fields: []string{"id"},
@@ -274,10 +277,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		handleSchemaChange(n.schema, r, cp)
 	} else {
 		// Execute
-		tx(cp)
+		execute(cp)
 	}
 
-	for _, op := range ops {
+	for _, op := range cp.ops {
 		r.Logger.Debug().
 			Str("op", op.String()).
 			Msg("Operation")
@@ -287,7 +290,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		r.Logger.
 			Debug().
 			Str("error", cp.err.Error()).
-			Msg("Transaction failed")
+			Msg("Action failed")
 
 		// Rollback
 		err = cp.rollback()
@@ -307,7 +310,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
-		// Commit the transaction entry
+		// Commit the entry
 		err = n.log.Append(cp.ops.Bytes())
 		if err != nil {
 			panic(fmt.Errorf("could not append: %s", err))
@@ -361,27 +364,4 @@ func (n *Node) AddSource(name string, s Source) {
 // RegisterJournal ...
 func (n *Node) RegisterJournal(j Journal) {
 	n.log = j
-}
-
-// resource ...
-// TODO Validate the query?
-func (n *Node) resource(_ uint, qry QueryRes) (jsonapi.Resource, error) {
-	return n.main.src.Resource(qry)
-}
-
-// collection ...
-// TODO Validate the query?
-// TODO Complete the sorting rule
-func (n *Node) collection(_ uint, qry QueryCol) (jsonapi.Collection, error) {
-	return n.main.src.Collection(qry)
-}
-
-// Apply ...
-func (n *Node) Apply(ops []Op) error {
-	err := n.main.src.Apply(ops)
-	if err != nil {
-		return errors.New("karigo: an operation could not be executed")
-	}
-
-	return nil
 }

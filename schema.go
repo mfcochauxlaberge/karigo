@@ -180,6 +180,7 @@ type set struct {
 	// Attributes
 	Name    string `json:"name" api:"attr"`
 	Version uint   `json:"version" api:"attr"`
+	Created bool   `json:"created" api:"attr"`
 	Active  bool   `json:"active" api:"attr"`
 
 	// Relationships
@@ -192,10 +193,11 @@ type attr struct {
 	ID string `json:"id" api:"0_attrs"`
 
 	// Attributes
-	Name   string `json:"name" api:"attr"`
-	Type   string `json:"type" api:"attr"`
-	Null   bool   `json:"null" api:"attr"`
-	Active bool   `json:"active" api:"attr"`
+	Name    string `json:"name" api:"attr"`
+	Type    string `json:"type" api:"attr"`
+	Null    bool   `json:"null" api:"attr"`
+	Created bool   `json:"created" api:"attr"`
+	Active  bool   `json:"active" api:"attr"`
 
 	// Relationships
 	Set string `json:"set" api:"rel,0_sets,attrs"`
@@ -210,6 +212,7 @@ type rel struct {
 	ToOne    bool   `json:"to-one" api:"attr"`
 	ToName   string `json:"to-name" api:"attr"`
 	FromOne  bool   `json:"from-one" api:"attr"`
+	Created  bool   `json:"created" api:"attr"`
 	Active   bool   `json:"active" api:"attr"`
 
 	// Relationships
