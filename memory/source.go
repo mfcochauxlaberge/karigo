@@ -186,30 +186,32 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 	case "0_attrs":
 		if id != "" && field == "created" && v.(bool) {
 			// New attribute
-			setID := s.sets["0_attrs"].Resource(id, nil).GetToOne("set")
-			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
-			attrType, _ := jsonapi.GetAttrType(
-				s.sets["0_attrs"].Resource(id, nil).Get("type").(string),
+			attr := s.sets["0_attrs"].Resource(id, nil)
+			typ, null := jsonapi.GetAttrType(attr.Get("type").(string))
+
+			_ = s.sets[attr.GetToOne("set")].Type.AddAttr(
+				jsonapi.Attr{
+					Name:     attr.Get("name").(string),
+					Type:     typ,
+					Nullable: null,
+				},
 			)
-			_ = s.sets[setID].Type.AddAttr(jsonapi.Attr{
-				Name:     attrName,
-				Type:     attrType,
-				Nullable: s.sets["0_attrs"].Resource(id, nil).Get("null").(bool),
-			})
 		}
 	case "0_rels":
 		if id != "" && field == "created" && v.(bool) {
 			// New relationship
-			setID := s.sets["0_rels"].Resource(id, nil).GetToOne("from-set")
-			relName := s.sets["0_rels"].Resource(id, nil).Get("from-name").(string)
-			_ = s.sets[setID].Type.AddRel(jsonapi.Rel{
-				// FromType:  s.sets["0_rels"].Resource(id,nil).Get("type").(string),
-				FromName: relName,
-				ToOne:    s.sets["0_rels"].Resource(id, nil).Get("to-one").(bool),
-				ToType:   s.sets["0_rels"].Resource(id, nil).GetToOne("from-set"),
-				// ToName:  id,
-				// FromOne: s.sets["0_rels"].Resource(id,nil).Get("to-one").(bool),
-			})
+			rel := s.sets["0_rels"].Resource(id, nil)
+
+			_ = s.sets[rel.GetToOne("from-set")].Type.AddRel(
+				jsonapi.Rel{
+					FromType: rel.GetToOne("from-set"),
+					FromName: rel.Get("from-name").(string),
+					ToOne:    rel.Get("to-one").(bool),
+					ToType:   rel.GetToOne("to-set"),
+					ToName:   rel.Get("to-name").(string),
+					FromOne:  rel.Get("from-one").(bool),
+				},
+			)
 		}
 	}
 
