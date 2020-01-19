@@ -62,6 +62,7 @@ func (s *Source) Reset() error {
 			map[string]interface{}{
 				"name":    typ.Name,
 				"version": 0,
+				"created": true,
 				"active":  true,
 				"attrs":   attrIDs,
 				"rels":    relIDs,
@@ -74,11 +75,12 @@ func (s *Source) Reset() error {
 				types["0_attrs"],
 				typ.Name+"_"+attr.Name,
 				map[string]interface{}{
-					"name":   attr.Name,
-					"type":   jsonapi.GetAttrTypeString(attr.Type, false),
-					"null":   attr.Nullable,
-					"active": true,
-					"set":    typ.Name,
+					"name":    attr.Name,
+					"type":    jsonapi.GetAttrTypeString(attr.Type, false),
+					"null":    attr.Nullable,
+					"created": true,
+					"active":  true,
+					"set":     typ.Name,
 				},
 			))
 		}
@@ -94,6 +96,7 @@ func (s *Source) Reset() error {
 				"to-one":    rel.ToOne,
 				"to-name":   rel.ToName,
 				"from-one":  rel.FromOne,
+				"created":   true,
 				"active":    true,
 				"from-set":  rel.FromType,
 				"to-set":    rel.ToType,
@@ -173,7 +176,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 	// Type change
 	switch set {
 	case "0_sets":
-		if id != "" && field == "active" && v.(bool) {
+		if id != "" && field == "created" && v.(bool) {
 			// New set
 			s.sets[id] = &jsonapi.SoftCollection{}
 			s.sets[id].SetType(&jsonapi.Type{
@@ -181,7 +184,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			})
 		}
 	case "0_attrs":
-		if id != "" && field == "active" && v.(bool) {
+		if id != "" && field == "created" && v.(bool) {
 			// New attribute
 			setID := s.sets["0_attrs"].Resource(id, nil).GetToOne("set")
 			attrName := s.sets["0_attrs"].Resource(id, nil).Get("name").(string)
@@ -195,7 +198,7 @@ func (s *Source) opSet(set, id, field string, v interface{}) {
 			})
 		}
 	case "0_rels":
-		if id != "" && field == "active" && v.(bool) {
+		if id != "" && field == "created" && v.(bool) {
 			// New relationship
 			setID := s.sets["0_rels"].Resource(id, nil).GetToOne("from-set")
 			relName := s.sets["0_rels"].Resource(id, nil).Get("from-name").(string)
