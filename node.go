@@ -135,14 +135,17 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		res, _ = r.Doc.Data.(jsonapi.Resource)
 	}
 
+	tx, _ := n.main.src.NewTx()
+
 	cp := &Checkpoint{
+		tx:   tx,
 		node: n,
 		ops:  []Op{},
 	}
 
 	// Check password is correct if request is writing (non-GET).
 	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
-		pwRes, _ := n.main.src.Resource(QueryRes{
+		pwRes, _ := cp.tx.Resource(QueryRes{
 			Set:    "0_meta",
 			ID:     "password",
 			Fields: []string{"value"},
@@ -226,7 +229,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			ops = NewOpInsert(res)
 		}
 
-		found, _ := n.resource(0, QueryRes{
+		found, _ := cp.tx.Resource(QueryRes{
 			Set:    res.GetType().Name,
 			ID:     res.GetID(),
 			Fields: []string{"id"},
@@ -345,27 +348,4 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	return doc
-}
-
-// resource ...
-// TODO Validate the query?
-func (n *Node) resource(_ uint, qry QueryRes) (jsonapi.Resource, error) {
-	return n.main.src.Resource(qry)
-}
-
-// collection ...
-// TODO Validate the query?
-// TODO Complete the sorting rule
-func (n *Node) collection(_ uint, qry QueryCol) (jsonapi.Collection, error) {
-	return n.main.src.Collection(qry)
-}
-
-// apply ...
-func (n *Node) apply(ops []Op) error {
-	err := n.main.src.Apply(ops)
-	if err != nil {
-		return errors.New("karigo: an operation could not be executed")
-	}
-
-	return nil
 }
