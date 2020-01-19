@@ -71,6 +71,100 @@ func FirstSchema() *jsonapi.Schema {
 	return schema
 }
 
+// ClusterSchema ...
+func ClusterSchema() *jsonapi.Schema {
+	schema := &jsonapi.Schema{}
+
+	typ, err := jsonapi.BuildType(server{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(node{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(api{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	typ, err = jsonapi.BuildType(domain{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = schema.AddType(typ)
+	if err != nil {
+		panic(err)
+	}
+
+	return schema
+}
+
+// server ...
+type server struct {
+	ID string `json:"id" api:"0_servers"`
+
+	// Attributes
+	// Name    string `json:"name" api:"attr"`
+	Address string `json:"address" api:"attr"`
+
+	// Relationships
+	Nodes []string `json:"nodes" api:"rel,0_nodes,server"`
+}
+
+// node ...
+type node struct {
+	ID string `json:"id" api:"0_nodes"`
+
+	// Attributes
+	Address string `json:"address" api:"attr"`
+
+	// Relationships
+	Server string `json:"server" api:"rel,0_servers,nodes"`
+	API    string `json:"api" api:"rel,0_apis,nodes"`
+}
+
+// api ...
+type api struct {
+	ID string `json:"id" api:"0_apis"`
+
+	// Attributes
+	// Address string `json:"address" api:"attr"`
+
+	// Relationships
+	Nodes   []string `json:"nodes" api:"rel,0_nodes,api"`
+	Domains []string `json:"domains" api:"rel,0_domains,api"`
+}
+
+// domain ...
+type domain struct {
+	ID string `json:"id" api:"0_domains"`
+
+	// Attributes
+	Address string `json:"address" api:"attr"`
+
+	// Relationships
+	API string `json:"api" api:"rel,0_apis,domains"`
+}
+
 // meta ...
 type meta struct {
 	ID string `json:"id" api:"0_meta"`
@@ -145,6 +239,49 @@ type op struct {
 
 	// Relationships
 	Version string `json:"version" api:"rel,0_log,ops"`
+}
+
+// SchemaToOps returns a slice of operations necessary to recreate the schema.
+func SchemaToOps(schema *jsonapi.Schema) []Op {
+	ops := []Op{}
+
+	for _, typ := range schema.Types {
+		// Add set
+		ops = append(ops, NewOpAddSet(typ.Name)...)
+		ops = append(ops, NewOpActivateSet(typ.Name)...)
+
+		// Add attributes
+		for _, attr := range typ.Attrs {
+			ops = append(ops, NewOpAddAttr(
+				typ.Name,
+				attr.Name,
+				jsonapi.GetAttrTypeString(attr.Type, false),
+				attr.Nullable,
+			)...)
+			ops = append(ops, NewOpActivateAttr(typ.Name, attr.Name)...)
+		}
+
+		// Add relationships
+		for _, rel := range typ.Rels {
+			ops = append(ops, NewOpAddRel(
+				rel.FromType,
+				rel.FromName,
+				rel.ToType,
+				rel.ToName,
+				rel.ToOne,
+				rel.FromOne,
+			)...)
+
+			relID := rel.FromType + "_" + rel.FromName
+			if rel.ToName != "" {
+				relID += "_" + rel.ToType + "_" + rel.ToName
+			}
+
+			ops = append(ops, NewOpActivateRel(relID)...)
+		}
+	}
+
+	return ops
 }
 
 func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
@@ -246,3 +383,48 @@ func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
 func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {
 	s.RemoveRel(res.Get("from-type").(string), res.Get("name").(string))
 }
+
+// func handleClusterChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
+// var (
+// 	res jsonapi.Resource
+// 	err error
+// )
+
+// res, _ = r.Doc.Data.(jsonapi.Resource)
+
+// if r.Method == "PATCH" {
+// 	// Can only be for activating or deactivating
+// 	// a set, attribute, or relationship.
+// 	if active, ok := res.Get("active").(bool); ok {
+// 		if active {
+// 			switch r.URL.ResType {
+// 			case "0_sets":
+// 				err = activateSet(s, res.GetID())
+// 			case "0_attrs":
+// 				res = cp.Resource(QueryRes{
+// 					Set: "0_attrs",
+// 					ID:  res.GetID(),
+// 				})
+// 				err = activateAttr(s, res)
+// 			case "0_rels":
+// 				res = cp.Resource(QueryRes{
+// 					Set: "0_rels",
+// 					ID:  res.GetID(),
+// 				})
+// 				err = activateRel(s, res)
+// 			}
+// 		} else {
+// 			switch r.URL.ResType {
+// 			case "0_sets":
+// 				deactivateSet(s, res)
+// 			case "0_attrs":
+// 				deactivateAttr(s, res)
+// 			case "0_rels":
+// 				deactivateRel(s, res)
+// 			}
+// 		}
+// 	}
+
+// 	cp.Check(err)
+// }
+// }

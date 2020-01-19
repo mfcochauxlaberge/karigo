@@ -34,8 +34,7 @@ func NewNode(journal Journal, src Source) *Node {
 
 // Node ...
 type Node struct {
-	Name    string
-	Domains []string
+	Name string
 
 	// Run
 	log  Journal
@@ -348,4 +347,21 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	return doc
+}
+
+// AddSource adds a source to the node.
+//
+// name is currently ignored and only one source can be added. Adding a second
+// source simply overrides the first one.
+//
+// TODO Add support for multiple sources.
+func (n *Node) AddSource(name string, s Source) {
+	n.main = source{
+		src: s,
+	}
+}
+
+// RegisterJournal ...
+func (n *Node) RegisterJournal(j Journal) {
+	n.log = j
 }

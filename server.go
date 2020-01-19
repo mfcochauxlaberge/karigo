@@ -40,6 +40,10 @@ type Server struct {
 func (s *Server) Run(port uint) {
 	s.logger.Info().Str("event", "server_start")
 
+	if s.Nodes == nil {
+		s.Nodes = map[string]*Node{}
+	}
+
 	for _, node := range s.Nodes {
 		node.logger = s.logger
 	}
