@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 
@@ -172,7 +173,7 @@ func (s *Source) Rollback() error {
 }
 
 func (s *Source) opSet(set, id, field string, v interface{}) {
-	// fmt.Printf("set, id, field = %s, %s, %s = %v\n", set, id, field, v)
+	fmt.Printf("set, id, field = %s, %s, %s = %v\n", set, id, field, v)
 	// Type change
 	switch set {
 	case "0_sets":
