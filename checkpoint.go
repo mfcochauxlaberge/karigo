@@ -14,8 +14,7 @@ type Checkpoint struct {
 	tx   Tx
 	node *Node
 
-	version uint
-	ops     Entry
+	ops Entry
 
 	err error
 }
