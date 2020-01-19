@@ -126,10 +126,12 @@ func TestJournalRange(t *testing.T) {
 	assert.Len(rang, 0)
 
 	journal = &memory.Journal{}
+
 	for i := 100; i < 200; i++ {
 		data := strconv.Itoa(i)
 		_ = journal.Append([]byte(data))
 	}
+
 	_ = journal.Cut(50)
 
 	// Empty range

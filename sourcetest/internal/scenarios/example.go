@@ -40,7 +40,7 @@ func init() {
 					false,
 					true,
 				),
-				karigo.NewOpActivateRel("users", "articles"),
+				karigo.NewOpActivateRel("articles_author_users_articles"),
 
 				// Data
 				karigo.NewOpSet("users", "", "id", "abc123"),

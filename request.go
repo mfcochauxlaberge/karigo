@@ -2,6 +2,7 @@ package karigo
 
 import (
 	"github.com/mfcochauxlaberge/jsonapi"
+	"github.com/rs/zerolog"
 )
 
 // Methods
@@ -14,11 +15,15 @@ const (
 
 // Request ...
 type Request struct {
-	ID     string
+	ID string
+
 	Method string
 	URL    *jsonapi.URL
-	Doc    *jsonapi.Document
-	Body   []byte
+
+	Body []byte
+	Doc  *jsonapi.Document
+
+	Logger zerolog.Logger
 }
 
 func (r *Request) isSchemaChange() bool {
@@ -28,5 +33,6 @@ func (r *Request) isSchemaChange() bool {
 			return true
 		}
 	}
+
 	return false
 }

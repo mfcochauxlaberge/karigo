@@ -1,19 +1,19 @@
 package karigo
 
-import (
-	"github.com/mfcochauxlaberge/jsonapi"
-)
-
-// Source ...
+// A Source is the interface used by karigo to query data from a database and
+// apply operations to mutate the data.
+//
+// Each of the interface's methods have comments to explain how to implement a
+// Source. See the current implementations for more details.
 type Source interface {
+	// Reset wipes all data and brings the underlying database
+	// to a clean state.
+	//
+	// A clean state represents the schema returned by FirstSchema.
 	Reset() error
 
-	Resource(QueryRes) (jsonapi.Resource, error)
-	Collection(QueryCol) (jsonapi.Collection, error)
-	Apply([]Op) error
-
-	Commit() error
-	Rollback() error
+	// NewTx returns a new Tx object.
+	NewTx() (Tx, error)
 }
 
 // source is a thin convenient wrapper for a Source.

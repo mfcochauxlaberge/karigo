@@ -1,5 +1,3 @@
-# karigo
-
 <div align="center" style="text-align: center;">
   <img src="assets/logo.png" height="120">
   <br>
@@ -14,7 +12,7 @@
   </a> -->
   <br>
   <a href="https://github.com/mfcochauxlaberge/karigo/blob/master/go.mod">
-    <img src="https://img.shields.io/badge/go%20version-go1.12%2B-red">
+    <img src="https://img.shields.io/badge/go%20version-1.12%2B-%2300acd7">
   </a>
   <a href="https://github.com/mfcochauxlaberge/karigo/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/mfcochauxlaberge/karigo?color=a33">
@@ -23,6 +21,8 @@
     <img src="https://godoc.org/github.com/golang/gddo?status.svg">
   </a>
 </div>
+
+# karigo
 
 karigo is an API engine that follows the [JSON:API specification](https://jsonapi.org/format).
 
@@ -39,7 +39,7 @@ This is a work in progress. It is not possible to make a production API with thi
  - Read and write valid JSON:API requests
  - Parse the URL (including its parameters)
  - Route the endpoints to the corresponding business logic
- - Provide basic validation rules
+ - Provide basic validation rules (mostly type checking)
  - Save each transaction in an exposed ordered log
 
 ### What the user has to do
@@ -85,7 +85,7 @@ Such a log makes a lot of tasks easier:
 
 ### Transaction
 
-Each request modiying data results in a transaction appended to an ordered log. A transaction is a set of operations. An operation is the field of a resource and a value. Executing the operation means setting the resource's field to the value.
+Each request modifying data results in a transaction appended to an ordered log. A transaction is a set of operations. An operation is the field of a resource and a value. Executing the operation means setting the resource's field to the value.
 
 ## Documentation
 
