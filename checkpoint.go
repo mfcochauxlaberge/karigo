@@ -13,8 +13,7 @@ type Checkpoint struct {
 
 	node *Node
 
-	version uint
-	ops     Entry
+	ops Entry
 
 	err error
 }
@@ -25,7 +24,7 @@ func (c *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
 		return nil
 	}
 
-	res, err := c.node.resource(c.version, qry)
+	res, err := c.node.resource(0, qry)
 	if err != nil {
 		c.Check(err)
 		return nil
@@ -40,7 +39,7 @@ func (c *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 		return nil
 	}
 
-	col, err := c.node.collection(c.version, qry)
+	col, err := c.node.collection(0, qry)
 	if err != nil {
 		c.Check(err)
 		return nil
