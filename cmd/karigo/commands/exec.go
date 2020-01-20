@@ -6,10 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	commit *bool
-)
-
 var cmdExec = &cobra.Command{
 	Use:   "exec",
 	Short: "Execute an operation",
@@ -21,6 +17,10 @@ var cmdExec = &cobra.Command{
 		}
 	},
 }
+
+var (
+	commit *bool
+)
 
 func init() {
 	commit = cmdExec.Flags().BoolP("commit", "", false, "commit the operation")
