@@ -273,13 +273,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	cp.Apply(ops)
 
-	if r.isSchemaChange() {
-		// Handle schema change
-		handleSchemaChange(n.schema, r, cp)
-	} else {
-		// Execute
-		execute(cp)
-	}
+	// Execute
+	execute(cp)
 
 	for _, op := range cp.ops {
 		r.Logger.Debug().

@@ -53,6 +53,7 @@ func (c *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
 func (c *Checkpoint) Apply(ops []Op) {
 	if c.err == nil {
 		c.Check(c.tx.Apply(ops))
+		handleSchemaChanges(c.node.schema, ops)
 	}
 
 	if c.err == nil {

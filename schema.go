@@ -147,49 +147,78 @@ type op struct {
 	Version string `json:"version" api:"rel,0_log,ops"`
 }
 
-func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
-	var (
-		res jsonapi.Resource
-		err error
-	)
-
-	res, _ = r.Doc.Data.(jsonapi.Resource)
-
-	if r.Method == "PATCH" {
-		// Can only be for activating or deactivating
-		// a set, attribute, or relationship.
-		if active, ok := res.Get("active").(bool); ok {
-			if active {
-				switch r.URL.ResType {
-				case "0_sets":
-					err = activateSet(s, res.GetID())
-				case "0_attrs":
-					res = cp.Resource(QueryRes{
-						Set: "0_attrs",
-						ID:  res.GetID(),
-					})
-					err = activateAttr(s, res)
-				case "0_rels":
-					res = cp.Resource(QueryRes{
-						Set: "0_rels",
-						ID:  res.GetID(),
-					})
-					err = activateRel(s, res)
+// handleSchemaChanges updates the given schema according to the operations.
+func handleSchemaChanges(s *jsonapi.Schema, ops []Op) {
+	for _, op := range ops {
+		switch op.Key.Set {
+		case "0_sets":
+			if op.Key.Field == "active" {
+				if op.Value.(bool) {
+					// Add set
+				} else {
+					// Remove set
 				}
-			} else {
-				switch r.URL.ResType {
-				case "0_sets":
-					deactivateSet(s, res)
-				case "0_attrs":
-					deactivateAttr(s, res)
-				case "0_rels":
-					deactivateRel(s, res)
+			}
+		case "0_attrs":
+			if op.Key.Field == "active" {
+				if op.Value.(bool) {
+					// Add attribute
+				} else {
+					// Remove attribute
+				}
+			}
+		case "0_rels":
+			if op.Key.Field == "active" {
+				if op.Value.(bool) {
+					// Add relationship
+				} else {
+					// Remove relationship
 				}
 			}
 		}
-
-		cp.Check(err)
 	}
+	// var (
+	// 	res jsonapi.Resource
+	// 	err error
+	// )
+
+	// res, _ = r.Doc.Data.(jsonapi.Resource)
+
+	// if r.Method == "PATCH" {
+	// 	// Can only be for activating or deactivating
+	// 	// a set, attribute, or relationship.
+	// 	if active, ok := res.Get("active").(bool); ok {
+	// 		if active {
+	// 			switch r.URL.ResType {
+	// 			case "0_sets":
+	// 				err = activateSet(s, res.GetID())
+	// 			case "0_attrs":
+	// 				res = cp.Resource(QueryRes{
+	// 					Set: "0_attrs",
+	// 					ID:  res.GetID(),
+	// 				})
+	// 				err = activateAttr(s, res)
+	// 			case "0_rels":
+	// 				res = cp.Resource(QueryRes{
+	// 					Set: "0_rels",
+	// 					ID:  res.GetID(),
+	// 				})
+	// 				err = activateRel(s, res)
+	// 			}
+	// 		} else {
+	// 			switch r.URL.ResType {
+	// 			case "0_sets":
+	// 				deactivateSet(s, res)
+	// 			case "0_attrs":
+	// 				deactivateAttr(s, res)
+	// 			case "0_rels":
+	// 				deactivateRel(s, res)
+	// 			}
+	// 		}
+	// 	}
+
+	// 	cp.Check(err)
+	// }
 }
 
 func activateSet(s *jsonapi.Schema, name string) error {
