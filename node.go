@@ -54,16 +54,6 @@ type Node struct {
 	sync.Mutex
 }
 
-// Run ...
-func (n *Node) Run() error {
-	// n.Lock()
-	// n.Unlock()
-	// Handle events
-	for {
-		select {}
-	}
-}
-
 // Handle ...
 func (n *Node) Handle(r *Request) *jsonapi.Document {
 	var (

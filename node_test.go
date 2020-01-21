@@ -38,8 +38,6 @@ func TestNode(t *testing.T) {
 	// Node
 	node := NewNode(journal, src)
 
-	go func() { _ = node.Run() }()
-
 	url, err := jsonapi.NewURLFromRaw(schema, "/things")
 	if err != nil {
 		panic(err)
