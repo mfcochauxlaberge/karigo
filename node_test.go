@@ -27,13 +27,17 @@ func TestNode(t *testing.T) {
 	src := &memory.Source{}
 	_ = src.Reset() // TODO Necessary?
 
-	_ = src.Apply(NewOpAddSet("things"))
+	tx, _ := src.NewTx()
+
+	_ = tx.Apply(NewOpAddSet("things"))
+	_ = tx.Apply(NewOpActivateSet("things"))
 
 	// Journal
 	journal := &memory.Journal{}
 
 	// Node
 	node := NewNode(journal, src)
+
 	go func() { _ = node.Run() }()
 
 	url, err := jsonapi.NewURLFromRaw(schema, "/things")
@@ -46,6 +50,7 @@ func TestNode(t *testing.T) {
 		URL:    url,
 	}
 	res := node.Handle(req)
+
 	if len(res.Errors) > 0 {
 		t.Errorf("At least one error occurred: %v\n", err)
 	}

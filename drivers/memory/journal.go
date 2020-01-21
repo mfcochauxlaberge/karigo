@@ -26,7 +26,9 @@ func (j *Journal) Append(c []byte) error {
 	if c == nil {
 		c = []byte{}
 	}
+
 	j.log = append(j.log, c)
+
 	return nil
 }
 
@@ -39,6 +41,7 @@ func (j *Journal) Oldest() (uint, []byte, error) {
 	if len(j.log) > 0 {
 		return j.start, j.log[0], nil
 	}
+
 	return 0, nil, errors.New("karigo: journal is empty")
 }
 
@@ -52,6 +55,7 @@ func (j *Journal) Newest() (uint, []byte, error) {
 		newest := j.start + uint(len(j.log)) - 1
 		return newest, j.log[len(j.log)-1], nil
 	}
+
 	return 0, nil, errors.New("karigo: journal is empty")
 }
 
@@ -64,6 +68,7 @@ func (j *Journal) At(i uint) ([]byte, error) {
 	if i < j.start || i > j.start+uint(len(j.log))-1 {
 		return nil, fmt.Errorf("karigo: index %d does not exist", i)
 	}
+
 	return j.log[i-j.start], nil
 }
 
@@ -99,6 +104,7 @@ func (j *Journal) Cut(i uint) error {
 	if i > j.start+uint(len(j.log)) {
 		j.start = j.start + uint(len(j.log)) - 1
 		j.log = [][]byte{j.log[len(j.log)-1]}
+
 		return nil
 	}
 
@@ -106,9 +112,11 @@ func (j *Journal) Cut(i uint) error {
 	// entry and the newest one.
 	l := j.start + uint(len(j.log)) - 1 - i
 	newLog := make([][]byte, l)
+
 	for n := uint(0); n < uint(len(newLog)-1); n++ {
 		newLog[n] = j.log[i-j.start]
 	}
+
 	j.start = i
 	j.log = newLog
 
@@ -128,17 +136,19 @@ func (j *Journal) Range(f, t uint) ([][]byte, error) {
 		panic("f > t")
 	}
 
-	if len(j.log) == 0 {
+	switch {
+	case len(j.log) == 0:
 		return nil, errors.New("journal is empty")
-	} else if f == t {
+	case f == t:
 		return [][]byte{}, nil
-	} else if f < j.start {
+	case f < j.start:
 		return nil, fmt.Errorf("journal was cut after %d", f)
-	} else if t > j.start+uint(len(j.log))-1 {
+	case t > j.start+uint(len(j.log))-1:
 		return nil, fmt.Errorf("journal has no entry at index %d yet", t)
-	} else {
+	default:
 		rang := make([][]byte, t-f+1)
 		_ = copy(rang, j.log[f-j.start:t-j.start+1])
+
 		return rang, nil
 	}
 }

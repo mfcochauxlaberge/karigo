@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	beSimple *bool
-	showDeps *bool
-)
-
 var cmdVersion = &cobra.Command{
 	Use:   "version",
 	Short: "Show the version number",
@@ -33,6 +28,11 @@ var cmdVersion = &cobra.Command{
 		}
 	},
 }
+
+var (
+	beSimple *bool
+	showDeps *bool
+)
 
 func init() {
 	beSimple = cmdVersion.Flags().BoolP("simple", "", false, "simply print the version")
