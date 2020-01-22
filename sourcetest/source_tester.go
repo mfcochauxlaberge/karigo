@@ -1,29 +1,32 @@
 package sourcetest
 
 import (
-	"bytes"
 	"errors"
-	"flag"
 	"fmt"
-	"io/ioutil"
 	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/internal/gold"
 	"github.com/mfcochauxlaberge/karigo/sourcetest/internal/scenarios"
 
 	"github.com/stretchr/testify/assert"
 )
-
-var update = flag.Bool("update-golden-files", false, "update the golden files")
 
 // Test ...
 func Test(t *testing.T, src karigo.Source) error {
 	assert := assert.New(t)
 
 	scenarios := scenarios.Scenarios
+
+	runner := gold.NewRunner("testdata")
+
+	err := runner.Prepare()
+	if err != nil {
+		panic(err)
+	}
 
 	// Run scenarios
 	for _, scenario := range scenarios {
@@ -112,32 +115,17 @@ func Test(t *testing.T, src karigo.Source) error {
 
 		// sort.Strings(verif)
 		sort.Strings(keys)
+		out := []byte(strings.Join(keys, "\n"))
 
 		// Golden file
 		filename := strings.Replace(scenario.Name, " ", "_", -1) + ".txt"
 		path := filepath.Join("testdata", "goldenfiles", "scenarios", filename)
 
-		if !*update {
-			// Retrieve the expected result from file
-			contents, _ := ioutil.ReadFile(path)
-			expected := []string{}
-
-			for _, key := range strings.Split(string(contents), "\n") {
-				if key != "" {
-					expected = append(expected, key)
-				}
-			}
-
-			assert.Equal(expected, keys, scenario.Name)
-		} else {
-			dst := &bytes.Buffer{}
-			for _, key := range keys {
-				_, _ = fmt.Fprintln(dst, key)
-			}
-
-			// TODO Figure out whether 0644 is okay or not.
-			err = ioutil.WriteFile(path, dst.Bytes(), 0644)
-			assert.NoError(err)
+		err = runner.Test(path, out)
+		if _, ok := err.(gold.ComparisonError); ok {
+			assert.Fail("file is different", scenario.Name)
+		} else if err != nil {
+			panic(err)
 		}
 	}
 
