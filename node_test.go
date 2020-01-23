@@ -3,10 +3,10 @@ package karigo_test
 import (
 	"testing"
 
-	"github.com/mfcochauxlaberge/jsonapi"
-
 	. "github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/memory"
+
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 func TestNode(t *testing.T) {
