@@ -1,6 +1,7 @@
 package sourcetest
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
@@ -15,7 +16,7 @@ import (
 )
 
 // Test ...
-func Test(t *testing.T, src karigo.Source) error {
+func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 	assert := assert.New(t)
 
 	scenarios := scenarios.Scenarios
@@ -41,12 +42,24 @@ func Test(t *testing.T, src karigo.Source) error {
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
 			case karigo.Op:
-				err := tx.Apply([]karigo.Op{s})
+				ss := karigo.Entry{s}
+
+				err := tx.Apply(ss)
+				if err != nil {
+					return err
+				}
+
+				err = jrnl.Append(ss.Bytes())
 				if err != nil {
 					return err
 				}
 			case []karigo.Op:
 				err := tx.Apply(s)
+				if err != nil {
+					return err
+				}
+
+				err = jrnl.Append(karigo.Entry(s).Bytes())
 				if err != nil {
 					return err
 				}
@@ -120,6 +133,39 @@ func Test(t *testing.T, src karigo.Source) error {
 		filename := strings.Replace(scenario.Name, " ", "_", -1) + ".txt"
 
 		err = runner.Test(filename, out)
+		if _, ok := err.(gold.ComparisonError); ok {
+			assert.Fail("file is different", scenario.Name)
+		} else if err != nil {
+			panic(err)
+		}
+
+		// Test journal
+		i, _, _ := jrnl.Newest()
+		entries, _ := jrnl.Range(0, i)
+
+		journalOut := []byte{}
+
+		for _, entry := range entries {
+			ops := karigo.Entry{}
+
+			err := json.Unmarshal(entry, &ops)
+			if err != nil {
+				return err
+			}
+
+			for _, op := range ops {
+				journalOut = append(journalOut, []byte(op.String())...)
+				journalOut = append(journalOut, '\n')
+			}
+		}
+
+		if len(journalOut) > 0 {
+			journalOut = journalOut[:len(journalOut)-1]
+		}
+
+		filename = strings.Replace(scenario.Name, " ", "_", -1) + ".journal.txt"
+
+		err = runner.Test(filename, journalOut)
 		if _, ok := err.(gold.ComparisonError); ok {
 			assert.Fail("file is different", scenario.Name)
 		} else if err != nil {
