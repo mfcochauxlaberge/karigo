@@ -42,24 +42,24 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
 			case karigo.Op:
-				ss := []karigo.Op{s}
+				ss := karigo.Entry{s}
 
 				err := tx.Apply(ss)
 				if err != nil {
 					return err
 				}
 
-				err = jrnl.Append((karigo.Entry(ss)).Bytes())
+				err = jrnl.Append(ss.Bytes())
 				if err != nil {
 					return err
 				}
-			case []karigo.Op:
+			case karigo.Entry:
 				err := tx.Apply(s)
 				if err != nil {
 					return err
 				}
 
-				err = jrnl.Append((karigo.Entry(s)).Bytes())
+				err = jrnl.Append(s.Bytes())
 				if err != nil {
 					return err
 				}
