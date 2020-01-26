@@ -3,7 +3,6 @@ package sourcetest
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -21,7 +20,7 @@ func Test(t *testing.T, src karigo.Source) error {
 
 	scenarios := scenarios.Scenarios
 
-	runner := gold.NewRunner("testdata")
+	runner := gold.NewRunner("testdata/goldenfiles/scenarios")
 
 	err := runner.Prepare()
 	if err != nil {
@@ -119,9 +118,8 @@ func Test(t *testing.T, src karigo.Source) error {
 
 		// Golden file
 		filename := strings.Replace(scenario.Name, " ", "_", -1) + ".txt"
-		path := filepath.Join("testdata", "goldenfiles", "scenarios", filename)
 
-		err = runner.Test(path, out)
+		err = runner.Test(filename, out)
 		if _, ok := err.(gold.ComparisonError); ok {
 			assert.Fail("file is different", scenario.Name)
 		} else if err != nil {
