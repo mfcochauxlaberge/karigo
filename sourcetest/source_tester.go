@@ -53,13 +53,13 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 				if err != nil {
 					return err
 				}
-			case karigo.Entry:
+			case []karigo.Op:
 				err := tx.Apply(s)
 				if err != nil {
 					return err
 				}
 
-				err = jrnl.Append(s.Bytes())
+				err = jrnl.Append(karigo.Entry(s).Bytes())
 				if err != nil {
 					return err
 				}
