@@ -1,0 +1,18 @@
+# github.com/containous/yaegi v0.7.4
+github.com/containous/yaegi/interp
+github.com/containous/yaegi/stdlib
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
+# github.com/mfcochauxlaberge/jsonapi v0.17.0
+github.com/mfcochauxlaberge/jsonapi
+# github.com/mfcochauxlaberge/karigo v0.0.0-20200126220409-bc5ed9fbddfa
+github.com/mfcochauxlaberge/karigo
+# github.com/rs/cors v1.7.0
+github.com/rs/cors
+# github.com/rs/zerolog v1.17.2
+github.com/rs/zerolog
+github.com/rs/zerolog/internal/cbor
+github.com/rs/zerolog/internal/json
+# golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish

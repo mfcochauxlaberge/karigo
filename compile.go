@@ -25,6 +25,7 @@ func compile(code []byte) (Tx, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	stat, _ := file.Stat()
 
 	// Write code to temporary file
@@ -46,7 +47,8 @@ func compile(code []byte) (Tx, error) {
 		},
 		Dir: dir,
 	}
-	_, err = cmd.Output()
+
+	_, err = cmd.CombinedOutput()
 	if err != nil {
 		return nil, fmt.Errorf("karigo: compilation error: %s", err.Error())
 	}

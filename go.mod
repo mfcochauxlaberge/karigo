@@ -3,6 +3,7 @@ module github.com/mfcochauxlaberge/karigo
 go 1.12
 
 require (
+	github.com/containous/yaegi v0.7.4
 	github.com/google/uuid v1.1.1
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mfcochauxlaberge/jsonapi v0.17.0
