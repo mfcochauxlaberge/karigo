@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/google/uuid v1.1.1
-	github.com/kr/pretty v0.1.0 // indirect
+	github.com/jackc/pgx/v4 v4.3.0
 	github.com/mfcochauxlaberge/jsonapi v0.17.0
 	github.com/rs/cors v1.7.0
 	github.com/rs/zerolog v1.17.2
