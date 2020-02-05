@@ -36,18 +36,18 @@ This is a work in progress. It is not possible to make a production API with thi
 
 ### What karigo can do
 
- - Read and write valid JSON:API requests
- - Parse the URL (including its parameters)
- - Route the endpoints to the corresponding business logic
- - Provide basic validation rules (mostly type checking)
- - Save each transaction in an exposed ordered log
+* Read and write valid JSON:API requests
+* Parse the URL (including its parameters)
+* Route the endpoints to the corresponding business logic
+* Provide basic validation rules (mostly type checking)
+* Save each transaction in an exposed ordered log
 
 ### What the user has to do
 
- - Run the service (`karigo run`)
- - Define the types (names, attributes, and relationships)
- - Provide more specific validation rules
- - Write the business logic
+* Run the service (`karigo run`)
+* Define the types (names, attributes, and relationships)
+* Provide more specific validation rules
+* Write the business logic
 
 ## Concepts
 
@@ -55,16 +55,16 @@ This is a work in progress. It is not possible to make a production API with thi
 
 A type has a name, attributes, and relationships.
 
- - Name
- - Attributes
-   - String, number, boolean, etc
-   - Can be nil
-   - Have validation rules
- - Relationships
-   - A string for to-one relationships
-   - A slice of strings for to-many relationships
-   - Can be empty
-   - Can have an inverse relationship
+* Name
+* Attributes
+  * String, number, boolean, etc
+  * Can be nil
+  * Have validation rules
+* Relationships
+  * A string for to-one relationships
+  * A slice of strings for to-many relationships
+  * Can be empty
+  * Can have an inverse relationship
 
 ### Resource
 
@@ -78,10 +78,10 @@ The log is an ordered and append-only sequence of transactions.
 
 Such a log makes a lot of tasks easier:
 
- - Replicate and synchronize the data
- - Replay the transactions to benchmark performance
- - Trigger events when a resource, field, or type is modified
- - Build a simple and powerful test suite
+* Replicate and synchronize the data
+* Replay the transactions to benchmark performance
+* Trigger events when a resource, field, or type is modified
+* Build a simple and powerful test suite
 
 ### Transaction
 

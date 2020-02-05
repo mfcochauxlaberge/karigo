@@ -1,29 +1,32 @@
 package sourcetest
 
 import (
-	"bytes"
+	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/internal/gold"
 	"github.com/mfcochauxlaberge/karigo/sourcetest/internal/scenarios"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var update = flag.Bool("update-golden-files", false, "update the golden files")
-
 // Test ...
-func Test(t *testing.T, src karigo.Source) error {
+func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 	assert := assert.New(t)
 
 	scenarios := scenarios.Scenarios
+
+	runner := gold.NewRunner("testdata/goldenfiles/scenarios")
+
+	err := runner.Prepare()
+	if err != nil {
+		panic(err)
+	}
 
 	// Run scenarios
 	for _, scenario := range scenarios {
@@ -39,12 +42,24 @@ func Test(t *testing.T, src karigo.Source) error {
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
 			case karigo.Op:
-				err := tx.Apply([]karigo.Op{s})
+				ss := karigo.Entry{s}
+
+				err := tx.Apply(ss)
+				if err != nil {
+					return err
+				}
+
+				err = jrnl.Append(ss.Bytes())
 				if err != nil {
 					return err
 				}
 			case []karigo.Op:
 				err := tx.Apply(s)
+				if err != nil {
+					return err
+				}
+
+				err = jrnl.Append(karigo.Entry(s).Bytes())
 				if err != nil {
 					return err
 				}
@@ -112,32 +127,49 @@ func Test(t *testing.T, src karigo.Source) error {
 
 		// sort.Strings(verif)
 		sort.Strings(keys)
+		out := []byte(strings.Join(keys, "\n"))
 
 		// Golden file
 		filename := strings.Replace(scenario.Name, " ", "_", -1) + ".txt"
-		path := filepath.Join("testdata", "goldenfiles", "scenarios", filename)
 
-		if !*update {
-			// Retrieve the expected result from file
-			contents, _ := ioutil.ReadFile(path)
-			expected := []string{}
+		err = runner.Test(filename, out)
+		if _, ok := err.(gold.ComparisonError); ok {
+			assert.Fail("file is different", scenario.Name)
+		} else if err != nil {
+			panic(err)
+		}
 
-			for _, key := range strings.Split(string(contents), "\n") {
-				if key != "" {
-					expected = append(expected, key)
-				}
+		// Test journal
+		i, _, _ := jrnl.Newest()
+		entries, _ := jrnl.Range(0, i)
+
+		journalOut := []byte{}
+
+		for _, entry := range entries {
+			ops := karigo.Entry{}
+
+			err := json.Unmarshal(entry, &ops)
+			if err != nil {
+				return err
 			}
 
-			assert.Equal(expected, keys, scenario.Name)
-		} else {
-			dst := &bytes.Buffer{}
-			for _, key := range keys {
-				_, _ = fmt.Fprintln(dst, key)
+			for _, op := range ops {
+				journalOut = append(journalOut, []byte(op.String())...)
+				journalOut = append(journalOut, '\n')
 			}
+		}
 
-			// TODO Figure out whether 0644 is okay or not.
-			err = ioutil.WriteFile(path, dst.Bytes(), 0644)
-			assert.NoError(err)
+		if len(journalOut) > 0 {
+			journalOut = journalOut[:len(journalOut)-1]
+		}
+
+		filename = strings.Replace(scenario.Name, " ", "_", -1) + ".journal.txt"
+
+		err = runner.Test(filename, journalOut)
+		if _, ok := err.(gold.ComparisonError); ok {
+			assert.Fail("file is different", scenario.Name)
+		} else if err != nil {
+			panic(err)
 		}
 	}
 
