@@ -11,6 +11,7 @@ import (
 func Execute() {
 	rootCmd.AddCommand(
 		cmdExec,
+		cmdNew,
 		cmdRun,
 		cmdVersion,
 	)
