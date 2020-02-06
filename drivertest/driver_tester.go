@@ -1,4 +1,4 @@
-package sourcetest
+package drivertest
 
 import (
 	"encoding/json"
@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/drivertest/internal/scenarios"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
-	"github.com/mfcochauxlaberge/karigo/sourcetest/internal/scenarios"
 
 	"github.com/stretchr/testify/assert"
 )
