@@ -10,8 +10,8 @@ import (
 // Execute ...
 func Execute() {
 	rootCmd.AddCommand(
+		cmdCheck,
 		cmdExec,
-		cmdNew,
 		cmdRun,
 		cmdVersion,
 	)

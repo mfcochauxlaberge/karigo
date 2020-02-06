@@ -4,9 +4,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cmdNew = &cobra.Command{
+var cmdCheck = &cobra.Command{
 	Use:   "new",
-	Short: "Create new instance",
+	Short: "Check instance",
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO
 	},
