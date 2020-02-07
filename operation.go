@@ -9,8 +9,8 @@ import (
 
 // Operations
 const (
-	OpSet = '='
-	OpAdd = '&'
+	OpSet    = '='
+	OpInsert = '>'
 )
 
 // Op ...
@@ -70,7 +70,7 @@ func NewOpAdd(set, id, field string, v interface{}) Op {
 			ID:    id,
 			Field: field,
 		},
-		Op:    OpAdd,
+		Op:    OpInsert,
 		Value: v,
 	}
 }

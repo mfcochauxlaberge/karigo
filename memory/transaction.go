@@ -65,8 +65,8 @@ func (t *Tx) Apply(ops []karigo.Op) error {
 		switch op.Op {
 		case karigo.OpSet:
 			t.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
-		case karigo.OpAdd:
-			t.opAdd(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
+		case karigo.OpInsert:
+			t.opInsert(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
 		}
 	}
 
@@ -156,7 +156,7 @@ func (t *Tx) opSet(set, id, field string, v interface{}) {
 	}
 }
 
-func (t *Tx) opAdd(set, id, field string, v interface{}) {
+func (t *Tx) opInsert(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", set, id, field, v)
 	curr := reflect.ValueOf(t.sets[set].Resource(id, nil).GetToMany(field))
 	curr = reflect.Append(curr, reflect.ValueOf(v))
