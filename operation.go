@@ -9,8 +9,11 @@ import (
 
 // Operations
 const (
-	OpSet    = '='
-	OpInsert = '>'
+	OpSet      = '='
+	OpAdd      = '+'
+	OpSubtract = '-'
+	OpInsert   = '>'
+	OpRemove   = '<'
 )
 
 // Op ...
