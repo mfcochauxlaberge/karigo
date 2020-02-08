@@ -87,8 +87,8 @@ func NewOpAdd(set, id, field string, v interface{}) Op {
 	}
 }
 
-// NewOpInsert ...
-func NewOpInsert(res jsonapi.Resource) []Op {
+// NewOpInsertRes ...
+func NewOpInsertRes(res jsonapi.Resource) []Op {
 	set := res.GetType().Name
 	id := res.GetID()
 	ops := []Op{}

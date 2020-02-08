@@ -216,7 +216,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		default:
-			ops = NewOpInsert(res)
+			ops = NewOpInsertRes(res)
 		}
 
 		found, _ := cp.tx.Resource(QueryRes{
