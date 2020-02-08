@@ -1,7 +1,6 @@
 package drivertest
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
@@ -49,7 +48,12 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 					return err
 				}
 
-				err = jrnl.Append(ss.Bytes())
+				enc, err := karigo.Encode(0, ss)
+				if err != nil {
+					return err
+				}
+
+				err = jrnl.Append(enc)
 				if err != nil {
 					return err
 				}
@@ -59,7 +63,12 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 					return err
 				}
 
-				err = jrnl.Append(karigo.Entry(s).Bytes())
+				enc, err := karigo.Encode(0, karigo.Entry(s))
+				if err != nil {
+					return err
+				}
+
+				err = jrnl.Append(enc)
 				if err != nil {
 					return err
 				}
@@ -146,9 +155,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 		journalOut := []byte{}
 
 		for _, entry := range entries {
-			ops := karigo.Entry{}
-
-			err := json.Unmarshal(entry, &ops)
+			ops, err := karigo.Decode(0, entry)
 			if err != nil {
 				return err
 			}

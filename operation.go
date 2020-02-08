@@ -1,7 +1,6 @@
 package karigo
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -41,16 +40,6 @@ func (o Op) String() string {
 }
 
 type Entry []Op
-
-// Bytes ...
-func (e Entry) Bytes() []byte {
-	b, err := json.Marshal(e)
-	if err != nil {
-		panic(fmt.Errorf("can't get Entry bytes: %s", err))
-	}
-
-	return b
-}
 
 // NewOpSet ...
 func NewOpSet(set, id, field string, v interface{}) Op {

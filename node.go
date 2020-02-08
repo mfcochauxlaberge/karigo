@@ -301,8 +301,13 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
+		enc, err := Encode(0, cp.ops)
+		if err != nil {
+			panic(fmt.Errorf("could not encode ops: %s", err))
+		}
+
 		// Commit the entry
-		err = n.journal.Append(cp.ops.Bytes())
+		err = n.journal.Append(enc)
 		if err != nil {
 			panic(fmt.Errorf("could not append: %s", err))
 		}
