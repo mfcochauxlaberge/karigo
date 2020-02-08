@@ -8,7 +8,7 @@ import (
 )
 
 // Encode ...
-func Encode(v uint, e Entry) ([]byte, error) {
+func Encode(v uint, ops []Op) ([]byte, error) {
 	var (
 		enc []byte
 		err error
@@ -17,7 +17,7 @@ func Encode(v uint, e Entry) ([]byte, error) {
 	switch v {
 	case 0:
 		// Version 0
-		enc, err = msgpack.Marshal(e)
+		enc, err = msgpack.Marshal(ops)
 		if err != nil {
 			return nil, fmt.Errorf("cannot encode: %s", err)
 		}
@@ -29,17 +29,17 @@ func Encode(v uint, e Entry) ([]byte, error) {
 }
 
 // Decode ...
-func Decode(v uint, raw []byte) (Entry, error) {
+func Decode(v uint, raw []byte) ([]Op, error) {
 	if len(raw) == 0 {
 		return nil, errors.New("no bytes")
 	}
 
-	e := Entry{}
+	ops := []Op{}
 
 	switch v {
 	case 0:
 		// Version 0
-		err := msgpack.Unmarshal(raw, &e)
+		err := msgpack.Unmarshal(raw, &ops)
 		if err != nil {
 			return nil, fmt.Errorf("cannot decode: %s", err)
 		}
@@ -47,5 +47,5 @@ func Decode(v uint, raw []byte) (Entry, error) {
 		return nil, errors.New("unsupported version")
 	}
 
-	return e, nil
+	return ops, nil
 }

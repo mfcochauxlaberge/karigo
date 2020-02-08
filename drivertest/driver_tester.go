@@ -41,7 +41,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
 			case karigo.Op:
-				ss := karigo.Entry{s}
+				ss := []karigo.Op{s}
 
 				err := tx.Apply(ss)
 				if err != nil {
@@ -63,7 +63,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 					return err
 				}
 
-				enc, err := karigo.Encode(0, karigo.Entry(s))
+				enc, err := karigo.Encode(0, s)
 				if err != nil {
 					return err
 				}

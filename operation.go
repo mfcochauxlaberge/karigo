@@ -59,8 +59,6 @@ func (o Op) String() string {
 	)
 }
 
-type Entry []Op
-
 // NewOpSet ...
 func NewOpSet(set, id, field string, v interface{}) Op {
 	return Op{
