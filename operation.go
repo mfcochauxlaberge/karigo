@@ -8,11 +8,31 @@ import (
 
 // Operations
 const (
-	OpSet      = '='
-	OpAdd      = '+'
+	// OpSet means that the key must be set
+	// to the value.
+	OpSet = '='
+
+	// OpAdd means that the key must be
+	// incremented by the value. If the new
+	// value is above its maximum, the key
+	// must be set to that maximum.
+	OpAdd = '+'
+
+	// OpSubtract means that the key must
+	// be decremented by the value. If the
+	// new value is under its minimum, the
+	// key must be set to that minimum.
 	OpSubtract = '-'
-	OpInsert   = '>'
-	OpRemove   = '<'
+
+	// OpInsert means that the value must
+	// be added to the set represented by
+	// the key if it is not present.
+	OpInsert = '>'
+
+	// OpRemove means that the value must
+	// be removed from the set represented
+	// by the key if it is present.
+	OpRemove = '<'
 )
 
 // Op ...
