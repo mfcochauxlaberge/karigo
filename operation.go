@@ -74,8 +74,8 @@ func NewOpSet(set, id, field string, v interface{}) Op {
 	}
 }
 
-// NewOpAdd ...
-func NewOpAdd(set, id, field string, v interface{}) Op {
+// NewOpInsert ...
+func NewOpInsert(set, id, field string, v interface{}) Op {
 	return Op{
 		Key: Key{
 			Set:   set,
@@ -160,7 +160,7 @@ func NewOpCreateAttr(set, name, typ string, null bool) []Op {
 		NewOpSet("0_attrs", id, "set", set),
 		NewOpSet("0_attrs", id, "created", true),
 		NewOpSet("0_attrs", id, "active", false),
-		NewOpAdd("0_sets", set, "attrs", id),
+		NewOpInsert("0_sets", set, "attrs", id),
 	}
 }
 
@@ -214,7 +214,7 @@ func NewOpCreateRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool
 		NewOpSet("0_rels", id, "from-one", fromOne),
 		NewOpSet("0_rels", id, "created", true),
 		NewOpSet("0_rels", id, "active", false),
-		NewOpAdd("0_sets", fromSet, "rels", id),
+		NewOpInsert("0_sets", fromSet, "rels", id),
 	}
 }
 
