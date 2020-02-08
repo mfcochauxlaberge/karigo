@@ -74,6 +74,32 @@ func NewOpSet(set, id, field string, v interface{}) Op {
 	}
 }
 
+// NewOpAdd ...
+func NewOpAdd(set, id, field string, v interface{}) Op {
+	return Op{
+		Key: Key{
+			Set:   set,
+			ID:    id,
+			Field: field,
+		},
+		Op:    OpAdd,
+		Value: v,
+	}
+}
+
+// NewOpSubtract ...
+func NewOpSubtract(set, id, field string, v interface{}) Op {
+	return Op{
+		Key: Key{
+			Set:   set,
+			ID:    id,
+			Field: field,
+		},
+		Op:    OpSubtract,
+		Value: v,
+	}
+}
+
 // NewOpInsert ...
 func NewOpInsert(set, id, field string, v interface{}) Op {
 	return Op{
@@ -83,6 +109,19 @@ func NewOpInsert(set, id, field string, v interface{}) Op {
 			Field: field,
 		},
 		Op:    OpInsert,
+		Value: v,
+	}
+}
+
+// NewOpRemove ...
+func NewOpRemove(set, id, field string, v interface{}) Op {
+	return Op{
+		Key: Key{
+			Set:   set,
+			ID:    id,
+			Field: field,
+		},
+		Op:    OpRemove,
 		Value: v,
 	}
 }
