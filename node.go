@@ -196,9 +196,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		switch res.GetType().Name {
 		case "0_sets":
 			res.SetID(res.Get("name").(string))
-			ops = NewOpAddSet(res.GetID())
+			ops = NewOpCreateSet(res.GetID())
 		case "0_attrs":
-			ops = NewOpAddAttr(
+			ops = NewOpCreateAttr(
 				res.GetToOne("set"),
 				res.Get("name").(string),
 				res.Get("type").(string),
@@ -206,7 +206,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		case "0_rels":
-			ops = NewOpAddRel(
+			ops = NewOpCreateRel(
 				res.GetToOne("from-set"),
 				res.Get("from-name").(string),
 				res.GetToOne("to-set"),
@@ -216,7 +216,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		default:
-			ops = NewOpInsertRes(res)
+			ops = NewOpCreateRes(res)
 		}
 
 		found, _ := cp.tx.Resource(QueryRes{

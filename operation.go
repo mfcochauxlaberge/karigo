@@ -87,8 +87,8 @@ func NewOpAdd(set, id, field string, v interface{}) Op {
 	}
 }
 
-// NewOpInsertRes ...
-func NewOpInsertRes(res jsonapi.Resource) []Op {
+// NewOpCreateRes ...
+func NewOpCreateRes(res jsonapi.Resource) []Op {
 	set := res.GetType().Name
 	id := res.GetID()
 	ops := []Op{}
@@ -116,8 +116,8 @@ func NewOpInsertRes(res jsonapi.Resource) []Op {
 	return ops
 }
 
-// NewOpAddSet ...
-func NewOpAddSet(set string) []Op {
+// NewOpCreateSet ...
+func NewOpCreateSet(set string) []Op {
 	return []Op{
 		NewOpSet("0_sets", "", "id", set),
 		NewOpSet("0_sets", set, "name", set),
@@ -148,8 +148,8 @@ func NewOpDeactivateSet(set string) []Op {
 	}
 }
 
-// NewOpAddAttr ...
-func NewOpAddAttr(set, name, typ string, null bool) []Op {
+// NewOpCreateAttr ...
+func NewOpCreateAttr(set, name, typ string, null bool) []Op {
 	id := set + "_" + name
 
 	return []Op{
@@ -191,8 +191,8 @@ func NewOpDeactivateAttr(set, name string) []Op {
 	}
 }
 
-// NewOpAddRel ...
-func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
+// NewOpCreateRel ...
+func NewOpCreateRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
 	id := fromSet + "_" + fromName
 
 	if toName != "" {
