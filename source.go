@@ -6,6 +6,8 @@ package karigo
 // Each of the interface's methods have comments to explain how to implement a
 // Source. See the current implementations for more details.
 type Source interface {
+	Service
+
 	// Reset wipes all data and brings the underlying database
 	// to a clean state.
 	//

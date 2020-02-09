@@ -2,6 +2,8 @@ package karigo
 
 // Journal ...
 type Journal interface {
+	Service
+
 	// Append appends an entry to the journal.
 	Append([]byte) error
 

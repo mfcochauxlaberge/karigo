@@ -17,6 +17,16 @@ type Journal struct {
 	m sync.Mutex
 }
 
+// Connect implements the corresponding method of karigo.Journal.
+func (j *Journal) Connect(_ map[string]string) error {
+	return nil
+}
+
+// Ping implements the corresponding method of karigo.Journal.
+func (j *Journal) Ping() bool {
+	return true
+}
+
 // Append implements the corresponding method of karigo.Journal.
 func (j *Journal) Append(c []byte) error {
 	j.m.Lock()
