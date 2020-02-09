@@ -38,5 +38,6 @@ type Journal interface {
 
 // source is a thin convenient wrapper for a Journal.
 type journal struct {
-	jrnl Journal
+	jrnl  Journal
+	alive bool
 }

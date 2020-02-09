@@ -58,6 +58,12 @@ type Node struct {
 
 // Handle ...
 func (n *Node) Handle(r *Request) *jsonapi.Document {
+	if !n.journal.alive || !n.main.alive {
+		if !n.connect() {
+			panic("cannot connect to necessary services")
+		}
+	}
+
 	var (
 		res jsonapi.Resource
 		doc = &jsonapi.Document{}
@@ -311,11 +317,13 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		// Commit the entry
 		err = n.journal.jrnl.Append(enc)
 		if err != nil {
+			n.journal.alive = false
 			panic(fmt.Errorf("could not append: %s", err))
 		}
 
 		err = cp.commit()
 		if err != nil {
+			n.main.alive = false
 			panic(fmt.Errorf("could not commit: %s", err))
 		}
 
@@ -345,4 +353,29 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	return doc
+}
+
+func (n *Node) connect() bool {
+	n.Lock()
+	defer n.Unlock()
+
+	if !n.main.alive {
+		err := n.main.src.Connect(nil)
+		if err != nil {
+			return false
+		}
+
+		n.main.alive = true
+	}
+
+	if !n.journal.alive {
+		err := n.journal.jrnl.Connect(nil)
+		if err != nil {
+			return false
+		}
+
+		n.journal.alive = true
+	}
+
+	return true
 }

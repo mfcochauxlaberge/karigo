@@ -20,7 +20,8 @@ type Source interface {
 
 // source is a thin convenient wrapper for a Source.
 type source struct {
-	src Source
+	src   Source
+	alive bool
 	// versions map[string]uint64
 	// node     *Node
 }
