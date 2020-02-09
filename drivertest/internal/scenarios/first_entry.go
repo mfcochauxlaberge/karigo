@@ -7,7 +7,7 @@ func init() {
 		Scenario{
 			Name: "first_entry",
 			Steps: []interface{}{
-				karigo.NewOpAddSet("type_name"),
+				karigo.NewOpCreateSet("type_name"),
 				karigo.NewOpActivateSet("type_name"),
 			},
 		},

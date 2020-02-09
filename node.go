@@ -13,9 +13,11 @@ import (
 )
 
 // NewNode ...
-func NewNode(journal Journal, src Source) *Node {
+func NewNode(jrnl Journal, src Source) *Node {
 	node := &Node{
-		journal: journal,
+		journal: journal{
+			jrnl: jrnl,
+		},
 		main: source{
 			src: src,
 		},
@@ -38,7 +40,7 @@ type Node struct {
 	Domains []string
 
 	// Run
-	journal Journal
+	journal journal
 	main    source
 
 	// Schema
@@ -56,6 +58,12 @@ type Node struct {
 
 // Handle ...
 func (n *Node) Handle(r *Request) *jsonapi.Document {
+	if !n.journal.alive || !n.main.alive {
+		if !n.connect() {
+			panic("cannot connect to necessary services")
+		}
+	}
+
 	var (
 		res jsonapi.Resource
 		doc = &jsonapi.Document{}
@@ -196,9 +204,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		switch res.GetType().Name {
 		case "0_sets":
 			res.SetID(res.Get("name").(string))
-			ops = NewOpAddSet(res.GetID())
+			ops = NewOpCreateSet(res.GetID())
 		case "0_attrs":
-			ops = NewOpAddAttr(
+			ops = NewOpCreateAttr(
 				res.GetToOne("set"),
 				res.Get("name").(string),
 				res.Get("type").(string),
@@ -206,7 +214,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		case "0_rels":
-			ops = NewOpAddRel(
+			ops = NewOpCreateRel(
 				res.GetToOne("from-set"),
 				res.Get("from-name").(string),
 				res.GetToOne("to-set"),
@@ -216,7 +224,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		default:
-			ops = NewOpInsert(res)
+			ops = NewOpCreateRes(res)
 		}
 
 		found, _ := cp.tx.Resource(QueryRes{
@@ -301,14 +309,21 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
-		// Commit the entry
-		err = n.journal.Append(cp.ops.Bytes())
+		enc, err := Encode(0, cp.ops)
 		if err != nil {
+			panic(fmt.Errorf("could not encode ops: %s", err))
+		}
+
+		// Commit the entry
+		err = n.journal.jrnl.Append(enc)
+		if err != nil {
+			n.journal.alive = false
 			panic(fmt.Errorf("could not append: %s", err))
 		}
 
 		err = cp.commit()
 		if err != nil {
+			n.main.alive = false
 			panic(fmt.Errorf("could not commit: %s", err))
 		}
 
@@ -338,4 +353,29 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	return doc
+}
+
+func (n *Node) connect() bool {
+	n.Lock()
+	defer n.Unlock()
+
+	if !n.main.alive {
+		err := n.main.src.Connect(nil)
+		if err != nil {
+			return false
+		}
+
+		n.main.alive = true
+	}
+
+	if !n.journal.alive {
+		err := n.journal.jrnl.Connect(nil)
+		if err != nil {
+			return false
+		}
+
+		n.journal.alive = true
+	}
+
+	return true
 }

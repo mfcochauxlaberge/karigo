@@ -29,7 +29,7 @@ func TestNode(t *testing.T) {
 
 	tx, _ := src.NewTx()
 
-	_ = tx.Apply(NewOpAddSet("things"))
+	_ = tx.Apply(NewOpCreateSet("things"))
 	_ = tx.Apply(NewOpActivateSet("things"))
 
 	// Journal

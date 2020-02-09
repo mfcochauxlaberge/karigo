@@ -2,6 +2,8 @@ package karigo
 
 // Journal ...
 type Journal interface {
+	Service
+
 	// Append appends an entry to the journal.
 	Append([]byte) error
 
@@ -32,4 +34,10 @@ type Journal interface {
 	// whether it is because the journal's history starts
 	// after f or t is greater than the newest index.
 	Range(f uint, t uint) ([][]byte, error)
+}
+
+// source is a thin convenient wrapper for a Journal.
+type journal struct {
+	jrnl  Journal
+	alive bool
 }

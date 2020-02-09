@@ -17,6 +17,16 @@ type Source struct {
 	sync.Mutex
 }
 
+// Connect ...
+func (s *Source) Connect(_ map[string]string) error {
+	return nil
+}
+
+// Ping ...
+func (s *Source) Ping() bool {
+	return true
+}
+
 // Reset ...
 func (s *Source) Reset() error {
 	s.Lock()
