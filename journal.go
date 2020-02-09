@@ -35,3 +35,8 @@ type Journal interface {
 	// after f or t is greater than the newest index.
 	Range(f uint, t uint) ([][]byte, error)
 }
+
+// source is a thin convenient wrapper for a Journal.
+type journal struct {
+	jrnl Journal
+}

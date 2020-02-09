@@ -13,9 +13,11 @@ import (
 )
 
 // NewNode ...
-func NewNode(journal Journal, src Source) *Node {
+func NewNode(jrnl Journal, src Source) *Node {
 	node := &Node{
-		journal: journal,
+		journal: journal{
+			jrnl: jrnl,
+		},
 		main: source{
 			src: src,
 		},
@@ -38,7 +40,7 @@ type Node struct {
 	Domains []string
 
 	// Run
-	journal Journal
+	journal journal
 	main    source
 
 	// Schema
@@ -307,7 +309,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 
 		// Commit the entry
-		err = n.journal.Append(enc)
+		err = n.journal.jrnl.Append(enc)
 		if err != nil {
 			panic(fmt.Errorf("could not append: %s", err))
 		}
