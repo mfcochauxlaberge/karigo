@@ -3,17 +3,13 @@ package psql
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v4"
 )
 
 // NewJournal ...
 func NewJournal(c string) (*Journal, error) {
-	conn, err := pgx.Connect(context.Background(), c)
-	if err != nil {
-		return nil, err
-	}
-
 	jrnl := &Journal{
 		conn: conn,
 	}
@@ -27,13 +23,35 @@ type Journal struct {
 }
 
 // Connect implements the corresponding method of karigo.Journal.
-func (j *Journal) Connect(_ map[string]string) error {
+//
+// Params:
+//  - user
+//  - password
+//  - addr (hostname and port)
+func (j *Journal) Connect(params map[string]string) error {
+	s := fmt.Sprintf(
+		"postgresql://%s:%s@%s",
+		params["user"],
+		params["password"],
+		params["addr"],
+	)
+
+	conn, err := pgx.Connect(context.Background(), s)
+	if err != nil {
+		return nil, err
+	}
+
 	return nil
 }
 
 // Ping implements the corresponding method of karigo.Journal.
 func (j *Journal) Ping() bool {
-	return true
+	if j.conn != nil {
+		j.conn.Ping(context.Background())
+		return err == nil
+	}
+
+	return false
 }
 
 // Append implements the corresponding method of karigo.Journal.
