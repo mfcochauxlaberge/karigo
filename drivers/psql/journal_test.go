@@ -25,7 +25,9 @@ func TestJournalSource(t *testing.T) {
 	assert := assert.New(t)
 
 	jrnl, err := psql.NewJournal("postgresql://test:test@localhost")
-	assert.NoError(err)
+	if err != nil {
+		t.Skipf("psql journal test skipped: %s", err)
+	}
 
 	err = jrnl.Append([]byte("abc"))
 	assert.NoError(err)
