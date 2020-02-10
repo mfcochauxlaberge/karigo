@@ -1,9 +1,10 @@
-package memory
+package memory_test
 
 import (
 	"testing"
 
 	"github.com/mfcochauxlaberge/karigo/drivertest"
+	. "github.com/mfcochauxlaberge/karigo/memory"
 )
 
 func TestMemorySource(t *testing.T) {
