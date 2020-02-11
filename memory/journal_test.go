@@ -8,7 +8,7 @@ import (
 	. "github.com/mfcochauxlaberge/karigo/memory"
 )
 
-var _ = (karigo.Journal)(nil)
+var _ karigo.Journal = (*Journal)(nil)
 
 func TestJournal(t *testing.T) {
 	jrnl := &Journal{}
