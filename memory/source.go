@@ -8,8 +8,6 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
-var _ karigo.Source = (*Source)(nil)
-
 // Source ...
 type Source struct {
 	sets map[string]*jsonapi.SoftCollection
