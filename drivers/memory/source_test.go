@@ -1,17 +1,18 @@
-package memory
+package memory_test
 
 import (
 	"testing"
 
+	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/drivertest"
+	. "github.com/mfcochauxlaberge/karigo/memory"
 )
+
+var _ karigo.Source = (*Source)(nil)
 
 func TestMemorySource(t *testing.T) {
 	src := &Source{}
 	jrnl := &Journal{}
 
-	err := drivertest.Test(t, src, jrnl)
-	if err != nil {
-		t.Errorf("Source %T failed: %s", src, err)
-	}
+	drivertest.Test(t, src, jrnl)
 }

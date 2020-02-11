@@ -4,6 +4,10 @@ package karigo
 type Journal interface {
 	Service
 
+	// Reset empties the whole journal. The next append
+	// will add an entry add index 0.
+	Reset() error
+
 	// Append appends an entry to the journal.
 	Append([]byte) error
 

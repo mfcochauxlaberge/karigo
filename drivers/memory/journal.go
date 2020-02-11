@@ -17,6 +17,17 @@ type Journal struct {
 	m sync.Mutex
 }
 
+// Reset implements the corresponding method of karigo.Journal.
+func (j *Journal) Reset() error {
+	j.m.Lock()
+	defer j.m.Unlock()
+
+	j.log = [][]byte{}
+	j.start = 0
+
+	return nil
+}
+
 // Connect implements the corresponding method of karigo.Journal.
 func (j *Journal) Connect(_ map[string]string) error {
 	return nil

@@ -1,7 +1,6 @@
 package drivertest
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -15,7 +14,7 @@ import (
 )
 
 // Test ...
-func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
+func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 	assert := assert.New(t)
 
 	scenarios := scenarios.Scenarios
@@ -31,9 +30,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 	for _, scenario := range scenarios {
 		// Reset
 		err := src.Reset()
-		if err != nil {
-			return err
-		}
+		assert.NoError(err)
 
 		tx, _ := src.NewTx()
 
@@ -44,36 +41,26 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 				ss := []karigo.Op{s}
 
 				err := tx.Apply(ss)
-				if err != nil {
-					return err
-				}
+				assert.NoError(err)
 
 				enc, err := karigo.Encode(0, ss)
-				if err != nil {
-					return err
-				}
+				assert.NoError(err)
 
 				err = jrnl.Append(enc)
-				if err != nil {
-					return err
-				}
+				assert.NoError(err)
+
 			case []karigo.Op:
 				err := tx.Apply(s)
-				if err != nil {
-					return err
-				}
+				assert.NoError(err)
 
 				enc, err := karigo.Encode(0, s)
-				if err != nil {
-					return err
-				}
+				assert.NoError(err)
 
 				err = jrnl.Append(enc)
-				if err != nil {
-					return err
-				}
+				assert.NoError(err)
+
 			default:
-				return errors.New("karigo: unknown step")
+				panic("karigo: unknown step")
 			}
 		}
 
@@ -88,9 +75,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 			PageNumber: 0,
 			PageSize:   1000,
 		})
-		if err != nil {
-			return fmt.Errorf("could not get list of sets: %s", err)
-		}
+		assert.NoError(err)
 
 		for i := 0; i < sets.Len(); i++ {
 			set := sets.At(i)
@@ -102,9 +87,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 				PageNumber: 0,
 				PageSize:   1000,
 			})
-			if err != nil {
-				return fmt.Errorf("could not get collection from %q: %s", id, err)
-			}
+			assert.NoError(err)
 
 			// For each resource...
 			for j := 0; j < col.Len(); j++ {
@@ -144,8 +127,8 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 		err = runner.Test(filename, out)
 		if _, ok := err.(gold.ComparisonError); ok {
 			assert.Fail("file is different", scenario.Name)
-		} else if err != nil {
-			panic(err)
+		} else {
+			assert.NoError(err)
 		}
 
 		// Test journal
@@ -156,9 +139,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 
 		for _, entry := range entries {
 			ops, err := karigo.Decode(0, entry)
-			if err != nil {
-				return err
-			}
+			assert.NoError(err)
 
 			for _, op := range ops {
 				journalOut = append(journalOut, []byte(op.String())...)
@@ -175,10 +156,8 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) error {
 		err = runner.Test(filename, journalOut)
 		if _, ok := err.(gold.ComparisonError); ok {
 			assert.Fail("file is different", scenario.Name)
-		} else if err != nil {
-			panic(err)
+		} else {
+			assert.NoError(err)
 		}
 	}
-
-	return nil
 }
