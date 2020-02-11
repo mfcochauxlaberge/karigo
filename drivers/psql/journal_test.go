@@ -5,6 +5,7 @@ import (
 
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/drivers/psql"
+	"github.com/mfcochauxlaberge/karigo/drivertest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,14 +22,25 @@ var _ karigo.Journal = (*psql.Journal)(nil)
 // 	m.Run()
 // }
 
-func TestJournalSource(t *testing.T) {
+func TestJournal(t *testing.T) {
 	assert := assert.New(t)
 
-	jrnl, err := psql.NewJournal("postgresql://test:test@localhost")
+	jrnl := &psql.Journal{}
+
+	err := jrnl.Connect(map[string]string{
+		"addr":     "127.0.0.1",
+		"user":     "test",
+		"password": "test",
+		"database": "test_journal",
+	})
 	if err != nil {
 		t.Skipf("psql journal test skipped: %s", err)
 	}
 
-	err = jrnl.Append([]byte("abc"))
+	err = jrnl.Reset()
 	assert.NoError(err)
+
+	assert.Equal(1, 2)
+
+	drivertest.TestJournal(t, jrnl)
 }
