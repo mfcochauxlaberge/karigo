@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/mfcochauxlaberge/karigo"
+	. "github.com/mfcochauxlaberge/karigo/drivers/memory"
 	"github.com/mfcochauxlaberge/karigo/drivertest"
-	. "github.com/mfcochauxlaberge/karigo/memory"
 )
 
 var _ karigo.Journal = (*Journal)(nil)

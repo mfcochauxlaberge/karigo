@@ -5,7 +5,7 @@ import (
 
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/drivertest"
-	. "github.com/mfcochauxlaberge/karigo/memory"
+	. "github.com/mfcochauxlaberge/karigo/drivers/memory"
 )
 
 var _ karigo.Source = (*Source)(nil)

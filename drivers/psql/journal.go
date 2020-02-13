@@ -22,16 +22,29 @@ type Journal struct {
 //  - database
 func (j *Journal) Connect(params map[string]string) error {
 	s := fmt.Sprintf(
-		"postgresql://%s:%s@%s/%s",
+		"postgresql://%s:%s@%s/%s?search_path=%s",
 		params["user"],
 		params["password"],
 		params["addr"],
 		params["database"],
+		params["schema"],
 	)
 
 	conn, err := pgx.Connect(context.Background(), s)
 	if err != nil {
 		return err
+	}
+
+	// Table
+	_, err = conn.Exec(
+		context.Background(),
+		`CREATE TABLE journal (
+			index BIGINT PRIMARY KEY,
+			entry BYTEA
+		)`,
+	)
+	if err != nil {
+		panic(err)
 	}
 
 	j.conn = conn
