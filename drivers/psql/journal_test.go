@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v4"
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/drivers/psql"
 	"github.com/mfcochauxlaberge/karigo/drivertest"
+
+	"github.com/jackc/pgx/v4"
 )
 
 var _ karigo.Journal = (*psql.Journal)(nil)
