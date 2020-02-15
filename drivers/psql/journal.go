@@ -10,8 +10,8 @@ import (
 
 // Journal is the PostgreSQL implementation of karigo.Journal.
 type Journal struct {
-	index uint
-	conn  *pgx.Conn
+	nextIndex uint
+	conn      *pgx.Conn
 }
 
 // Connect implements the corresponding method of karigo.Journal.
@@ -78,7 +78,7 @@ func (j *Journal) Connect(params map[string]string) error {
 		return err
 	}
 
-	j.index = index
+	j.nextIndex = index + 1
 	j.conn = conn
 
 	return nil
@@ -105,7 +105,7 @@ func (j *Journal) Reset() error {
 		return err
 	}
 
-	j.index = 0
+	j.nextIndex = 0
 
 	return nil
 }
@@ -119,13 +119,13 @@ func (j *Journal) Append(c []byte) error {
 	_, err := j.conn.Exec(
 		context.Background(),
 		`INSERT INTO "journal" (index, entry) VALUES ($1, $2)`,
-		j.index, c,
+		j.nextIndex, c,
 	)
 	if err != nil {
 		return err
 	}
 
-	j.index++
+	j.nextIndex++
 
 	return nil
 }
@@ -192,7 +192,7 @@ func (j *Journal) At(i uint) ([]byte, error) {
 	err := row.Scan(&entry)
 	if err == pgx.ErrNoRows {
 		return nil, errors.New("karigo: index does not exist")
-	} else if err != nil && err != pgx.ErrNoRows {
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -205,8 +205,8 @@ func (j *Journal) At(i uint) ([]byte, error) {
 
 // Cut implements the corresponding method of karigo.Journal.
 func (j *Journal) Cut(i uint) error {
-	if i > j.index {
-		i = j.index
+	if i > j.nextIndex-1 {
+		i = j.nextIndex - 1
 	}
 
 	_, err := j.conn.Exec(
@@ -223,5 +223,44 @@ func (j *Journal) Cut(i uint) error {
 
 // Range implements the corresponding method of karigo.Journal.
 func (j *Journal) Range(f, t uint) ([][]byte, error) {
-	return nil, nil
+	switch {
+	case f > t:
+		panic("f > t")
+	case t >= j.nextIndex:
+		return nil, fmt.Errorf("journal has no entry at index %d yet", t)
+	case f == t:
+		return [][]byte{}, nil
+	}
+
+	rows, err := j.conn.Query(
+		context.Background(),
+		`
+		SELECT "entry"
+		FROM "journal"
+		WHERE index >= $1
+		AND index <= $2
+		`,
+		f, t,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	entries := make([][]byte, 0, t-f+1)
+	for rows.Next() {
+		var entry []byte
+		err := rows.Scan(&entry)
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, entry)
+	}
+
+	if len(entries) == 0 && f < t {
+		return nil, errors.New("no entries found")
+	} else if uint(len(entries)) != t-f+1 {
+		return nil, errors.New("range outside boundaries")
+	}
+
+	return entries, nil
 }

@@ -95,13 +95,13 @@ func testCut(t *testing.T, jrnl karigo.Journal) {
 		_ = jrnl.Append([]byte(data))
 	}
 
-	v, entry, _ = jrnl.Oldest()
+	v, entry, _ = jrnl.Newest()
 	assert.Equal(99, int(v))
 	assert.Equal([]byte("99"), entry)
 
 	// Cut after newest index
 	assert.NoError(jrnl.Cut(999))
-	v, entry, _ = jrnl.Oldest()
+	v, entry, _ = jrnl.Newest()
 	assert.Equal(99, int(v))
 	assert.Equal([]byte("99"), entry)
 
