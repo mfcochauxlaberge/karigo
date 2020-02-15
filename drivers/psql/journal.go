@@ -46,6 +46,7 @@ func (j *Journal) Connect(params map[string]string) error {
 	)
 
 	var name string
+
 	err = row.Scan(&name)
 	if err != nil && err != pgx.ErrNoRows {
 		return fmt.Errorf("journal table does not exist")
@@ -74,6 +75,7 @@ func (j *Journal) Connect(params map[string]string) error {
 
 	var index uint
 	err = row.Scan(&index)
+
 	if err != nil && err != pgx.ErrNoRows {
 		return err
 	}
@@ -141,6 +143,7 @@ func (j *Journal) Oldest() (uint, []byte, error) {
 		index uint
 		entry []byte
 	)
+
 	err := row.Scan(&index, &entry)
 	if err == pgx.ErrNoRows {
 		return 0, nil, errors.New("karigo: journal is empty")
@@ -166,6 +169,7 @@ func (j *Journal) Newest() (uint, []byte, error) {
 		index uint
 		entry []byte
 	)
+
 	err := row.Scan(&index, &entry)
 	if err == pgx.ErrNoRows {
 		return 0, nil, errors.New("karigo: journal is empty")
@@ -189,6 +193,7 @@ func (j *Journal) At(i uint) ([]byte, error) {
 	)
 
 	var entry []byte
+
 	err := row.Scan(&entry)
 	if err == pgx.ErrNoRows {
 		return nil, errors.New("karigo: index does not exist")
@@ -247,12 +252,15 @@ func (j *Journal) Range(f, t uint) ([][]byte, error) {
 	}
 
 	entries := make([][]byte, 0, t-f+1)
+
 	for rows.Next() {
 		var entry []byte
+
 		err := rows.Scan(&entry)
 		if err != nil {
 			return nil, err
 		}
+
 		entries = append(entries, entry)
 	}
 
