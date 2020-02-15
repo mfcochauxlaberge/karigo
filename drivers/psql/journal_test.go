@@ -19,7 +19,7 @@ func TestJournal(t *testing.T) {
 	err := jrnl.Connect(map[string]string{
 		"addr":     "127.0.0.1",
 		"user":     "postgres",
-		"password": "postgres",
+		"password": "",
 		"database": "postgres",
 	})
 	if err != nil {
@@ -32,7 +32,7 @@ func TestJournal(t *testing.T) {
 	s := fmt.Sprintf(
 		"postgresql://%s:%s@%s/%s",
 		"postgres",
-		"postgres",
+		"",
 		"127.0.0.1",
 		"postgres",
 	)
