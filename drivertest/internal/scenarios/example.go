@@ -10,29 +10,29 @@ func init() {
 			Name: "example",
 			Steps: []interface{}{
 				// Users
-				karigo.NewOpAddSet("users"),
+				karigo.NewOpCreateSet("users"),
 				karigo.NewOpActivateSet("users"),
-				karigo.NewOpAddAttr("users", "username", "string", false),
+				karigo.NewOpCreateAttr("users", "username", "string", false),
 				karigo.NewOpActivateAttr("users", "username"),
-				karigo.NewOpAddAttr("users", "password", "string", false),
+				karigo.NewOpCreateAttr("users", "password", "string", false),
 				karigo.NewOpActivateAttr("users", "password"),
-				karigo.NewOpAddAttr("users", "created-at", "time", false),
+				karigo.NewOpCreateAttr("users", "created-at", "time", false),
 				karigo.NewOpActivateAttr("users", "created-at"),
 
 				// Articles
-				karigo.NewOpAddSet("articles"),
+				karigo.NewOpCreateSet("articles"),
 				karigo.NewOpActivateSet("articles"),
-				karigo.NewOpAddAttr("articles", "title", "string", false),
+				karigo.NewOpCreateAttr("articles", "title", "string", false),
 				karigo.NewOpActivateAttr("articles", "title"),
-				karigo.NewOpAddAttr("articles", "content", "string", false),
+				karigo.NewOpCreateAttr("articles", "content", "string", false),
 				karigo.NewOpActivateAttr("articles", "content"),
-				karigo.NewOpAddAttr("articles", "created-at", "string", false),
+				karigo.NewOpCreateAttr("articles", "created-at", "string", false),
 				karigo.NewOpActivateAttr("articles", "created-at"),
-				karigo.NewOpAddAttr("articles", "updated-at", "string", false),
+				karigo.NewOpCreateAttr("articles", "updated-at", "string", false),
 				karigo.NewOpActivateAttr("articles", "updated-at"),
 
 				// Relationships
-				karigo.NewOpAddRel(
+				karigo.NewOpCreateRel(
 					"users",
 					"articles",
 					"articles",

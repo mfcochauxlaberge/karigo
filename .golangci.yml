@@ -60,7 +60,7 @@ issues:
       linters:
         - gochecknoglobals
 
-    - path: sourcetest
+    - path: drivertest
       linters:
         - gochecknoglobals
         - gochecknoinits

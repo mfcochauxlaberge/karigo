@@ -1,7 +1,6 @@
 package karigo
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -9,8 +8,31 @@ import (
 
 // Operations
 const (
+	// OpSet means that the key must be set
+	// to the value.
 	OpSet = '='
-	OpAdd = '&'
+
+	// OpAdd means that the key must be
+	// incremented by the value. If the new
+	// value is above its maximum, the key
+	// must be set to that maximum.
+	OpAdd = '+'
+
+	// OpSubtract means that the key must
+	// be decremented by the value. If the
+	// new value is under its minimum, the
+	// key must be set to that minimum.
+	OpSubtract = '-'
+
+	// OpInsert means that the value must
+	// be added to the set represented by
+	// the key if it is not present.
+	OpInsert = '>'
+
+	// OpRemove means that the value must
+	// be removed from the set represented
+	// by the key if it is present.
+	OpRemove = '<'
 )
 
 // Op ...
@@ -35,18 +57,6 @@ func (o Op) String() string {
 		string(o.Op),
 		o.Value,
 	)
-}
-
-type Entry []Op
-
-// Bytes ...
-func (e Entry) Bytes() []byte {
-	b, err := json.Marshal(e)
-	if err != nil {
-		panic(fmt.Errorf("can't get Entry bytes: %s", err))
-	}
-
-	return b
 }
 
 // NewOpSet ...
@@ -75,8 +85,47 @@ func NewOpAdd(set, id, field string, v interface{}) Op {
 	}
 }
 
+// NewOpSubtract ...
+func NewOpSubtract(set, id, field string, v interface{}) Op {
+	return Op{
+		Key: Key{
+			Set:   set,
+			ID:    id,
+			Field: field,
+		},
+		Op:    OpSubtract,
+		Value: v,
+	}
+}
+
 // NewOpInsert ...
-func NewOpInsert(res jsonapi.Resource) []Op {
+func NewOpInsert(set, id, field string, v interface{}) Op {
+	return Op{
+		Key: Key{
+			Set:   set,
+			ID:    id,
+			Field: field,
+		},
+		Op:    OpInsert,
+		Value: v,
+	}
+}
+
+// NewOpRemove ...
+func NewOpRemove(set, id, field string, v interface{}) Op {
+	return Op{
+		Key: Key{
+			Set:   set,
+			ID:    id,
+			Field: field,
+		},
+		Op:    OpRemove,
+		Value: v,
+	}
+}
+
+// NewOpCreateRes ...
+func NewOpCreateRes(res jsonapi.Resource) []Op {
 	set := res.GetType().Name
 	id := res.GetID()
 	ops := []Op{}
@@ -104,8 +153,8 @@ func NewOpInsert(res jsonapi.Resource) []Op {
 	return ops
 }
 
-// NewOpAddSet ...
-func NewOpAddSet(set string) []Op {
+// NewOpCreateSet ...
+func NewOpCreateSet(set string) []Op {
 	return []Op{
 		NewOpSet("0_sets", "", "id", set),
 		NewOpSet("0_sets", set, "name", set),
@@ -136,8 +185,8 @@ func NewOpDeactivateSet(set string) []Op {
 	}
 }
 
-// NewOpAddAttr ...
-func NewOpAddAttr(set, name, typ string, null bool) []Op {
+// NewOpCreateAttr ...
+func NewOpCreateAttr(set, name, typ string, null bool) []Op {
 	id := set + "_" + name
 
 	return []Op{
@@ -148,7 +197,7 @@ func NewOpAddAttr(set, name, typ string, null bool) []Op {
 		NewOpSet("0_attrs", id, "set", set),
 		NewOpSet("0_attrs", id, "created", true),
 		NewOpSet("0_attrs", id, "active", false),
-		NewOpAdd("0_sets", set, "attrs", id),
+		NewOpInsert("0_sets", set, "attrs", id),
 	}
 }
 
@@ -179,8 +228,8 @@ func NewOpDeactivateAttr(set, name string) []Op {
 	}
 }
 
-// NewOpAddRel ...
-func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
+// NewOpCreateRel ...
+func NewOpCreateRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) []Op {
 	id := fromSet + "_" + fromName
 
 	if toName != "" {
@@ -202,7 +251,7 @@ func NewOpAddRel(fromSet, fromName, toSet, toName string, toOne, fromOne bool) [
 		NewOpSet("0_rels", id, "from-one", fromOne),
 		NewOpSet("0_rels", id, "created", true),
 		NewOpSet("0_rels", id, "active", false),
-		NewOpAdd("0_sets", fromSet, "rels", id),
+		NewOpInsert("0_sets", fromSet, "rels", id),
 	}
 }
 

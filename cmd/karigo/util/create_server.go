@@ -2,7 +2,7 @@ package util
 
 import (
 	"github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory"
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 )
 
 func CreateServer() *karigo.Server {

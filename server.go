@@ -62,11 +62,32 @@ func (s *Server) Run(port uint) {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestID := uuid.New().String()[:8]
 
-	// Parse domain and port
-	domain, port := domainAndPort(r.Host)
-
 	// Populate logger with rid
 	logger := s.logger.With().Str("rid", requestID).Logger()
+
+	defer func() {
+		if err := recover(); err != nil {
+			msg := ""
+
+			switch e := err.(type) {
+			case error:
+				msg = e.Error()
+			case string:
+				msg = e
+			}
+
+			errLogger := logger.Output(os.Stderr)
+			errLogger.Info().
+				Str("event", "recover").
+				Str("error", msg)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"rip"}`))
+		}
+	}()
+
+	// Parse domain and port
+	domain, port := domainAndPort(r.Host)
 
 	logger.Info().
 		Str("event", "read_request").

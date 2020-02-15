@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	. "github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory"
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
@@ -29,7 +29,7 @@ func TestNode(t *testing.T) {
 
 	tx, _ := src.NewTx()
 
-	_ = tx.Apply(NewOpAddSet("things"))
+	_ = tx.Apply(NewOpCreateSet("things"))
 	_ = tx.Apply(NewOpActivateSet("things"))
 
 	// Journal

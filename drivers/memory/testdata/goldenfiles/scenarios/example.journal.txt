@@ -11,7 +11,7 @@
 0_attrs.users_username.set = users
 0_attrs.users_username.created = true
 0_attrs.users_username.active = false
-0_sets.users.attrs & users_username
+0_sets.users.attrs > users_username
 0_attrs.users_username.active = true
 0_attrs._.id = users_password
 0_attrs.users_password.name = password
@@ -20,7 +20,7 @@
 0_attrs.users_password.set = users
 0_attrs.users_password.created = true
 0_attrs.users_password.active = false
-0_sets.users.attrs & users_password
+0_sets.users.attrs > users_password
 0_attrs.users_password.active = true
 0_attrs._.id = users_created-at
 0_attrs.users_created-at.name = created-at
@@ -29,7 +29,7 @@
 0_attrs.users_created-at.set = users
 0_attrs.users_created-at.created = true
 0_attrs.users_created-at.active = false
-0_sets.users.attrs & users_created-at
+0_sets.users.attrs > users_created-at
 0_attrs.users_created-at.active = true
 0_sets._.id = articles
 0_sets.articles.name = articles
@@ -44,7 +44,7 @@
 0_attrs.articles_title.set = articles
 0_attrs.articles_title.created = true
 0_attrs.articles_title.active = false
-0_sets.articles.attrs & articles_title
+0_sets.articles.attrs > articles_title
 0_attrs.articles_title.active = true
 0_attrs._.id = articles_content
 0_attrs.articles_content.name = content
@@ -53,7 +53,7 @@
 0_attrs.articles_content.set = articles
 0_attrs.articles_content.created = true
 0_attrs.articles_content.active = false
-0_sets.articles.attrs & articles_content
+0_sets.articles.attrs > articles_content
 0_attrs.articles_content.active = true
 0_attrs._.id = articles_created-at
 0_attrs.articles_created-at.name = created-at
@@ -62,7 +62,7 @@
 0_attrs.articles_created-at.set = articles
 0_attrs.articles_created-at.created = true
 0_attrs.articles_created-at.active = false
-0_sets.articles.attrs & articles_created-at
+0_sets.articles.attrs > articles_created-at
 0_attrs.articles_created-at.active = true
 0_attrs._.id = articles_updated-at
 0_attrs.articles_updated-at.name = updated-at
@@ -71,7 +71,7 @@
 0_attrs.articles_updated-at.set = articles
 0_attrs.articles_updated-at.created = true
 0_attrs.articles_updated-at.active = false
-0_sets.articles.attrs & articles_updated-at
+0_sets.articles.attrs > articles_updated-at
 0_attrs.articles_updated-at.active = true
 0_rels._.id = articles_author_users_articles
 0_rels.articles_author_users_articles.from-name = articles
@@ -82,13 +82,7 @@
 0_rels.articles_author_users_articles.from-one = true
 0_rels.articles_author_users_articles.created = true
 0_rels.articles_author_users_articles.active = false
-0_sets.users.rels & articles_author_users_articles
+0_sets.users.rels > articles_author_users_articles
 0_rels.articles_author_users_articles.active = true
 users._.id = abc123
 users.abc123.username = mafiaboy
-0_sets._.id = type_name
-0_sets.type_name.name = type_name
-0_sets.type_name.version = 0
-0_sets.type_name.created = true
-0_sets.type_name.active = false
-0_sets.type_name.active = true

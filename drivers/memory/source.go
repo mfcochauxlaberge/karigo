@@ -8,13 +8,21 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
-var _ karigo.Source = (*Source)(nil)
-
 // Source ...
 type Source struct {
 	sets map[string]*jsonapi.SoftCollection
 
 	sync.Mutex
+}
+
+// Connect ...
+func (s *Source) Connect(_ map[string]string) error {
+	return nil
+}
+
+// Ping ...
+func (s *Source) Ping() bool {
+	return true
 }
 
 // Reset ...
