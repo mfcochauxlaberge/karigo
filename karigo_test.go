@@ -2,6 +2,7 @@ package karigo_test
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/cmd/karigo/util"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
 
@@ -262,18 +264,22 @@ func TestKarigo(t *testing.T) {
 }
 
 func startServer() string {
-	server := util.CreateServer()
-	server.DisableLogger()
+	server := util.CreateServer(karigo.Config{
+		Host: "127.0.0.1",
+		Port: findFreePort(),
+	})
 
-	port := findFreePort()
+	fmt.Printf("karigo_test nodes: %v\n", server.Nodes)
+
+	server.DisableLogger()
 
 	// Run server
 	go func() {
-		server.Run(port)
+		server.Run()
 	}()
 	time.Sleep(100 * time.Millisecond)
 
-	return "127.0.0.1:" + strconv.Itoa(int(port))
+	return "127.0.0.1:" + strconv.Itoa(int(server.Port))
 }
 
 func do(method, host, path string, body []byte) (int, []byte, []byte, error) {

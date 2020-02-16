@@ -7,7 +7,7 @@ import (
 
 func CreateServer(config karigo.Config) *karigo.Server {
 	// Server
-	server := karigo.NewServer()
+	server := karigo.NewServer(config)
 
 	src := &memory.Source{}
 	_ = src.Reset()
@@ -17,7 +17,9 @@ func CreateServer(config karigo.Config) *karigo.Server {
 	ctlNode.Name = "main_node"
 
 	// Register node
-	for _, host := range config.Hosts {
+	server.Nodes[server.Host] = ctlNode
+
+	for _, host := range server.OtherHosts {
 		server.Nodes[host] = ctlNode
 	}
 
