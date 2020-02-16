@@ -9,6 +9,11 @@ func CreateServer(config karigo.Config) *karigo.Server {
 	// Server
 	server := karigo.NewServer(config)
 
+	// Journal
+	jrnl := &memory.Journal{}
+	_ = jrnl.Connect(nil)
+
+	// Source
 	src := &memory.Source{}
 	_ = src.Reset()
 
