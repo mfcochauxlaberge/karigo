@@ -2,7 +2,6 @@ package karigo_test
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -268,8 +267,6 @@ func startServer() string {
 		Host: "127.0.0.1",
 		Port: findFreePort(),
 	})
-
-	fmt.Printf("karigo_test nodes: %v\n", server.Nodes)
 
 	server.DisableLogger()
 
