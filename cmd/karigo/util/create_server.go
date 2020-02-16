@@ -5,7 +5,7 @@ import (
 	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 )
 
-func CreateServer() *karigo.Server {
+func CreateServer(config karigo.Config) *karigo.Server {
 	// Server
 	server := karigo.NewServer()
 
@@ -17,8 +17,9 @@ func CreateServer() *karigo.Server {
 	ctlNode.Name = "main_node"
 
 	// Register node
-	server.Nodes["127.0.0.1"] = ctlNode
-	server.Nodes["localhost"] = ctlNode
+	for _, host := range config.Hosts {
+		server.Nodes[host] = ctlNode
+	}
 
 	return server
 }
