@@ -17,8 +17,8 @@
   <a href="https://github.com/mfcochauxlaberge/karigo/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/mfcochauxlaberge/karigo?color=a33">
   </a>
-  <a href="https://godoc.org/github.com/mfcochauxlaberge/karigo">
-    <img src="https://godoc.org/github.com/golang/gddo?status.svg">
+  <a href="https://pkg.go.dev/github.com/mfcochauxlaberge/karigo?tab=doc">
+    <img src="https://img.shields.io/static/v1?label=doc&message=pkg.go.dev&color=007d9c">
   </a>
 </div>
 
