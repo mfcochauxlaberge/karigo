@@ -9,6 +9,6 @@ type Service interface {
 	// in the map.
 	Connect(map[string]string) error
 
-	// Ping reports whether there is an actice connection or not.
+	// Ping reports whether there is an active connection or not.
 	Ping() bool
 }
