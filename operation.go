@@ -1,7 +1,9 @@
 package karigo
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
@@ -34,6 +36,25 @@ const (
 	// by the key if it is present.
 	OpRemove = '<'
 )
+
+// NewOpFromString parses a string and returns the Op object it represents.
+func NewOpFromString(s string) (Op, error) {
+	parts := strings.Split(s, " ")
+
+	op := Op{}
+
+	if len(parts) < 3 {
+		return op, errors.New("cannot parse op string")
+	}
+
+	var (
+		key   = parts[0]
+		op    = parts[1]
+		value = strings.Join(parts[2:], " ")
+	)
+
+	return Op{}, nil
+}
 
 // Op ...
 type Op struct {
