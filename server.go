@@ -17,9 +17,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func NewServer() *Server {
+func NewServer(config Config) *Server {
 	s := &Server{
-		Nodes: map[string]*Node{},
+		Config: config,
+		Nodes:  map[string]*Node{},
 	}
 
 	s.logger = s.logger.
@@ -31,14 +32,16 @@ func NewServer() *Server {
 
 // Server ...
 type Server struct {
+	Config
+
 	Nodes map[string]*Node
 
 	logger zerolog.Logger
 }
 
 // Run ...
-func (s *Server) Run(port uint) {
-	s.logger.Info().Str("event", "server_start")
+func (s *Server) Run() {
+	s.logger.Info().Str("event", "server_start").Msg("Server listening")
 
 	for _, node := range s.Nodes {
 		node.logger = s.logger
@@ -52,7 +55,7 @@ func (s *Server) Run(port uint) {
 	handler := c.Handler(s)
 
 	// Listen and serve
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), handler)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", s.Port), handler)
 	if err != http.ErrServerClosed {
 		panic(err)
 	}
@@ -62,11 +65,32 @@ func (s *Server) Run(port uint) {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestID := uuid.New().String()[:8]
 
-	// Parse domain and port
-	domain, port := domainAndPort(r.Host)
-
 	// Populate logger with rid
 	logger := s.logger.With().Str("rid", requestID).Logger()
+
+	defer func() {
+		if err := recover(); err != nil {
+			msg := ""
+
+			switch e := err.(type) {
+			case error:
+				msg = e.Error()
+			case string:
+				msg = e
+			}
+
+			errLogger := logger.Output(os.Stderr)
+			errLogger.Info().
+				Str("event", "recover").
+				Str("error", msg)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"rip"}`))
+		}
+	}()
+
+	// Parse domain and port
+	domain, port := domainAndPort(r.Host)
 
 	logger.Info().
 		Str("event", "read_request").
@@ -96,8 +120,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	url, err := jsonapi.NewURLFromRaw(node.schema, r.URL.String())
 	if err != nil {
 		logger.
-			Err(err).
+			Debug().
 			Str("url", r.URL.String()).
+			Str("error", err.Error()).
 			Msg("Invalid URL")
 
 		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
@@ -118,7 +143,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Build request
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		logger.Err(err).Send()
+		logger.
+			Debug().
+			Str("error", err.Error()).
+			Send()
 
 		_ = sendResponse(w, http.StatusInternalServerError, nil, logger)
 
@@ -145,7 +173,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Marshal response
 	pl, err := jsonapi.MarshalDocument(doc, url)
 	if err != nil {
-		logger.Err(err).Send()
+		logger.
+			Debug().
+			Str("error", err.Error()).
+			Send()
 
 		_ = sendResponse(
 			w,

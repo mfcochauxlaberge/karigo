@@ -8,17 +8,7 @@ import (
 func FirstSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
 
-	typ, err := jsonapi.BuildType(meta{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(set{})
+	typ, err := jsonapi.BuildType(set{})
 	if err != nil {
 		panic(err)
 	}
@@ -48,17 +38,7 @@ func FirstSchema() *jsonapi.Schema {
 		panic(err)
 	}
 
-	typ, err = jsonapi.BuildType(log{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(op{})
+	typ, err = jsonapi.BuildType(meta{})
 	if err != nil {
 		panic(err)
 	}
@@ -71,14 +51,6 @@ func FirstSchema() *jsonapi.Schema {
 	return schema
 }
 
-// meta ...
-type meta struct {
-	ID string `json:"id" api:"0_meta"`
-
-	// Attributes
-	Value string `json:"value" api:"attr"`
-}
-
 // set ...
 type set struct {
 	ID string `json:"id" api:"0_sets"`
@@ -86,6 +58,7 @@ type set struct {
 	// Attributes
 	Name    string `json:"name" api:"attr"`
 	Version uint   `json:"version" api:"attr"`
+	Created bool   `json:"created" api:"attr"`
 	Active  bool   `json:"active" api:"attr"`
 
 	// Relationships
@@ -98,10 +71,11 @@ type attr struct {
 	ID string `json:"id" api:"0_attrs"`
 
 	// Attributes
-	Name   string `json:"name" api:"attr"`
-	Type   string `json:"type" api:"attr"`
-	Null   bool   `json:"null" api:"attr"`
-	Active bool   `json:"active" api:"attr"`
+	Name    string `json:"name" api:"attr"`
+	Type    string `json:"type" api:"attr"`
+	Null    bool   `json:"null" api:"attr"`
+	Created bool   `json:"created" api:"attr"`
+	Active  bool   `json:"active" api:"attr"`
 
 	// Relationships
 	Set string `json:"set" api:"rel,0_sets,attrs"`
@@ -116,6 +90,7 @@ type rel struct {
 	ToOne    bool   `json:"to-one" api:"attr"`
 	ToName   string `json:"to-name" api:"attr"`
 	FromOne  bool   `json:"from-one" api:"attr"`
+	Created  bool   `json:"created" api:"attr"`
 	Active   bool   `json:"active" api:"attr"`
 
 	// Relationships
@@ -123,25 +98,12 @@ type rel struct {
 	ToSet   string `json:"to-set" api:"rel,0_sets"`
 }
 
-// log ...
-type log struct {
-	ID string `json:"id" api:"0_log"`
-
-	// Relationships
-	Ops []string `json:"ops" api:"rel,0_ops,version"`
-}
-
-// op ...
-type op struct {
-	ID string `json:"id" api:"0_ops"`
+// meta ...
+type meta struct {
+	ID string `json:"id" api:"0_meta"`
 
 	// Attributes
-	Key   string `json:"set" api:"attr"`
-	Op    string `json:"op" api:"attr"`
 	Value string `json:"value" api:"attr"`
-
-	// Relationships
-	Version string `json:"version" api:"rel,0_log,ops"`
 }
 
 func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {

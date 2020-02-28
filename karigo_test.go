@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/cmd/karigo/util"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
-	"github.com/mfcochauxlaberge/karigo/memory"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -263,29 +263,20 @@ func TestKarigo(t *testing.T) {
 }
 
 func startServer() string {
-	server := karigo.NewServer()
+	server := util.CreateServer(karigo.Config{
+		Host: "127.0.0.1",
+		Port: findFreePort(),
+	})
 
 	server.DisableLogger()
 
-	src := &memory.Source{}
-	_ = src.Reset()
-	node := karigo.NewNode(&memory.Journal{}, src)
-	node.Name = "test"
-	node.Domains = []string{"localhost", "127.0.0.1"}
-
-	for _, domain := range node.Domains {
-		server.Nodes[domain] = node
-	}
-
-	port := findFreePort()
-
 	// Run server
 	go func() {
-		server.Run(port)
+		server.Run()
 	}()
 	time.Sleep(100 * time.Millisecond)
 
-	return "127.0.0.1:" + strconv.Itoa(int(port))
+	return "127.0.0.1:" + strconv.Itoa(int(server.Port))
 }
 
 func do(method, host, path string, body []byte) (int, []byte, []byte, error) {

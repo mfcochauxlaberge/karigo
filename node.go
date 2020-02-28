@@ -13,15 +13,17 @@ import (
 )
 
 // NewNode ...
-func NewNode(journal Journal, src Source) *Node {
+func NewNode(jrnl Journal, src Source) *Node {
 	node := &Node{
-		log: journal,
+		journal: journal{
+			jrnl: jrnl,
+		},
 		main: source{
 			src: src,
 		},
 
 		schema: FirstSchema(),
-		// funcs: map[string]Tx{},
+		// funcs: map[string]Action{},
 
 		err:      make(chan error),
 		shutdown: make(chan bool),
@@ -38,12 +40,12 @@ type Node struct {
 	Domains []string
 
 	// Run
-	log  Journal
-	main source
+	journal journal
+	main    source
 
 	// Schema
 	schema *jsonapi.Schema
-	// funcs  map[string]Tx
+	// funcs  map[string]Action
 
 	// Channels
 	err      chan error
@@ -54,18 +56,14 @@ type Node struct {
 	sync.Mutex
 }
 
-// Run ...
-func (n *Node) Run() error {
-	// n.Lock()
-	// n.Unlock()
-	// Handle events
-	for {
-		select {}
-	}
-}
-
 // Handle ...
 func (n *Node) Handle(r *Request) *jsonapi.Document {
+	if !n.journal.alive || !n.main.alive {
+		if !n.connect() {
+			panic("cannot connect to necessary services")
+		}
+	}
+
 	var (
 		res jsonapi.Resource
 		doc = &jsonapi.Document{}
@@ -86,9 +84,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			}
 
 			r.Logger.
-				Err(err).
-				Str("abc", "123").
-				Int("def", 42).
+				Info().
+				Str("err", err.Error()).
 				Msg("Panic")
 		}
 	}()
@@ -96,7 +93,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	if len(r.Body) > 0 {
 		r.Doc, err = jsonapi.UnmarshalDocument(r.Body, n.schema)
 		if err != nil {
-			r.Logger.Err(err).Msg("Could not unmarshal document")
+			r.Logger.
+				Debug().
+				Str("error", err.Error()).
+				Msg("Could not unmarshal document")
 		}
 	}
 
@@ -110,8 +110,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			res, err = jsonapi.UnmarshalPartialResource(frame.Data, n.schema)
 			if err != nil {
 				r.Logger.
-					Err(err).
-					Msg("Could not partially unmarshal reosurce")
+					Debug().
+					Str("error", err.Error()).
+					Msg("Could not partially unmarshal resource")
 			}
 		}
 
@@ -132,14 +133,17 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		res, _ = r.Doc.Data.(jsonapi.Resource)
 	}
 
+	tx, _ := n.main.src.NewTx()
+
 	cp := &Checkpoint{
+		tx:   tx,
 		node: n,
 		ops:  []Op{},
 	}
 
 	// Check password is correct if request is writing (non-GET).
 	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
-		pwRes, _ := n.main.src.Resource(QueryRes{
+		pwRes, _ := cp.tx.Resource(QueryRes{
 			Set:    "0_meta",
 			ID:     "password",
 			Fields: []string{"value"},
@@ -186,9 +190,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	}
 
-	tx := TxDefault
+	execute := ActionDefault
 	ops := []Op{}
-	// Prepare transaction
+	// Prepare action
 	switch r.Method {
 	case GET:
 	case POST:
@@ -200,9 +204,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		switch res.GetType().Name {
 		case "0_sets":
 			res.SetID(res.Get("name").(string))
-			ops = NewOpAddSet(res.GetID())
+			ops = NewOpCreateSet(res.GetID())
 		case "0_attrs":
-			ops = NewOpAddAttr(
+			ops = NewOpCreateAttr(
 				res.GetToOne("set"),
 				res.Get("name").(string),
 				res.Get("type").(string),
@@ -210,7 +214,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		case "0_rels":
-			ops = NewOpAddRel(
+			ops = NewOpCreateRel(
 				res.GetToOne("from-set"),
 				res.Get("from-name").(string),
 				res.GetToOne("to-set"),
@@ -220,10 +224,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		default:
-			ops = NewOpInsert(res)
+			ops = NewOpCreateRes(res)
 		}
 
-		found, _ := n.resource(0, QueryRes{
+		found, _ := cp.tx.Resource(QueryRes{
 			Set:    res.GetType().Name,
 			ID:     res.GetID(),
 			Fields: []string{"id"},
@@ -272,10 +276,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		handleSchemaChange(n.schema, r, cp)
 	} else {
 		// Execute
-		tx(cp)
+		execute(cp)
 	}
 
-	for _, op := range ops {
+	for _, op := range cp.ops {
 		r.Logger.Debug().
 			Str("op", op.String()).
 			Msg("Operation")
@@ -283,8 +287,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	if cp.err != nil {
 		r.Logger.
-			Err(cp.err).
-			Msg("Transaction failed")
+			Debug().
+			Str("error", cp.err.Error()).
+			Msg("Action failed")
 
 		// Rollback
 		err = cp.rollback()
@@ -304,14 +309,21 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
-		// Commit the transaction entry
-		err = n.log.Append(cp.ops.Bytes())
+		enc, err := Encode(0, cp.ops)
 		if err != nil {
+			panic(fmt.Errorf("could not encode ops: %s", err))
+		}
+
+		// Commit the entry
+		err = n.journal.jrnl.Append(enc)
+		if err != nil {
+			n.journal.alive = false
 			panic(fmt.Errorf("could not append: %s", err))
 		}
 
 		err = cp.commit()
 		if err != nil {
+			n.main.alive = false
 			panic(fmt.Errorf("could not commit: %s", err))
 		}
 
@@ -343,25 +355,27 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	return doc
 }
 
-// resource ...
-// TODO Validate the query?
-func (n *Node) resource(_ uint, qry QueryRes) (jsonapi.Resource, error) {
-	return n.main.src.Resource(qry)
-}
+func (n *Node) connect() bool {
+	n.Lock()
+	defer n.Unlock()
 
-// collection ...
-// TODO Validate the query?
-// TODO Complete the sorting rule
-func (n *Node) collection(_ uint, qry QueryCol) (jsonapi.Collection, error) {
-	return n.main.src.Collection(qry)
-}
+	if !n.main.alive {
+		err := n.main.src.Connect(nil)
+		if err != nil {
+			return false
+		}
 
-// apply ...
-func (n *Node) apply(ops []Op) error {
-	err := n.main.src.Apply(ops)
-	if err != nil {
-		return errors.New("karigo: an operation could not be executed")
+		n.main.alive = true
 	}
 
-	return nil
+	if !n.journal.alive {
+		err := n.journal.jrnl.Connect(nil)
+		if err != nil {
+			return false
+		}
+
+		n.journal.alive = true
+	}
+
+	return true
 }
