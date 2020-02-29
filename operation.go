@@ -55,8 +55,8 @@ func ParseOp(s string, t int) (Op, error) {
 
 	return Op{
 		Key: Key{
-			ID:    key[0],
-			Set:   key[1],
+			Set:   key[0],
+			ID:    key[1],
 			Field: key[2],
 		},
 		Op:    parts[1][0],

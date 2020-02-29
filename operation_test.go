@@ -21,7 +21,15 @@ func TestParseOp(t *testing.T) {
 		{
 			str: `set.id.field = "value"`,
 			typ: jsonapi.AttrTypeString,
-			op:  Op{},
+			op: Op{
+				Key: Key{
+					Set:   "set",
+					ID:    "id",
+					Field: "field",
+				},
+				Op:    OpSet,
+				Value: "value",
+			},
 			err: nil,
 		},
 	}
