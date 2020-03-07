@@ -1,10 +1,9 @@
 package karigo
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-
-	"github.com/vmihailenco/msgpack"
 )
 
 // Encode ...
@@ -17,7 +16,7 @@ func Encode(v uint, ops []Op) ([]byte, error) {
 	switch v {
 	case 0:
 		// Version 0
-		enc, err = msgpack.Marshal(ops)
+		enc, err = json.Marshal(ops)
 		if err != nil {
 			return nil, fmt.Errorf("cannot encode: %s", err)
 		}
@@ -39,7 +38,7 @@ func Decode(v uint, raw []byte) ([]Op, error) {
 	switch v {
 	case 0:
 		// Version 0
-		err := msgpack.Unmarshal(raw, &ops)
+		err := json.Unmarshal(raw, &ops)
 		if err != nil {
 			return nil, fmt.Errorf("cannot decode: %s", err)
 		}
