@@ -1,7 +1,11 @@
 package karigo
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+
+	"github.com/mfcochauxlaberge/karigo/internal/bin"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
@@ -40,6 +44,59 @@ type Op struct {
 	Key   Key // Set, ID, Field
 	Op    byte
 	Value interface{}
+}
+
+// MarshalBinary ...
+func (o Op) MarshalBinary() ([]byte, error) {
+	// Value in binary format
+	val := bin.To(o.Value)
+
+	// Total needed space for the
+	// bytes to be returned.
+	need := len(o.Key.Set) + len(o.Key.Set) + len(o.Key.Set)
+	need += 2 // Two dots in the key
+	need += 2 // Two spaces around the operator
+	need += len(val)
+
+	data := make([]byte, 0, need)
+
+	// Append to the slice
+	data = append(data, o.Key.Set...)
+	data = append(data, '.')
+	data = append(data, o.Key.ID...)
+	data = append(data, '.')
+	data = append(data, o.Key.Field...)
+	data = append(data, ' ')
+	data = append(data, o.Op)
+	data = append(data, ' ')
+	data = append(data, val...)
+
+	return data, nil
+}
+
+// UnmarshalBinary ...
+func (o *Op) UnmarshalBinary(data []byte) error {
+	parts := bytes.SplitN(data, []byte{' '}, 3)
+
+	if len(parts) != 3 {
+		return errors.New("invalid binary op")
+	}
+
+	key := bytes.Split(parts[0], []byte{'.'})
+
+	if len(key) != 3 {
+		return errors.New("invalid key in binary op")
+	}
+
+	var err error
+
+	o.Key.Set = string(key[0])
+	o.Key.ID = string(key[1])
+	o.Key.Field = string(key[2])
+	o.Op = parts[1][0]
+	o.Value, err = bin.From(parts[2])
+
+	return err
 }
 
 // String ...
