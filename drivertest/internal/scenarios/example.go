@@ -16,7 +16,7 @@ func init() {
 				karigo.NewOpActivateAttr("users", "username"),
 				karigo.NewOpCreateAttr("users", "password", "string", false),
 				karigo.NewOpActivateAttr("users", "password"),
-				karigo.NewOpCreateAttr("users", "created-at", "time", false),
+				karigo.NewOpCreateAttr("users", "created-at", "time.Time", false),
 				karigo.NewOpActivateAttr("users", "created-at"),
 
 				// Articles
