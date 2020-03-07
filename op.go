@@ -14,14 +14,14 @@ const (
 
 	// OpAdd means that the key must be
 	// incremented by the value. If the new
-	// value is above its maximum, the key
-	// must be set to that maximum.
+	// value overflows, the key must be set
+	// to the highest possible value.
 	OpAdd = '+'
 
-	// OpSubtract means that the key must
-	// be decremented by the value. If the
-	// new value is under its minimum, the
-	// key must be set to that minimum.
+	// OpAdd means that the key must be
+	// decremented by the value. If the new
+	// value underflows, the key must be set
+	// to the lowest possible value.
 	OpSubtract = '-'
 
 	// OpInsert means that the value must
