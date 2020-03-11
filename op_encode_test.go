@@ -14,13 +14,16 @@ func TestOpEncode(t *testing.T) {
 	tests := []struct {
 		name string
 		ops  []Op
+		err  string
 	}{
 		{
 			name: "nil ops",
 			ops:  nil,
+			err:  "no ops",
 		}, {
 			name: "no ops",
 			ops:  []Op{},
+			err:  "no ops",
 		}, {
 			name: "1 op",
 			ops: []Op{
@@ -34,16 +37,41 @@ func TestOpEncode(t *testing.T) {
 					Value: "string value",
 				},
 			},
+		}, {
+			name: "2 ops",
+			ops: []Op{
+				{
+					Key: Key{
+						Set:   "set",
+						ID:    "id",
+						Field: "field",
+					},
+					Op:    OpSet,
+					Value: "string value",
+				}, {
+					Key: Key{
+						Set:   "set2",
+						ID:    "id2",
+						Field: "field2",
+					},
+					Op:    OpSet,
+					Value: 42,
+				},
+			},
 		},
 	}
 
 	for _, test := range tests {
 		data, err := Encode(0, test.ops)
-		assert.NoError(err)
 
-		ops, err := Decode(0, data)
-		assert.NoError(err)
+		if test.err == "" {
+			assert.NoError(err, test.name)
 
-		assert.Equal(test.ops, ops)
+			ops, err := Decode(0, data)
+			assert.NoError(err, test.name)
+			assert.Equal(test.ops, ops, test.name)
+		} else {
+			assert.EqualError(err, test.err, test.name)
+		}
 	}
 }
