@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOpEncode(t *testing.T) {
+func TestOpEncodeV0(t *testing.T) {
 	assert := assert.New(t)
 
 	tests := []struct {
