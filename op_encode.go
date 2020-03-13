@@ -25,7 +25,7 @@ func Encode(v uint, ops []Op) ([]byte, error) {
 		// Version 0
 		enc, err = encodeV0(ops)
 		if err != nil {
-			return nil, fmt.Errorf("cannot encode: %s", err)
+			return nil, err
 		}
 	default:
 		return nil, errors.New("unsupported version")
@@ -50,7 +50,7 @@ func Decode(v uint, data []byte) ([]Op, error) {
 		// Version 0
 		ops, err = decodeV0(data)
 		if err != nil {
-			return nil, fmt.Errorf("cannot decode: %s", err)
+			return nil, err
 		}
 	default:
 		return nil, errors.New("unsupported version")
@@ -75,8 +75,13 @@ func encodeV0(ops []Op) ([]byte, error) {
 		}
 
 		m["key"] = json.RawMessage(key)
-		m["op"] = op.Op
+		m["op"] = string(op.Op)
 		m["value"] = op.Value
+
+		if op.Value == nil {
+			return nil, errors.New("op has nil value")
+		}
+
 		m["type"] = jsonapi.GetAttrTypeString(
 			jsonapi.GetAttrType(fmt.Sprintf("%T", op.Value)),
 		)
@@ -130,6 +135,7 @@ func decodeV0(data []byte) ([]Op, error) {
 
 		// Value
 		typ := strings.Trim(string(m["type"]), `"`)
+
 		t, n := jsonapi.GetAttrType(typ)
 		attr := jsonapi.Attr{
 			Name:     "",
@@ -137,12 +143,10 @@ func decodeV0(data []byte) ([]Op, error) {
 			Nullable: n,
 		}
 
-		v, err := attr.UnmarshalToType(m["value"])
+		op.Value, err = attr.UnmarshalToType(m["value"])
 		if err != nil {
 			return nil, err
 		}
-
-		op.Value = v
 
 		ops = append(ops, op)
 	}
