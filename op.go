@@ -35,6 +35,7 @@ const (
 	OpRemove = '<'
 )
 
+// NewOp ...
 func NewOp(op string) byte {
 	switch op {
 	case "=":
