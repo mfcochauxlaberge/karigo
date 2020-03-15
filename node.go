@@ -309,22 +309,24 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
-		enc, err := Encode(0, cp.ops)
-		if err != nil {
-			panic(fmt.Errorf("could not encode ops: %s", err))
-		}
+		if len(ops) > 0 {
+			enc, err := Encode(0, cp.ops)
+			if err != nil {
+				panic(fmt.Errorf("could not encode ops: %s", err))
+			}
 
-		// Commit the entry
-		err = n.journal.jrnl.Append(enc)
-		if err != nil {
-			n.journal.alive = false
-			panic(fmt.Errorf("could not append: %s", err))
-		}
+			// Commit the entry
+			err = n.journal.jrnl.Append(enc)
+			if err != nil {
+				n.journal.alive = false
+				panic(fmt.Errorf("could not append: %s", err))
+			}
 
-		err = cp.commit()
-		if err != nil {
-			n.main.alive = false
-			panic(fmt.Errorf("could not commit: %s", err))
+			err = cp.commit()
+			if err != nil {
+				n.main.alive = false
+				panic(fmt.Errorf("could not commit: %s", err))
+			}
 		}
 
 		// Response payload
