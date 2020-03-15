@@ -2,6 +2,10 @@ language: go
 go:
   - 1.12.x
   - 1.13.x
+  - 1.14.x
+
+services:
+  - postgresql
 
 branches:
   only:
@@ -13,11 +17,11 @@ env:
 before_script:
   - 'curl -sfL
       https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh
-      | sh -s v1.21.0'
+      | sh -s v1.23.6'
 
 script:
   - ./bin/golangci-lint run
-  - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+  - go test ./... -v -race -coverprofile=coverage.txt -covermode=atomic
 
 # after_success:
 #   - bash <(curl -s https://codecov.io/bash)

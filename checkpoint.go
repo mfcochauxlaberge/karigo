@@ -14,7 +14,7 @@ type Checkpoint struct {
 	tx   Tx
 	node *Node
 
-	ops Entry
+	ops []Op
 
 	err error
 }

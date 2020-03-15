@@ -17,9 +17,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func NewServer() *Server {
+func NewServer(config Config) *Server {
 	s := &Server{
-		Nodes: map[string]*Node{},
+		Config: config,
+		Nodes:  map[string]*Node{},
 	}
 
 	s.logger = s.logger.
@@ -31,14 +32,19 @@ func NewServer() *Server {
 
 // Server ...
 type Server struct {
+	Config
+
 	Nodes map[string]*Node
 
 	logger zerolog.Logger
 }
 
 // Run ...
-func (s *Server) Run(port uint) {
-	s.logger.Info().Str("event", "server_start")
+func (s *Server) Run() {
+	s.logger.Info().
+		Str("event", "server_start").
+		Uint("port", s.Port).
+		Msg("Server listening")
 
 	for _, node := range s.Nodes {
 		node.logger = s.logger
@@ -52,7 +58,7 @@ func (s *Server) Run(port uint) {
 	handler := c.Handler(s)
 
 	// Listen and serve
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), handler)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", s.Port), handler)
 	if err != http.ErrServerClosed {
 		panic(err)
 	}
@@ -62,11 +68,32 @@ func (s *Server) Run(port uint) {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	requestID := uuid.New().String()[:8]
 
-	// Parse domain and port
-	domain, port := domainAndPort(r.Host)
-
 	// Populate logger with rid
 	logger := s.logger.With().Str("rid", requestID).Logger()
+
+	defer func() {
+		if err := recover(); err != nil {
+			msg := ""
+
+			switch e := err.(type) {
+			case error:
+				msg = e.Error()
+			case string:
+				msg = e
+			}
+
+			errLogger := logger.Output(os.Stderr)
+			errLogger.Info().
+				Str("event", "recover").
+				Str("error", msg)
+
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"rip"}`))
+		}
+	}()
+
+	// Parse domain and port
+	domain, port := domainAndPort(r.Host)
 
 	logger.Info().
 		Str("event", "read_request").

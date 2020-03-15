@@ -52,11 +52,15 @@ issues:
       linters:
         - gochecknoglobals
 
+    - source: var update = flag.Bool\("update-golden-files",
+      linters:
+        - gochecknoglobals
+
     - source: regexp.MustCompile
       linters:
         - gochecknoglobals
 
-    - path: sourcetest
+    - path: drivertest
       linters:
         - gochecknoglobals
         - gochecknoinits

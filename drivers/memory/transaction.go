@@ -20,32 +20,32 @@ type Tx struct {
 }
 
 // Resource ...
-func (s *Tx) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
-	s.Lock()
-	defer s.Unlock()
+func (t *Tx) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
+	t.Lock()
+	defer t.Unlock()
 
 	// Get resource
-	res := s.sets[qry.Set].Resource(qry.ID, qry.Fields)
+	res := t.sets[qry.Set].Resource(qry.ID, qry.Fields)
 
 	return res, nil
 }
 
 // Collection ...
-func (s *Tx) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
-	s.Lock()
-	defer s.Unlock()
+func (t *Tx) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
+	t.Lock()
+	defer t.Unlock()
 
 	// BelongsToFilter
 	var ids []string
 
 	if qry.BelongsToFilter.ID != "" {
-		res := s.sets[qry.BelongsToFilter.Type].Resource(qry.BelongsToFilter.ID, []string{})
+		res := t.sets[qry.BelongsToFilter.Type].Resource(qry.BelongsToFilter.ID, []string{})
 		ids = res.GetToMany(qry.BelongsToFilter.Name)
 	}
 
 	// Get all records from the given set
 	recs := jsonapi.Range(
-		s.sets[qry.Set],
+		t.sets[qry.Set],
 		ids,
 		nil,
 		qry.Sort,
@@ -57,16 +57,16 @@ func (s *Tx) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
 }
 
 // Apply ...
-func (s *Tx) Apply(ops []karigo.Op) error {
-	s.Lock()
-	defer s.Unlock()
+func (t *Tx) Apply(ops []karigo.Op) error {
+	t.Lock()
+	defer t.Unlock()
 
 	for _, op := range ops {
 		switch op.Op {
 		case karigo.OpSet:
-			s.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
-		case karigo.OpAdd:
-			s.opAdd(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
+			t.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
+		case karigo.OpInsert:
+			t.opInsert(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
 		}
 	}
 
@@ -74,34 +74,34 @@ func (s *Tx) Apply(ops []karigo.Op) error {
 }
 
 // Commit ...
-func (s *Tx) Commit() error {
+func (t *Tx) Commit() error {
 	return nil
 }
 
 // Rollback ...
-func (s *Tx) Rollback() error {
+func (t *Tx) Rollback() error {
 	return nil
 }
 
-func (s *Tx) opSet(set, id, field string, v interface{}) {
+func (t *Tx) opSet(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s = %v\n", set, id, field, v)
 	// Type change
 	switch set {
 	case "0_sets":
 		if id != "" && field == "created" && v.(bool) {
 			// New set
-			s.sets[id] = &jsonapi.SoftCollection{}
-			s.sets[id].SetType(&jsonapi.Type{
+			t.sets[id] = &jsonapi.SoftCollection{}
+			t.sets[id].SetType(&jsonapi.Type{
 				Name: id,
 			})
 		}
 	case "0_attrs":
 		if id != "" && field == "created" && v.(bool) {
 			// New attribute
-			attr := s.sets["0_attrs"].Resource(id, nil)
+			attr := t.sets["0_attrs"].Resource(id, nil)
 			typ, null := jsonapi.GetAttrType(attr.Get("type").(string))
 
-			_ = s.sets[attr.GetToOne("set")].Type.AddAttr(
+			_ = t.sets[attr.GetToOne("set")].Type.AddAttr(
 				jsonapi.Attr{
 					Name:     attr.Get("name").(string),
 					Type:     typ,
@@ -112,9 +112,9 @@ func (s *Tx) opSet(set, id, field string, v interface{}) {
 	case "0_rels":
 		if id != "" && field == "created" && v.(bool) {
 			// New relationship
-			rel := s.sets["0_rels"].Resource(id, nil)
+			rel := t.sets["0_rels"].Resource(id, nil)
 
-			_ = s.sets[rel.GetToOne("from-set")].Type.AddRel(
+			_ = t.sets[rel.GetToOne("from-set")].Type.AddRel(
 				jsonapi.Rel{
 					FromType: rel.GetToOne("from-set"),
 					FromName: rel.Get("from-name").(string),
@@ -130,50 +130,50 @@ func (s *Tx) opSet(set, id, field string, v interface{}) {
 	switch {
 	case id != "" && field != "id":
 		// Set a field
-		typ := s.sets[set].Type
+		typ := t.sets[set].Type
 		for _, attr := range typ.Attrs {
 			if attr.Name == field {
-				s.sets[set].Resource(id, nil).Set(field, v)
+				t.sets[set].Resource(id, nil).Set(field, v)
 			}
 		}
 
 		for _, rel := range typ.Rels {
 			if rel.FromName == field {
 				if rel.ToOne {
-					s.sets[set].Resource(id, nil).SetToOne(field, v.(string))
+					t.sets[set].Resource(id, nil).SetToOne(field, v.(string))
 				} else {
-					s.sets[set].Resource(id, nil).SetToMany(field, v.([]string))
+					t.sets[set].Resource(id, nil).SetToMany(field, v.([]string))
 				}
 			}
 		}
 	case id == "" && field == "id":
 		// Create a resource
-		typ := s.sets[set].Type
-		s.sets[set].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
+		typ := t.sets[set].Type
+		t.sets[set].Add(makeSoftResource(typ, v.(string), map[string]interface{}{}))
 	case id != "" && field == "id" && v.(string) == "":
 		// Delete a resource
-		s.sets[set].Remove(id)
+		t.sets[set].Remove(id)
 	}
 }
 
-func (s *Tx) opAdd(set, id, field string, v interface{}) {
+func (t *Tx) opInsert(set, id, field string, v interface{}) {
 	// fmt.Printf("set, id, field = %s, %s, %s += %v\n", set, id, field, v)
-	curr := reflect.ValueOf(s.sets[set].Resource(id, nil).GetToMany(field))
+	curr := reflect.ValueOf(t.sets[set].Resource(id, nil).GetToMany(field))
 	curr = reflect.Append(curr, reflect.ValueOf(v))
 
-	typ := s.sets[set].Type
+	typ := t.sets[set].Type
 	for _, attr := range typ.Attrs {
 		if attr.Name == field {
-			s.sets[set].Resource(id, nil).Set(field, v)
+			t.sets[set].Resource(id, nil).Set(field, v)
 		}
 	}
 
 	for _, rel := range typ.Rels {
 		if rel.FromName == field {
 			if rel.ToOne {
-				s.sets[set].Resource(id, nil).SetToOne(field, curr.Interface().(string))
+				t.sets[set].Resource(id, nil).SetToOne(field, curr.Interface().(string))
 			} else {
-				s.sets[set].Resource(id, nil).SetToMany(field, curr.Interface().([]string))
+				t.sets[set].Resource(id, nil).SetToMany(field, curr.Interface().([]string))
 			}
 		}
 	}
