@@ -3,10 +3,10 @@ package karigo_test
 import (
 	"testing"
 
-	"github.com/mfcochauxlaberge/jsonapi"
-
 	. "github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory"
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
+
+	"github.com/mfcochauxlaberge/jsonapi"
 )
 
 func TestNode(t *testing.T) {
@@ -29,7 +29,7 @@ func TestNode(t *testing.T) {
 
 	tx, _ := src.NewTx()
 
-	_ = tx.Apply(NewOpAddSet("things"))
+	_ = tx.Apply(NewOpCreateSet("things"))
 	_ = tx.Apply(NewOpActivateSet("things"))
 
 	// Journal
@@ -37,8 +37,6 @@ func TestNode(t *testing.T) {
 
 	// Node
 	node := NewNode(journal, src)
-
-	go func() { _ = node.Run() }()
 
 	url, err := jsonapi.NewURLFromRaw(schema, "/things")
 	if err != nil {

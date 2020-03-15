@@ -2,12 +2,12 @@ package util
 
 import (
 	"github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/memory"
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 )
 
-func CreateServer() *karigo.Server {
+func CreateServer(config karigo.Config) *karigo.Server {
 	// Server
-	server := karigo.NewServer()
+	server := karigo.NewServer(config)
 
 	src := &memory.Source{}
 	_ = src.Reset()
@@ -17,8 +17,11 @@ func CreateServer() *karigo.Server {
 	ctlNode.Name = "main_node"
 
 	// Register node
-	server.Nodes["127.0.0.1"] = ctlNode
-	server.Nodes["localhost"] = ctlNode
+	server.Nodes[server.Host] = ctlNode
+
+	for _, host := range server.OtherHosts {
+		server.Nodes[host] = ctlNode
+	}
 
 	return server
 }

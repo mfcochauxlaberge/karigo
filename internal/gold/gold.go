@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 )
 
+var update = flag.Bool("update-golden-files", false, "update the golden files")
+
 // NewRunner returns a *Runner.
 //
 // dir defines the Runner's directory, which is where all the files will be
@@ -20,7 +22,6 @@ import (
 //
 // NewRunner calls flag.Parse.
 func NewRunner(dir string) *Runner {
-	update := flag.Bool("update-golden-files", false, "update the golden files")
 	// TODO Should this be called here? Maybe let
 	// the user call it when appropriate.
 	flag.Parse()
@@ -102,7 +103,7 @@ func (r *Runner) Test(path string, content []byte) error {
 		// Compare the file with the given content.
 		file, err := ioutil.ReadFile(path)
 		if err != nil {
-			return nil
+			return err
 		}
 
 		if !bytes.Equal(file, content) {

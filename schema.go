@@ -8,17 +8,7 @@ import (
 func FirstSchema() *jsonapi.Schema {
 	schema := &jsonapi.Schema{}
 
-	typ, err := jsonapi.BuildType(meta{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(set{})
+	typ, err := jsonapi.BuildType(set{})
 	if err != nil {
 		panic(err)
 	}
@@ -48,17 +38,7 @@ func FirstSchema() *jsonapi.Schema {
 		panic(err)
 	}
 
-	typ, err = jsonapi.BuildType(log{})
-	if err != nil {
-		panic(err)
-	}
-
-	err = schema.AddType(typ)
-	if err != nil {
-		panic(err)
-	}
-
-	typ, err = jsonapi.BuildType(op{})
+	typ, err = jsonapi.BuildType(meta{})
 	if err != nil {
 		panic(err)
 	}
@@ -69,14 +49,6 @@ func FirstSchema() *jsonapi.Schema {
 	}
 
 	return schema
-}
-
-// meta ...
-type meta struct {
-	ID string `json:"id" api:"0_meta"`
-
-	// Attributes
-	Value string `json:"value" api:"attr"`
 }
 
 // set ...
@@ -126,25 +98,12 @@ type rel struct {
 	ToSet   string `json:"to-set" api:"rel,0_sets"`
 }
 
-// log ...
-type log struct {
-	ID string `json:"id" api:"0_log"`
-
-	// Relationships
-	Ops []string `json:"ops" api:"rel,0_ops,version"`
-}
-
-// op ...
-type op struct {
-	ID string `json:"id" api:"0_ops"`
+// meta ...
+type meta struct {
+	ID string `json:"id" api:"0_meta"`
 
 	// Attributes
-	Key   string `json:"set" api:"attr"`
-	Op    string `json:"op" api:"attr"`
 	Value string `json:"value" api:"attr"`
-
-	// Relationships
-	Version string `json:"version" api:"rel,0_log,ops"`
 }
 
 // handleSchemaChanges updates the given schema according to the operations.
