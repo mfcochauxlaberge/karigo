@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/google/uuid v1.1.1
-	github.com/jackc/pgx/v4 v4.4.1
+	github.com/jackc/pgx/v4 v4.5.0
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.3.0 // indirect
 	github.com/mfcochauxlaberge/jsonapi v0.18.0
