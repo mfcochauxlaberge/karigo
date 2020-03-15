@@ -1,9 +1,7 @@
 package karigo
 
 import (
-	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
@@ -16,14 +14,14 @@ const (
 
 	// OpAdd means that the key must be
 	// incremented by the value. If the new
-	// value is above its maximum, the key
-	// must be set to that maximum.
+	// value overflows, the key must be set
+	// to the highest possible value.
 	OpAdd = '+'
 
-	// OpSubtract means that the key must
-	// be decremented by the value. If the
-	// new value is under its minimum, the
-	// key must be set to that minimum.
+	// OpAdd means that the key must be
+	// decremented by the value. If the new
+	// value underflows, the key must be set
+	// to the lowest possible value.
 	OpSubtract = '-'
 
 	// OpInsert means that the value must
@@ -37,23 +35,22 @@ const (
 	OpRemove = '<'
 )
 
-// NewOpFromString parses a string and returns the Op object it represents.
-func NewOpFromString(s string) (Op, error) {
-	parts := strings.Split(s, " ")
-
-	op := Op{}
-
-	if len(parts) < 3 {
-		return op, errors.New("cannot parse op string")
+// NewOp ...
+func NewOp(op string) byte {
+	switch op {
+	case "=":
+		return OpSet
+	case "+":
+		return OpAdd
+	case "-":
+		return OpSubtract
+	case ">":
+		return OpInsert
+	case "<":
+		return OpRemove
+	default:
+		return 0
 	}
-
-	var (
-		key   = parts[0]
-		op    = parts[1]
-		value = strings.Join(parts[2:], " ")
-	)
-
-	return Op{}, nil
 }
 
 // Op ...

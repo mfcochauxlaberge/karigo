@@ -41,7 +41,10 @@ type Server struct {
 
 // Run ...
 func (s *Server) Run() {
-	s.logger.Info().Str("event", "server_start").Msg("Server listening")
+	s.logger.Info().
+		Str("event", "server_start").
+		Uint("port", s.Port).
+		Msg("Server listening")
 
 	for _, node := range s.Nodes {
 		node.logger = s.logger

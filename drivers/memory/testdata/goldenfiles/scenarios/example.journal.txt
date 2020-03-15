@@ -24,7 +24,7 @@
 0_attrs.users_password.active = true
 0_attrs._.id = users_created-at
 0_attrs.users_created-at.name = created-at
-0_attrs.users_created-at.type = time
+0_attrs.users_created-at.type = time.Time
 0_attrs.users_created-at.null = false
 0_attrs.users_created-at.set = users
 0_attrs.users_created-at.created = true
