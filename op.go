@@ -35,6 +35,24 @@ const (
 	OpRemove = '<'
 )
 
+// NewOp ...
+func NewOp(op string) byte {
+	switch op {
+	case "=":
+		return OpSet
+	case "+":
+		return OpAdd
+	case "-":
+		return OpSubtract
+	case ">":
+		return OpInsert
+	case "<":
+		return OpRemove
+	default:
+		return 0
+	}
+}
+
 // Op ...
 type Op struct {
 	Key   Key // Set, ID, Field
