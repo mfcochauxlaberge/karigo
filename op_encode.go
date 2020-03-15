@@ -128,9 +128,16 @@ func decodeV0(data []byte) ([]Op, error) {
 		}
 
 		// Op
-		err = json.Unmarshal(m["op"], &op.Op)
+		opStr := ""
+
+		err := json.Unmarshal(m["op"], &opStr)
 		if err != nil {
 			return nil, err
+		}
+
+		op.Op = NewOp(opStr)
+		if op.Op == 0 {
+			return nil, fmt.Errorf("unknown op %q", op.Op)
 		}
 
 		// Value
