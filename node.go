@@ -83,8 +83,6 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				err = e
 			}
 
-			fmt.Printf("recovered error: %s\n", err.Error())
-
 			r.Logger.
 				Info().
 				Str("err", err.Error()).
