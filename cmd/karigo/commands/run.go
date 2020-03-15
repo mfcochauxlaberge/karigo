@@ -12,8 +12,8 @@ var cmdRun = &cobra.Command{
 	Short: "Run the server",
 	Run: func(cmd *cobra.Command, args []string) {
 		server := util.CreateServer(karigo.Config{
-			Port: 6280,
-			Host: "127.0.0.1",
+			Port:  6280,
+			Hosts: []string{"127.0.0.1"},
 			Journal: map[string]string{
 				"type": "memory",
 			},
