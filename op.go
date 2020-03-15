@@ -48,7 +48,7 @@ func NewOp(op string) byte {
 	case "<":
 		return OpRemove
 	default:
-		return 1
+		return 0
 	}
 }
 

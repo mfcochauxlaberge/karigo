@@ -320,6 +320,50 @@ func TestOpEncode(t *testing.T) {
 	}
 }
 
+func TestOpEncodeV0InvalidData(t *testing.T) {
+	assert := assert.New(t)
+
+	tests := []struct {
+		name string
+		ops  []Op
+	}{
+		{
+			name: "nil slice",
+			ops: []Op{
+				{
+					Key: Key{
+						Set:   "set",
+						ID:    "id",
+						Field: "field",
+					},
+					Op:    OpSet,
+					Value: nil,
+				},
+			},
+		}, {
+			name: "nil slice",
+			ops: []Op{
+				{
+					Key: Key{
+						Set:   "set",
+						ID:    "id",
+						Field: "field",
+					},
+					Op: OpSet,
+					Value: func() string {
+						return "can't marshal a function"
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		_, err := Encode(0, test.ops)
+		assert.Error(err, test.name)
+	}
+}
+
 func TestOpDecodeV0InvalidData(t *testing.T) {
 	assert := assert.New(t)
 
@@ -340,7 +384,25 @@ func TestOpDecodeV0InvalidData(t *testing.T) {
 			name: "invalid op",
 			encoded: []byte(`[
 				{"key":{"field":"field","id":"id","set":"set"},
+					"op":"!@#","type":"string","value":"string value"}
+			]`),
+		}, {
+			name: "invalid op (integer)",
+			encoded: []byte(`[
+				{"key":{"field":"field","id":"id","set":"set"},
 					"op":999,"type":"string","value":"string value"}
+			]`),
+		}, {
+			name: "invalid op (integer)",
+			encoded: []byte(`[
+				{"key":{"field":["invalid","field"],"id":"id","set":"set"},
+					"op":999,"type":"string","value":"string value"}
+			]`),
+		}, {
+			name: "invalid op (integer)",
+			encoded: []byte(`[
+				{"key":{"field":"field","id":"id","set":"set"},
+					"op":"=","type":"int","value":"won't fit in int"}
 			]`),
 		},
 	}
@@ -349,6 +411,14 @@ func TestOpDecodeV0InvalidData(t *testing.T) {
 		_, err := Decode(0, test.encoded)
 		assert.Error(err, test.name)
 	}
+}
+
+func TestOpInvalidVersion(t *testing.T) {
+	_, err := Encode(999, []Op{{}, {}})
+	assert.EqualError(t, err, "unsupported version")
+
+	_, err = Decode(999, []byte(`some bytes`))
+	assert.EqualError(t, err, "unsupported version")
 }
 
 func ptr(v interface{}) interface{} {
