@@ -120,8 +120,8 @@ github.com/mattn/go-isatty v0.0.7/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hd
 github.com/mattn/go-isatty v0.0.8/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mattn/go-isatty v0.0.9/go.mod h1:YNRxwqDuOph6SZLI9vUUz6OYw3QyUt7WiY2yME+cCiQ=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
-github.com/mfcochauxlaberge/jsonapi v0.18.0 h1:xp0u6cJFM7dhGo1vpvSt+YtUWToTgASSJxFaTIyuS/M=
-github.com/mfcochauxlaberge/jsonapi v0.18.0/go.mod h1:p3KSUlwVwGin5OGmfXmWzlDHRsA4DRgN9L0uAFFDU9I=
+github.com/mfcochauxlaberge/jsonapi v0.18.1 h1:mBWexWyw5NBM89yEWBHkMTGqb0TFdM0+WYaRDhWpRP4=
+github.com/mfcochauxlaberge/jsonapi v0.18.1/go.mod h1:p3KSUlwVwGin5OGmfXmWzlDHRsA4DRgN9L0uAFFDU9I=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
