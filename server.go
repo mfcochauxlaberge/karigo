@@ -17,10 +17,9 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func NewServer(config Config) *Server {
+func NewServer() *Server {
 	s := &Server{
-		Config: config,
-		Nodes:  map[string]*Node{},
+		Nodes: map[string]*Node{},
 	}
 
 	s.logger = s.logger.
@@ -32,7 +31,7 @@ func NewServer(config Config) *Server {
 
 // Server ...
 type Server struct {
-	Config
+	Port uint
 
 	Nodes map[string]*Node
 
