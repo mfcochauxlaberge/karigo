@@ -14,19 +14,19 @@ func ReadConfig(path string) (karigo.Config, error) {
 	// If path is not specified, try
 	// the current directory.
 	if path == "" {
-		path = "./karigo.yml"
+		path = "karigo.yml"
 	}
 
 	c.SetConfigFile(path)
 
 	// Read the config
-	err := c.ReadInConfig()
-	if err != nil {
-		return karigo.Config{}, err
-	}
+	_ = c.ReadInConfig()
+	// Error ignored for now
+	// because a configuration
+	// file is not necessary.
 
 	// Defaults
-	err = c.Unmarshal(&config)
+	err := c.Unmarshal(&config)
 	if err != nil {
 		return karigo.Config{}, err
 	}

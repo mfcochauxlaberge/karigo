@@ -32,7 +32,12 @@ func CreateServer(config karigo.Config) *karigo.Server {
 		case "memory":
 			src = &memory.Source{}
 		default:
+			src = &memory.Source{}
 		}
+	}
+
+	if src == nil {
+		src = &memory.Source{}
 	}
 
 	_ = src.Reset()
