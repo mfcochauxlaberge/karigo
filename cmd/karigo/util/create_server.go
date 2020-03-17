@@ -22,23 +22,13 @@ func CreateServer(config karigo.Config) *karigo.Server {
 	case "psql":
 		jrnl = &psql.Journal{}
 	default:
+		jrnl = &memory.Journal{}
 	}
 
 	// Source
-	var src karigo.Source
-
-	for _, source := range config.Sources {
-		switch source["driver"] {
-		case "memory":
-			src = &memory.Source{}
-		default:
-			src = &memory.Source{}
-		}
-	}
-
-	if src == nil {
-		src = &memory.Source{}
-	}
+	// TODO Stop ignoring this configuration and
+	// use the proper driver for the source.
+	src := &memory.Source{}
 
 	_ = src.Reset()
 

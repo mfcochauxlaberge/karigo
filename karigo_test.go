@@ -264,8 +264,8 @@ func TestKarigo(t *testing.T) {
 
 func startServer() string {
 	server := util.CreateServer(karigo.Config{
-		Hosts: []string{"127.0.0.1"},
 		Port:  findFreePort(),
+		Hosts: []string{"127.0.0.1"},
 	})
 
 	server.DisableLogger()

@@ -81,8 +81,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				msg = e
 			}
 
-			errLogger := logger.Output(os.Stderr)
-			errLogger.Info().
+			// errLogger := logger.Output(os.Stderr)
+			logger.Info().
 				Str("event", "recover").
 				Str("error", msg)
 
