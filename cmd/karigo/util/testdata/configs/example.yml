@@ -1,0 +1,17 @@
+port: 6820
+
+hosts:
+  - 127.0.0.1
+  - localhost
+  - example.com
+
+journal:
+  driver: psql
+  addr: 127.0.0.1
+  database: exampledb
+  user: username
+  password: secret
+
+sources:
+  main:
+    driver: memory
