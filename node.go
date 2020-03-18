@@ -36,8 +36,7 @@ func NewNode(jrnl Journal, src Source) *Node {
 
 // Node ...
 type Node struct {
-	Name    string
-	Domains []string
+	Name string
 
 	// Run
 	journal journal
