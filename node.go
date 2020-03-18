@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/mfcochauxlaberge/karigo/query"
+
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/rs/zerolog"
@@ -142,7 +144,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	// Check password is correct if request is writing (non-GET).
 	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
-		pwRes, _ := cp.tx.Resource(QueryRes{
+		pwRes, _ := cp.tx.Resource(query.Res{
 			Set:    "0_meta",
 			ID:     "password",
 			Fields: []string{"value"},
@@ -226,7 +228,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			ops = NewOpCreateRes(res)
 		}
 
-		found, _ := cp.tx.Resource(QueryRes{
+		found, _ := cp.tx.Resource(query.Res{
 			Set:    res.GetType().Name,
 			ID:     res.GetID(),
 			Fields: []string{"id"},
@@ -332,20 +334,20 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		switch r.Method {
 		case GET:
 			if !r.URL.IsCol {
-				res := cp.Resource(NewQueryRes(r.URL))
+				res := cp.Resource(query.NewRes(r.URL))
 				doc.Data = res
 			} else {
 				col := &jsonapi.SoftCollection{}
 				typ := n.schema.GetType(r.URL.ResType)
 				col.SetType(&typ)
-				resources := cp.Collection(NewQueryCol(r.URL))
+				resources := cp.Collection(query.NewCol(r.URL))
 				for i := 0; i < resources.Len(); i++ {
 					col.Add(resources.At(i))
 				}
 				doc.Data = jsonapi.Collection(col)
 			}
 		case POST, PATCH:
-			qry := NewQueryRes(r.URL)
+			qry := query.NewRes(r.URL)
 			qry.ID = res.GetID()
 			res := cp.Resource(qry)
 			doc.Data = res

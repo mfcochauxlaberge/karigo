@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
@@ -20,7 +21,7 @@ type Tx struct {
 }
 
 // Resource ...
-func (t *Tx) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
+func (t *Tx) Resource(qry query.Res) (jsonapi.Resource, error) {
 	t.Lock()
 	defer t.Unlock()
 
@@ -31,7 +32,7 @@ func (t *Tx) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
 }
 
 // Collection ...
-func (t *Tx) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
+func (t *Tx) Collection(qry query.Col) (jsonapi.Collection, error) {
 	t.Lock()
 	defer t.Unlock()
 

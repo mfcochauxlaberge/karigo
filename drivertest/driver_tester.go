@@ -9,6 +9,7 @@ import (
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/drivertest/internal/scenarios"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
+	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -69,7 +70,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 		keys := []string{}
 
 		// Keys
-		sets, err := tx.Collection(karigo.QueryCol{
+		sets, err := tx.Collection(query.Col{
 			Set:        "0_sets",
 			Sort:       []string{"id"},
 			PageNumber: 0,
@@ -81,7 +82,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 			set := sets.At(i)
 			id := set.GetID()
 
-			col, err := tx.Collection(karigo.QueryCol{
+			col, err := tx.Collection(query.Col{
 				Set:        id,
 				Sort:       []string{"id"},
 				PageNumber: 0,

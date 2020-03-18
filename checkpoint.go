@@ -3,6 +3,8 @@ package karigo
 import (
 	"errors"
 
+	"github.com/mfcochauxlaberge/karigo/query"
+
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -20,7 +22,7 @@ type Checkpoint struct {
 }
 
 // Resource ...
-func (c *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
+func (c *Checkpoint) Resource(qry query.Res) jsonapi.Resource {
 	if c.err != nil {
 		return nil
 	}
@@ -35,7 +37,7 @@ func (c *Checkpoint) Resource(qry QueryRes) jsonapi.Resource {
 }
 
 // Collection ...
-func (c *Checkpoint) Collection(qry QueryCol) jsonapi.Collection {
+func (c *Checkpoint) Collection(qry query.Col) jsonapi.Collection {
 	if c.err != nil {
 		return nil
 	}
