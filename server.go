@@ -31,7 +31,7 @@ func NewServer() *Server {
 
 // Server ...
 type Server struct {
-	Port uint
+	Config
 
 	Nodes map[string]*Node
 

@@ -9,7 +9,7 @@ import (
 func CreateServer(config karigo.Config) *karigo.Server {
 	// Server
 	server := karigo.NewServer()
-	server.Port = config.Port
+	server.Config = config
 
 	// Journal
 	var jrnl karigo.Journal
