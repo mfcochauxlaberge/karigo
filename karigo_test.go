@@ -3,7 +3,6 @@ package karigo_test
 import (
 	"bytes"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/cmd/karigo/util"
+	"github.com/mfcochauxlaberge/karigo/internal/freeport"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
 
 	"github.com/stretchr/testify/assert"
@@ -265,7 +265,7 @@ func TestKarigo(t *testing.T) {
 func startServer() string {
 	server := util.CreateServer(karigo.Config{
 		Hosts: []string{"127.0.0.1"},
-		Port:  findFreePort(),
+		Port:  freeport.Find(),
 	})
 
 	server.DisableLogger()
@@ -341,21 +341,6 @@ func buildSortedHeader(h http.Header) []byte {
 	}
 
 	return headerBytes
-}
-
-func findFreePort() uint {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-	if err != nil {
-		return 0
-	}
-
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return 0
-	}
-	defer l.Close()
-
-	return uint(l.Addr().(*net.TCPAddr).Port)
 }
 
 type request struct {
