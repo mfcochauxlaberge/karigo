@@ -25,7 +25,7 @@ func TestNode(t *testing.T) {
 
 	// Source
 	src := &memory.Source{}
-	_ = src.Reset() // TODO Necessary?
+	_ = src.Reset(FirstSchema()) // TODO Necessary?
 
 	tx, _ := src.NewTx()
 

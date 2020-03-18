@@ -29,7 +29,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 	// Run scenarios
 	for _, scenario := range scenarios {
 		// Reset
-		err := src.Reset()
+		err := src.Reset(karigo.FirstSchema())
 		assert.NoError(err)
 
 		tx, _ := src.NewTx()

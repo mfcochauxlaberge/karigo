@@ -28,7 +28,7 @@ func CreateServer(config karigo.Config) *karigo.Server {
 	// use the proper driver for the source.
 	src := &memory.Source{}
 
-	_ = src.Reset()
+	_ = src.Reset(karigo.FirstSchema())
 
 	// Add cluster control node
 	ctlNode := karigo.NewNode(jrnl, src)

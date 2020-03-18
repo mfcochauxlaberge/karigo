@@ -26,13 +26,13 @@ func (s *Source) Ping() bool {
 }
 
 // Reset ...
-func (s *Source) Reset() error {
+func (s *Source) Reset(schema *jsonapi.Schema) error {
 	s.Lock()
 	defer s.Unlock()
 
 	types := map[string]*jsonapi.Type{}
 
-	for _, typ := range karigo.FirstSchema().Types {
+	for _, typ := range schema.Types {
 		ctyp := typ.Copy()
 		types[ctyp.Name] = &ctyp
 	}
@@ -94,7 +94,7 @@ func (s *Source) Reset() error {
 	}
 
 	// Relationships
-	for _, rel := range karigo.FirstSchema().Rels() {
+	for _, rel := range schema.Rels() {
 		s.sets["0_rels"].Add(makeSoftResource(
 			types["0_rels"],
 			rel.String(),
