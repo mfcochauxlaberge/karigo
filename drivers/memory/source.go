@@ -8,6 +8,13 @@ import (
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
+// NewSource ...
+func NewSource(schema *jsonapi.Schema) *Source {
+	return &Source{
+		sets: map[string]*jsonapi.SoftCollection{},
+	}
+}
+
 // Source ...
 type Source struct {
 	sets map[string]*jsonapi.SoftCollection

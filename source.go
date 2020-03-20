@@ -36,7 +36,7 @@ func newSource(params map[string]string) (Source, error) {
 
 	switch params["driver"] {
 	case "", "memory":
-		src = &memory.Source{}
+		src = memory.NewSource(FirstSchema())
 	default:
 		return nil, fmt.Errorf("unknown driver %q", params["driver"])
 	}
