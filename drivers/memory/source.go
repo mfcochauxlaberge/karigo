@@ -3,7 +3,7 @@ package memory
 import (
 	"sync"
 
-	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
@@ -115,7 +115,7 @@ func (s *Source) Reset(schema *jsonapi.Schema) error {
 }
 
 // NewTx ...
-func (s *Source) NewTx() (karigo.Tx, error) {
+func (s *Source) NewTx() (query.Tx, error) {
 	return &Tx{
 		src:  s,
 		sets: s.sets,

@@ -13,10 +13,10 @@ type Checkpoint struct {
 	Res jsonapi.Resource
 	Inc map[string]jsonapi.Resource
 
-	tx   Tx
+	tx   query.Tx
 	node *Node
 
-	ops []Op
+	ops []query.Op
 
 	err error
 }
@@ -52,7 +52,7 @@ func (c *Checkpoint) Collection(qry query.Col) jsonapi.Collection {
 }
 
 // Apply ...
-func (c *Checkpoint) Apply(ops []Op) {
+func (c *Checkpoint) Apply(ops []query.Op) {
 	if c.err == nil {
 		c.Check(c.tx.Apply(ops))
 	}

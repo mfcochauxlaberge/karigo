@@ -139,7 +139,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	cp := &Checkpoint{
 		tx:   tx,
 		node: n,
-		ops:  []Op{},
+		ops:  []query.Op{},
 	}
 
 	// Check password is correct if request is writing (non-GET).
@@ -192,7 +192,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	execute := ActionDefault
-	ops := []Op{}
+	ops := []query.Op{}
 	// Prepare action
 	switch r.Method {
 	case GET:
@@ -205,9 +205,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		switch res.GetType().Name {
 		case "0_sets":
 			res.SetID(res.Get("name").(string))
-			ops = NewOpCreateSet(res.GetID())
+			ops = query.NewOpCreateSet(res.GetID())
 		case "0_attrs":
-			ops = NewOpCreateAttr(
+			ops = query.NewOpCreateAttr(
 				res.GetToOne("set"),
 				res.Get("name").(string),
 				res.Get("type").(string),
@@ -215,7 +215,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		case "0_rels":
-			ops = NewOpCreateRel(
+			ops = query.NewOpCreateRel(
 				res.GetToOne("from-set"),
 				res.Get("from-name").(string),
 				res.GetToOne("to-set"),
@@ -225,7 +225,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		default:
-			ops = NewOpCreateRes(res)
+			ops = query.NewOpCreateRes(res)
 		}
 
 		found, _ := cp.tx.Resource(query.Res{
@@ -238,10 +238,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			cp.Fail(errors.New("id already used"))
 		}
 	case PATCH:
-		ops = []Op{}
+		ops = []query.Op{}
 
 		for _, attr := range res.Attrs() {
-			ops = append(ops, NewOpSet(
+			ops = append(ops, query.NewOpSet(
 				r.URL.ResType,
 				res.GetID(),
 				attr.Name,
@@ -251,14 +251,14 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		for _, rel := range res.Rels() {
 			if rel.ToOne {
-				ops = append(ops, NewOpSet(
+				ops = append(ops, query.NewOpSet(
 					r.URL.ResType,
 					res.GetID(),
 					rel.FromName,
 					res.GetToOne(rel.FromName),
 				))
 			} else {
-				ops = append(ops, NewOpSet(
+				ops = append(ops, query.NewOpSet(
 					r.URL.ResType,
 					res.GetID(),
 					rel.FromName,
@@ -267,7 +267,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			}
 		}
 	case DELETE:
-		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
+		ops = []query.Op{query.NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
 
 	cp.Apply(ops)
@@ -311,7 +311,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
 		if len(ops) > 0 {
-			enc, err := Encode(0, cp.ops)
+			enc, err := query.Encode(0, cp.ops)
 			if err != nil {
 				panic(fmt.Errorf("could not encode ops: %s", err))
 			}

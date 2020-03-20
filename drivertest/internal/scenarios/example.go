@@ -1,8 +1,6 @@
 package scenarios
 
-import (
-	"github.com/mfcochauxlaberge/karigo"
-)
+import "github.com/mfcochauxlaberge/karigo/query"
 
 func init() {
 	Scenarios = append(Scenarios,
@@ -10,29 +8,29 @@ func init() {
 			Name: "example",
 			Steps: []interface{}{
 				// Users
-				karigo.NewOpCreateSet("users"),
-				karigo.NewOpActivateSet("users"),
-				karigo.NewOpCreateAttr("users", "username", "string", false),
-				karigo.NewOpActivateAttr("users", "username"),
-				karigo.NewOpCreateAttr("users", "password", "string", false),
-				karigo.NewOpActivateAttr("users", "password"),
-				karigo.NewOpCreateAttr("users", "created-at", "time.Time", false),
-				karigo.NewOpActivateAttr("users", "created-at"),
+				query.NewOpCreateSet("users"),
+				query.NewOpActivateSet("users"),
+				query.NewOpCreateAttr("users", "username", "string", false),
+				query.NewOpActivateAttr("users", "username"),
+				query.NewOpCreateAttr("users", "password", "string", false),
+				query.NewOpActivateAttr("users", "password"),
+				query.NewOpCreateAttr("users", "created-at", "time.Time", false),
+				query.NewOpActivateAttr("users", "created-at"),
 
 				// Articles
-				karigo.NewOpCreateSet("articles"),
-				karigo.NewOpActivateSet("articles"),
-				karigo.NewOpCreateAttr("articles", "title", "string", false),
-				karigo.NewOpActivateAttr("articles", "title"),
-				karigo.NewOpCreateAttr("articles", "content", "string", false),
-				karigo.NewOpActivateAttr("articles", "content"),
-				karigo.NewOpCreateAttr("articles", "created-at", "string", false),
-				karigo.NewOpActivateAttr("articles", "created-at"),
-				karigo.NewOpCreateAttr("articles", "updated-at", "string", false),
-				karigo.NewOpActivateAttr("articles", "updated-at"),
+				query.NewOpCreateSet("articles"),
+				query.NewOpActivateSet("articles"),
+				query.NewOpCreateAttr("articles", "title", "string", false),
+				query.NewOpActivateAttr("articles", "title"),
+				query.NewOpCreateAttr("articles", "content", "string", false),
+				query.NewOpActivateAttr("articles", "content"),
+				query.NewOpCreateAttr("articles", "created-at", "string", false),
+				query.NewOpActivateAttr("articles", "created-at"),
+				query.NewOpCreateAttr("articles", "updated-at", "string", false),
+				query.NewOpActivateAttr("articles", "updated-at"),
 
 				// Relationships
-				karigo.NewOpCreateRel(
+				query.NewOpCreateRel(
 					"users",
 					"articles",
 					"articles",
@@ -40,11 +38,11 @@ func init() {
 					false,
 					true,
 				),
-				karigo.NewOpActivateRel("articles_author_users_articles"),
+				query.NewOpActivateRel("articles_author_users_articles"),
 
 				// Data
-				karigo.NewOpSet("users", "", "id", "abc123"),
-				karigo.NewOpSet("users", "abc123", "username", "mafiaboy"),
+				query.NewOpSet("users", "", "id", "abc123"),
+				query.NewOpSet("users", "abc123", "username", "mafiaboy"),
 			},
 		},
 	)

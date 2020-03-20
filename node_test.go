@@ -5,6 +5,7 @@ import (
 
 	. "github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/drivers/memory"
+	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
@@ -29,8 +30,8 @@ func TestNode(t *testing.T) {
 
 	tx, _ := src.NewTx()
 
-	_ = tx.Apply(NewOpCreateSet("things"))
-	_ = tx.Apply(NewOpActivateSet("things"))
+	_ = tx.Apply(query.NewOpCreateSet("things"))
+	_ = tx.Apply(query.NewOpActivateSet("things"))
 
 	// Journal
 	journal := &memory.Journal{}

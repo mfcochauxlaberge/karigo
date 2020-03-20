@@ -58,15 +58,15 @@ func (t *Tx) Collection(qry query.Col) (jsonapi.Collection, error) {
 }
 
 // Apply ...
-func (t *Tx) Apply(ops []karigo.Op) error {
+func (t *Tx) Apply(ops []query.Op) error {
 	t.Lock()
 	defer t.Unlock()
 
 	for _, op := range ops {
 		switch op.Op {
-		case karigo.OpSet:
+		case query.OpSet:
 			t.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
-		case karigo.OpInsert:
+		case query.OpInsert:
 			t.opInsert(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
 		}
 	}

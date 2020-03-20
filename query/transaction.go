@@ -1,8 +1,6 @@
-package karigo
+package query
 
 import (
-	"github.com/mfcochauxlaberge/karigo/query"
-
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -17,21 +15,20 @@ import (
 // Each of the interface's methods have comments that explain how to properly
 // implement Tx. See the current implementations for more details.
 type Tx interface {
-	// Resource returns the resource defined by query.Res if found.
+	// Resource returns the resource defined by Res if found.
 	//
 	// In all other cases, an error is returned and the resource
 	// is nil.
-	Resource(query.Res) (jsonapi.Resource, error)
+	Resource(Res) (jsonapi.Resource, error)
 
-	// Collection returns the collection of resources defined by
-	// query.Col.
+	// Collection returns the collection of resources defined by Col.
 	//
 	// An empty collection and no error are returned even if no
 	// resources fall under the query.
 	//
 	// In all other cases, an error is returned and the collection
 	// is nil.
-	Collection(query.Col) (jsonapi.Collection, error)
+	Collection(Col) (jsonapi.Collection, error)
 
 	// Apply applies the operations to the underlying database.
 	//
