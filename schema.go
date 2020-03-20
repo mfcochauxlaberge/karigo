@@ -1,6 +1,8 @@
 package karigo
 
 import (
+	"github.com/mfcochauxlaberge/karigo/query"
+
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -107,7 +109,7 @@ type meta struct {
 }
 
 // handleSchemaChanges updates the given schema according to the operations.
-func handleSchemaChanges(s *jsonapi.Schema, ops []Op) {
+func handleSchemaChanges(s *jsonapi.Schema, ops []query.Op) {
 	for _, op := range ops {
 		switch op.Key.Set {
 		case "0_sets":

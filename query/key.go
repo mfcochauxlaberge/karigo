@@ -1,4 +1,4 @@
-package karigo
+package query
 
 // Key ...
 type Key struct {

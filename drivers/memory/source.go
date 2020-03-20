@@ -3,10 +3,21 @@ package memory
 import (
 	"sync"
 
-	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
+
+// NewSource ...
+func NewSource(schema *jsonapi.Schema) *Source {
+	src := &Source{
+		sets: map[string]*jsonapi.SoftCollection{},
+	}
+
+	_ = src.Reset(schema)
+
+	return src
+}
 
 // Source ...
 type Source struct {
@@ -26,13 +37,13 @@ func (s *Source) Ping() bool {
 }
 
 // Reset ...
-func (s *Source) Reset() error {
+func (s *Source) Reset(schema *jsonapi.Schema) error {
 	s.Lock()
 	defer s.Unlock()
 
 	types := map[string]*jsonapi.Type{}
 
-	for _, typ := range karigo.FirstSchema().Types {
+	for _, typ := range schema.Types {
 		ctyp := typ.Copy()
 		types[ctyp.Name] = &ctyp
 	}
@@ -94,7 +105,7 @@ func (s *Source) Reset() error {
 	}
 
 	// Relationships
-	for _, rel := range karigo.FirstSchema().Rels() {
+	for _, rel := range schema.Rels() {
 		s.sets["0_rels"].Add(makeSoftResource(
 			types["0_rels"],
 			rel.String(),
@@ -115,7 +126,7 @@ func (s *Source) Reset() error {
 }
 
 // NewTx ...
-func (s *Source) NewTx() (karigo.Tx, error) {
+func (s *Source) NewTx() (query.Tx, error) {
 	return &Tx{
 		src:  s,
 		sets: s.sets,

@@ -9,6 +9,7 @@ import (
 	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/drivertest/internal/scenarios"
 	"github.com/mfcochauxlaberge/karigo/internal/gold"
+	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -29,7 +30,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 	// Run scenarios
 	for _, scenario := range scenarios {
 		// Reset
-		err := src.Reset()
+		err := src.Reset(karigo.FirstSchema())
 		assert.NoError(err)
 
 		tx, _ := src.NewTx()
@@ -37,23 +38,23 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 		// Run each step
 		for _, step := range scenario.Steps {
 			switch s := step.(type) {
-			case karigo.Op:
-				ss := []karigo.Op{s}
+			case query.Op:
+				ss := []query.Op{s}
 
 				err := tx.Apply(ss)
 				assert.NoError(err)
 
-				enc, err := karigo.Encode(0, ss)
+				enc, err := query.Encode(0, ss)
 				assert.NoError(err)
 
 				err = jrnl.Append(enc)
 				assert.NoError(err)
 
-			case []karigo.Op:
+			case []query.Op:
 				err := tx.Apply(s)
 				assert.NoError(err)
 
-				enc, err := karigo.Encode(0, s)
+				enc, err := query.Encode(0, s)
 				assert.NoError(err)
 
 				err = jrnl.Append(enc)
@@ -69,7 +70,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 		keys := []string{}
 
 		// Keys
-		sets, err := tx.Collection(karigo.QueryCol{
+		sets, err := tx.Collection(query.Col{
 			Set:        "0_sets",
 			Sort:       []string{"id"},
 			PageNumber: 0,
@@ -81,7 +82,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 			set := sets.At(i)
 			id := set.GetID()
 
-			col, err := tx.Collection(karigo.QueryCol{
+			col, err := tx.Collection(query.Col{
 				Set:        id,
 				Sort:       []string{"id"},
 				PageNumber: 0,
@@ -138,7 +139,7 @@ func Test(t *testing.T, src karigo.Source, jrnl karigo.Journal) {
 		journalOut := []byte{}
 
 		for _, entry := range entries {
-			ops, err := karigo.Decode(0, entry)
+			ops, err := query.Decode(0, entry)
 			assert.NoError(err)
 
 			for _, op := range ops {

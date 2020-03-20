@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/mfcochauxlaberge/karigo/query"
+
 	"github.com/google/uuid"
 	"github.com/mfcochauxlaberge/jsonapi"
 	"github.com/rs/zerolog"
@@ -13,15 +15,8 @@ import (
 )
 
 // NewNode ...
-func NewNode(jrnl Journal, src Source) *Node {
+func NewNode(config Config) *Node {
 	node := &Node{
-		journal: journal{
-			jrnl: jrnl,
-		},
-		main: source{
-			src: src,
-		},
-
 		schema: FirstSchema(),
 		// funcs: map[string]Action{},
 
@@ -31,13 +26,22 @@ func NewNode(jrnl Journal, src Source) *Node {
 		logger: zerolog.Logger{},
 	}
 
+	node.Hosts = config.Hosts
+	node.Journal = config.Journal
+	node.Sources = config.Sources
+
+	_ = node.connect()
+
 	return node
 }
 
 // Node ...
 type Node struct {
-	Name    string
-	Domains []string
+	Name string
+
+	Hosts   []string
+	Journal map[string]string
+	Sources map[string]map[string]string
 
 	// Run
 	journal journal
@@ -138,12 +142,12 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	cp := &Checkpoint{
 		tx:   tx,
 		node: n,
-		ops:  []Op{},
+		ops:  []query.Op{},
 	}
 
 	// Check password is correct if request is writing (non-GET).
 	if r.Method == POST || r.Method == PATCH || r.Method == DELETE {
-		pwRes, _ := cp.tx.Resource(QueryRes{
+		pwRes, _ := cp.tx.Resource(query.Res{
 			Set:    "0_meta",
 			ID:     "password",
 			Fields: []string{"value"},
@@ -191,7 +195,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	execute := ActionDefault
-	ops := []Op{}
+	ops := []query.Op{}
 	// Prepare action
 	switch r.Method {
 	case GET:
@@ -204,9 +208,9 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		switch res.GetType().Name {
 		case "0_sets":
 			res.SetID(res.Get("name").(string))
-			ops = NewOpCreateSet(res.GetID())
+			ops = query.NewOpCreateSet(res.GetID())
 		case "0_attrs":
-			ops = NewOpCreateAttr(
+			ops = query.NewOpCreateAttr(
 				res.GetToOne("set"),
 				res.Get("name").(string),
 				res.Get("type").(string),
@@ -214,7 +218,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		case "0_rels":
-			ops = NewOpCreateRel(
+			ops = query.NewOpCreateRel(
 				res.GetToOne("from-set"),
 				res.Get("from-name").(string),
 				res.GetToOne("to-set"),
@@ -224,10 +228,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			)
 			res.SetID(ops[0].Value.(string))
 		default:
-			ops = NewOpCreateRes(res)
+			ops = query.NewOpCreateRes(res)
 		}
 
-		found, _ := cp.tx.Resource(QueryRes{
+		found, _ := cp.tx.Resource(query.Res{
 			Set:    res.GetType().Name,
 			ID:     res.GetID(),
 			Fields: []string{"id"},
@@ -237,10 +241,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			cp.Fail(errors.New("id already used"))
 		}
 	case PATCH:
-		ops = []Op{}
+		ops = []query.Op{}
 
 		for _, attr := range res.Attrs() {
-			ops = append(ops, NewOpSet(
+			ops = append(ops, query.NewOpSet(
 				r.URL.ResType,
 				res.GetID(),
 				attr.Name,
@@ -250,14 +254,14 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 		for _, rel := range res.Rels() {
 			if rel.ToOne {
-				ops = append(ops, NewOpSet(
+				ops = append(ops, query.NewOpSet(
 					r.URL.ResType,
 					res.GetID(),
 					rel.FromName,
 					res.GetToOne(rel.FromName),
 				))
 			} else {
-				ops = append(ops, NewOpSet(
+				ops = append(ops, query.NewOpSet(
 					r.URL.ResType,
 					res.GetID(),
 					rel.FromName,
@@ -266,7 +270,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 			}
 		}
 	case DELETE:
-		ops = []Op{NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
+		ops = []query.Op{query.NewOpSet(r.URL.ResType, r.URL.ResID, "id", "")}
 	}
 
 	cp.Apply(ops)
@@ -305,7 +309,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		doc.Errors = []jsonapi.Error{jaErr}
 	} else {
 		if len(ops) > 0 {
-			enc, err := Encode(0, cp.ops)
+			enc, err := query.Encode(0, cp.ops)
 			if err != nil {
 				panic(fmt.Errorf("could not encode ops: %s", err))
 			}
@@ -328,20 +332,20 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		switch r.Method {
 		case GET:
 			if !r.URL.IsCol {
-				res := cp.Resource(NewQueryRes(r.URL))
+				res := cp.Resource(query.NewRes(r.URL))
 				doc.Data = res
 			} else {
 				col := &jsonapi.SoftCollection{}
 				typ := n.schema.GetType(r.URL.ResType)
 				col.SetType(&typ)
-				resources := cp.Collection(NewQueryCol(r.URL))
+				resources := cp.Collection(query.NewCol(r.URL))
 				for i := 0; i < resources.Len(); i++ {
 					col.Add(resources.At(i))
 				}
 				doc.Data = jsonapi.Collection(col)
 			}
 		case POST, PATCH:
-			qry := NewQueryRes(r.URL)
+			qry := query.NewRes(r.URL)
 			qry.ID = res.GetID()
 			res := cp.Resource(qry)
 			doc.Data = res
@@ -357,20 +361,24 @@ func (n *Node) connect() bool {
 	defer n.Unlock()
 
 	if !n.main.alive {
-		err := n.main.src.Connect(nil)
+		src, err := newSource(n.Sources["main"])
 		if err != nil {
 			return false
 		}
 
+		n.main.src = src
 		n.main.alive = true
 	}
 
 	if !n.journal.alive {
-		err := n.journal.jrnl.Connect(nil)
+		jrnl, err := newJournal(n.Journal)
 		if err != nil {
 			return false
 		}
 
+		_ = jrnl.Reset()
+
+		n.journal.jrnl = jrnl
 		n.journal.alive = true
 	}
 

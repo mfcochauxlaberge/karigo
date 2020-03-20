@@ -2,14 +2,11 @@ package karigo
 
 // Config ...
 type Config struct {
-	// Karigo
-	Host       string
-	Port       uint
-	OtherHosts []string
+	// Server
+	Port uint
 
-	// Journal
+	// Node
+	Hosts   []string
 	Journal map[string]string
-
-	// Source
 	Sources map[string]map[string]string
 }

@@ -2,24 +2,18 @@ package util
 
 import (
 	"github.com/mfcochauxlaberge/karigo"
-	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 )
 
 func CreateServer(config karigo.Config) *karigo.Server {
 	// Server
-	server := karigo.NewServer(config)
-
-	src := &memory.Source{}
-	_ = src.Reset()
+	server := karigo.NewServer()
+	server.Config = config
 
 	// Add cluster control node
-	ctlNode := karigo.NewNode(&memory.Journal{}, src)
+	ctlNode := karigo.NewNode(config)
 	ctlNode.Name = "main_node"
 
-	// Register node
-	server.Nodes[server.Host] = ctlNode
-
-	for _, host := range server.OtherHosts {
+	for _, host := range config.Hosts {
 		server.Nodes[host] = ctlNode
 	}
 
