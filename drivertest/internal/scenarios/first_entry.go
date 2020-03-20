@@ -1,14 +1,14 @@
 package scenarios
 
-import "github.com/mfcochauxlaberge/karigo"
+import "github.com/mfcochauxlaberge/karigo/query"
 
 func init() {
 	Scenarios = append(Scenarios,
 		Scenario{
 			Name: "first_entry",
 			Steps: []interface{}{
-				karigo.NewOpCreateSet("type_name"),
-				karigo.NewOpActivateSet("type_name"),
+				query.NewOpCreateSet("type_name"),
+				query.NewOpActivateSet("type_name"),
 			},
 		},
 	)

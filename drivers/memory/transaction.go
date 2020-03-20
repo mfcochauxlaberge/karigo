@@ -4,12 +4,10 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/mfcochauxlaberge/karigo"
+	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
-
-var _ karigo.Source = (*Source)(nil)
 
 // Tx ...
 type Tx struct {
@@ -20,7 +18,7 @@ type Tx struct {
 }
 
 // Resource ...
-func (t *Tx) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
+func (t *Tx) Resource(qry query.Res) (jsonapi.Resource, error) {
 	t.Lock()
 	defer t.Unlock()
 
@@ -31,7 +29,7 @@ func (t *Tx) Resource(qry karigo.QueryRes) (jsonapi.Resource, error) {
 }
 
 // Collection ...
-func (t *Tx) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
+func (t *Tx) Collection(qry query.Col) (jsonapi.Collection, error) {
 	t.Lock()
 	defer t.Unlock()
 
@@ -57,15 +55,15 @@ func (t *Tx) Collection(qry karigo.QueryCol) (jsonapi.Collection, error) {
 }
 
 // Apply ...
-func (t *Tx) Apply(ops []karigo.Op) error {
+func (t *Tx) Apply(ops []query.Op) error {
 	t.Lock()
 	defer t.Unlock()
 
 	for _, op := range ops {
 		switch op.Op {
-		case karigo.OpSet:
+		case query.OpSet:
 			t.opSet(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
-		case karigo.OpInsert:
+		case query.OpInsert:
 			t.opInsert(op.Key.Set, op.Key.ID, op.Key.Field, op.Value)
 		}
 	}

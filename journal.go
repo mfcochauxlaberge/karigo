@@ -1,5 +1,12 @@
 package karigo
 
+import (
+	"fmt"
+
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
+	"github.com/mfcochauxlaberge/karigo/drivers/psql"
+)
+
 // Journal ...
 type Journal interface {
 	Service
@@ -38,6 +45,30 @@ type Journal interface {
 	// whether it is because the journal's history starts
 	// after f or t is greater than the newest index.
 	Range(f uint, t uint) ([][]byte, error)
+}
+
+func newJournal(params map[string]string) (Journal, error) {
+	if params == nil {
+		params = map[string]string{}
+	}
+
+	var jrnl Journal
+
+	switch params["driver"] {
+	case "", "memory":
+		jrnl = &memory.Journal{}
+	case "psql":
+		jrnl = &psql.Journal{}
+	default:
+		return nil, fmt.Errorf("unknown driver %q", params["driver"])
+	}
+
+	err := jrnl.Connect(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return jrnl, nil
 }
 
 // source is a thin convenient wrapper for a Journal.

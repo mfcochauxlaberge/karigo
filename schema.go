@@ -1,6 +1,8 @@
 package karigo
 
 import (
+	"github.com/mfcochauxlaberge/karigo/query"
+
 	"github.com/mfcochauxlaberge/jsonapi"
 )
 
@@ -125,13 +127,13 @@ func handleSchemaChange(s *jsonapi.Schema, r *Request, cp *Checkpoint) {
 				case "0_sets":
 					err = activateSet(s, res.GetID())
 				case "0_attrs":
-					res = cp.Resource(QueryRes{
+					res = cp.Resource(query.Res{
 						Set: "0_attrs",
 						ID:  res.GetID(),
 					})
 					err = activateAttr(s, res)
 				case "0_rels":
-					res = cp.Resource(QueryRes{
+					res = cp.Resource(query.Res{
 						Set: "0_rels",
 						ID:  res.GetID(),
 					})

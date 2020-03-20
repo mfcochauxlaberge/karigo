@@ -11,7 +11,7 @@ import (
 var _ karigo.Source = (*Source)(nil)
 
 func TestMemorySource(t *testing.T) {
-	src := &Source{}
+	src := NewSource(karigo.FirstSchema())
 	jrnl := &Journal{}
 
 	drivertest.Test(t, src, jrnl)

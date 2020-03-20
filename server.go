@@ -17,10 +17,9 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func NewServer(config Config) *Server {
+func NewServer() *Server {
 	s := &Server{
-		Config: config,
-		Nodes:  map[string]*Node{},
+		Nodes: map[string]*Node{},
 	}
 
 	s.logger = s.logger.
@@ -41,6 +40,8 @@ type Server struct {
 
 // Run ...
 func (s *Server) Run() {
+	s.check()
+
 	s.logger.Info().
 		Str("event", "server_start").
 		Uint("port", s.Port).
@@ -66,6 +67,8 @@ func (s *Server) Run() {
 
 // ServeHTTP ...
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.check()
+
 	requestID := uuid.New().String()[:8]
 
 	// Populate logger with rid
@@ -82,8 +85,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				msg = e
 			}
 
-			errLogger := logger.Output(os.Stderr)
-			errLogger.Info().
+			// errLogger := logger.Output(os.Stderr)
+			logger.Info().
 				Str("event", "recover").
 				Str("error", msg)
 
@@ -213,11 +216,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) DisableLogger() {
+	s.check()
+
 	s.logger = zerolog.Nop()
 }
 
 func (s *Server) SetOutput(w io.Writer) {
+	s.check()
+
 	s.logger = s.logger.Output(w)
+}
+
+func (s *Server) check() {
+	if s.Port == 0 {
+		s.Port = 6820
+	}
 }
 
 func sendResponse(w http.ResponseWriter, code int, body []byte, logger zerolog.Logger) error {

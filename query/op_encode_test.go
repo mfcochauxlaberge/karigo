@@ -1,11 +1,11 @@
-package karigo_test
+package query_test
 
 import (
 	"bytes"
 	"testing"
 	"time"
 
-	. "github.com/mfcochauxlaberge/karigo"
+	. "github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/stretchr/testify/assert"
 )
