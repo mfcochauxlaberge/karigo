@@ -71,28 +71,6 @@ func newJournal(params map[string]string) (Journal, error) {
 	return jrnl, nil
 }
 
-func newSource(params map[string]string) (Source, error) {
-	if params == nil {
-		params = map[string]string{}
-	}
-
-	var src Source
-
-	switch params["driver"] {
-	case "", "memory":
-		src = &memory.Source{}
-	default:
-		return nil, fmt.Errorf("unknown driver %q", params["driver"])
-	}
-
-	err := src.Connect(params)
-	if err != nil {
-		return nil, err
-	}
-
-	return src, nil
-}
-
 // source is a thin convenient wrapper for a Journal.
 type journal struct {
 	jrnl  Journal

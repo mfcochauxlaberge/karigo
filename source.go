@@ -1,6 +1,9 @@
 package karigo
 
 import (
+	"fmt"
+
+	"github.com/mfcochauxlaberge/karigo/drivers/memory"
 	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/mfcochauxlaberge/jsonapi"
@@ -22,6 +25,28 @@ type Source interface {
 
 	// NewTx returns a new Tx object.
 	NewTx() (query.Tx, error)
+}
+
+func newSource(params map[string]string) (Source, error) {
+	if params == nil {
+		params = map[string]string{}
+	}
+
+	var src Source
+
+	switch params["driver"] {
+	case "", "memory":
+		src = &memory.Source{}
+	default:
+		return nil, fmt.Errorf("unknown driver %q", params["driver"])
+	}
+
+	err := src.Connect(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return src, nil
 }
 
 // source is a thin convenient wrapper for a Source.
