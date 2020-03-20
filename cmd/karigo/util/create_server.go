@@ -34,6 +34,10 @@ func CreateServer(config karigo.Config) *karigo.Server {
 	ctlNode := karigo.NewNode(jrnl, src)
 	ctlNode.Name = "main_node"
 
+	ctlNode.Hosts = config.Hosts
+	ctlNode.Journal = config.Journal
+	ctlNode.Sources = config.Sources
+
 	for _, host := range config.Hosts {
 		server.Nodes[host] = ctlNode
 	}

@@ -18,10 +18,12 @@ import (
 func NewNode(jrnl Journal, src Source) *Node {
 	node := &Node{
 		journal: journal{
-			jrnl: jrnl,
+			jrnl:  jrnl,
+			alive: true,
 		},
 		main: source{
-			src: src,
+			src:   src,
+			alive: true,
 		},
 
 		schema: FirstSchema(),
@@ -39,6 +41,10 @@ func NewNode(jrnl Journal, src Source) *Node {
 // Node ...
 type Node struct {
 	Name string
+
+	Hosts   []string
+	Journal map[string]string
+	Sources map[string]map[string]string
 
 	// Run
 	journal journal
@@ -363,20 +369,22 @@ func (n *Node) connect() bool {
 	defer n.Unlock()
 
 	if !n.main.alive {
-		err := n.main.src.Connect(nil)
+		src, err := newSource(n.Sources["main"])
 		if err != nil {
 			return false
 		}
 
+		n.main.src = src
 		n.main.alive = true
 	}
 
 	if !n.journal.alive {
-		err := n.journal.jrnl.Connect(nil)
+		jrnl, err := newJournal(n.Journal)
 		if err != nil {
 			return false
 		}
 
+		n.journal.jrnl = jrnl
 		n.journal.alive = true
 	}
 
