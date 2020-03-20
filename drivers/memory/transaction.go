@@ -4,13 +4,10 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/mfcochauxlaberge/karigo"
 	"github.com/mfcochauxlaberge/karigo/query"
 
 	"github.com/mfcochauxlaberge/jsonapi"
 )
-
-var _ karigo.Source = (*Source)(nil)
 
 // Tx ...
 type Tx struct {
