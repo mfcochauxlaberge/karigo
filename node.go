@@ -371,8 +371,6 @@ func (n *Node) connect() bool {
 			return false
 		}
 
-		_ = src.Reset(FirstSchema())
-
 		n.main.src = src
 		n.main.alive = true
 	}

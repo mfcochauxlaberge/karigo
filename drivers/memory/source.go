@@ -10,9 +10,13 @@ import (
 
 // NewSource ...
 func NewSource(schema *jsonapi.Schema) *Source {
-	return &Source{
+	src := &Source{
 		sets: map[string]*jsonapi.SoftCollection{},
 	}
+
+	_ = src.Reset(schema)
+
+	return src
 }
 
 // Source ...
