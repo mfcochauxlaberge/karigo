@@ -15,17 +15,8 @@ import (
 )
 
 // NewNode ...
-func NewNode(jrnl Journal, src Source) *Node {
+func NewNode(config Config) *Node {
 	node := &Node{
-		journal: journal{
-			jrnl:  jrnl,
-			alive: true,
-		},
-		main: source{
-			src:   src,
-			alive: true,
-		},
-
 		schema: FirstSchema(),
 		// funcs: map[string]Action{},
 
@@ -34,6 +25,12 @@ func NewNode(jrnl Journal, src Source) *Node {
 
 		logger: zerolog.Logger{},
 	}
+
+	node.Hosts = config.Hosts
+	node.Journal = config.Journal
+	node.Sources = config.Sources
+
+	_ = node.connect()
 
 	return node
 }
@@ -374,6 +371,8 @@ func (n *Node) connect() bool {
 			return false
 		}
 
+		_ = src.Reset(FirstSchema())
+
 		n.main.src = src
 		n.main.alive = true
 	}
@@ -383,6 +382,8 @@ func (n *Node) connect() bool {
 		if err != nil {
 			return false
 		}
+
+		_ = jrnl.Reset()
 
 		n.journal.jrnl = jrnl
 		n.journal.alive = true
