@@ -144,9 +144,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	tx, _ := n.main.src.NewTx()
 
 	cp := &Checkpoint{
-		tx:   tx,
-		node: n,
-		ops:  []query.Op{},
+		tx:  tx,
+		ops: []query.Op{},
 	}
 
 	// Check password is correct if request is writing (non-GET).

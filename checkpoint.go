@@ -13,8 +13,7 @@ type Checkpoint struct {
 	Res jsonapi.Resource
 	Inc map[string]jsonapi.Resource
 
-	tx   query.Tx
-	node *Node
+	tx query.Tx
 
 	ops []query.Op
 
