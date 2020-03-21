@@ -1,9 +1,8 @@
 package karigo
 
 import (
-	"github.com/mfcochauxlaberge/karigo/query"
-
 	"github.com/mfcochauxlaberge/jsonapi"
+	"github.com/mfcochauxlaberge/karigo/query"
 )
 
 // FirstSchema ...
@@ -108,131 +107,154 @@ type meta struct {
 	Value string `json:"value" api:"attr"`
 }
 
-// handleSchemaChanges updates the given schema according to the operations.
-func handleSchemaChanges(s *jsonapi.Schema, ops []query.Op) {
-	for _, op := range ops {
-		switch op.Key.Set {
-		case "0_sets":
-			if op.Key.Field == "active" {
-				if op.Value.(bool) {
-					// Add set
-				} else {
-					// Remove set
-				}
+// updateSchema updates the given schema according to the operations.
+func updateSchema(schema *jsonapi.Schema, tx query.Tx) error {
+	newSchema := &jsonapi.Schema{}
+
+	// Sets
+	sets, err := tx.Collection(query.Col{
+		Set:      "0_sets",
+		PageSize: 999,
+	})
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < sets.Len(); i++ {
+		set := sets.At(i)
+
+		err = newSchema.AddType(jsonapi.Type{
+			Name: set.Get("name").(string),
+		})
+		if err != nil {
+			return err
+		}
+
+		// Attributes
+		attrs, err := tx.Collection(query.Col{
+			Set: "0_attrs",
+			BelongsToFilter: jsonapi.BelongsToFilter{
+				Type: "0_sets",
+				ID:   set.GetID(),
+			},
+			PageSize: 999,
+		})
+		if err != nil {
+			return err
+		}
+
+		for j := 0; j < attrs.Len(); j++ {
+			attr := attrs.At(i)
+
+			t, _ := jsonapi.GetAttrType(attr.Get("type").(string))
+
+			err = newSchema.AddAttr(
+				set.GetID(),
+				jsonapi.Attr{
+					Name:     attr.Get("name").(string),
+					Type:     t,
+					Nullable: attr.Get("nullable").(bool),
+				},
+			)
+			if err != nil {
+				return err
 			}
-		case "0_attrs":
-			if op.Key.Field == "active" {
-				if op.Value.(bool) {
-					// Add attribute
-				} else {
-					// Remove attribute
-				}
-			}
-		case "0_rels":
-			if op.Key.Field == "active" {
-				if op.Value.(bool) {
-					// Add relationship
-				} else {
-					// Remove relationship
-				}
+		}
+
+		// Relationships
+		rels, err := tx.Collection(query.Col{
+			Set: "0_rels",
+			BelongsToFilter: jsonapi.BelongsToFilter{
+				Type: "0_sets",
+				ID:   set.GetID(),
+			},
+			PageSize: 999,
+		})
+		if err != nil {
+			return err
+		}
+
+		for j := 0; j < rels.Len(); j++ {
+			rel := rels.At(i)
+
+			err = newSchema.AddRel(
+				set.GetID(),
+				jsonapi.Rel{
+					FromType: rel.GetToOne("from-set"),
+					FromName: rel.Get("from-name").(string),
+					ToOne:    rel.Get("to-one").(bool),
+					ToType:   rel.GetToOne("to-set"),
+					ToName:   rel.Get("to-name").(string),
+					FromOne:  rel.Get("from-one").(bool),
+				},
+			)
+			if err != nil {
+				return err
 			}
 		}
 	}
-	// var (
-	// 	res jsonapi.Resource
-	// 	err error
-	// )
 
-	// res, _ = r.Doc.Data.(jsonapi.Resource)
-
-	// if r.Method == "PATCH" {
-	// 	// Can only be for activating or deactivating
-	// 	// a set, attribute, or relationship.
-	// 	if active, ok := res.Get("active").(bool); ok {
-	// 		if active {
-	// 			switch r.URL.ResType {
-	// 			case "0_sets":
-	// 				err = activateSet(s, res.GetID())
-	// 			case "0_attrs":
-	// 				res = cp.Resource(QueryRes{
-	// 					Set: "0_attrs",
-	// 					ID:  res.GetID(),
-	// 				})
-	// 				err = activateAttr(s, res)
-	// 			case "0_rels":
-	// 				res = cp.Resource(QueryRes{
-	// 					Set: "0_rels",
-	// 					ID:  res.GetID(),
-	// 				})
-	// 				err = activateRel(s, res)
-	// 			}
-	// 		} else {
-	// 			switch r.URL.ResType {
-	// 			case "0_sets":
-	// 				deactivateSet(s, res)
-	// 			case "0_attrs":
-	// 				deactivateAttr(s, res)
-	// 			case "0_rels":
-	// 				deactivateRel(s, res)
-	// 			}
-	// 		}
-	// 	}
-
-	// 	cp.Check(err)
-	// }
-}
-
-func activateSet(s *jsonapi.Schema, name string) error {
-	err := s.AddType(jsonapi.Type{
-		Name: name,
-	})
-
-	return err
-}
-
-func deactivateSet(s *jsonapi.Schema, res jsonapi.Resource) {
-	s.RemoveType(res.GetID())
-}
-
-func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) error {
-	typ, null := jsonapi.GetAttrType(res.Get("type").(string))
-	err := s.AddAttr(res.GetToOne("set"), jsonapi.Attr{
-		Name:     res.Get("name").(string),
-		Type:     typ,
-		Nullable: null,
-	})
-
-	return err
-}
-
-func deactivateAttr(s *jsonapi.Schema, res jsonapi.Resource) {
-	s.RemoveAttr(res.GetToOne("set"), res.Get("Name").(string))
-}
-
-func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
-	rel := jsonapi.Rel{
-		FromType: res.GetToOne("from-set"),
-		FromName: res.Get("from-name").(string),
-		ToOne:    res.Get("to-one").(bool),
-		ToType:   res.GetToOne("to-set"),
-		ToName:   res.Get("to-name").(string),
-		FromOne:  res.Get("from-one").(bool),
-	}
-	rel = rel.Normalize()
-
-	err := s.AddRel(res.GetToOne("from-set"), rel)
-	if err != nil {
-		return err
+	errs := newSchema.Check()
+	if len(errs) > 0 {
+		return errs[0]
 	}
 
-	err = s.AddRel(res.GetToOne("to-set"), rel.Invert())
-	if err != nil {
-		return err
-	}
+	*schema = *newSchema
 
 	return nil
 }
 
-func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {
-	s.RemoveRel(res.Get("from-type").(string), res.Get("name").(string))
-}
+// func activateSet(s *jsonapi.Schema, name string) error {
+// 	err := s.AddType(jsonapi.Type{
+// 		Name: name,
+// 	})
+
+// 	return err
+// }
+
+// func deactivateSet(s *jsonapi.Schema, res jsonapi.Resource) {
+// 	s.RemoveType(res.GetID())
+// }
+
+// func activateAttr(s *jsonapi.Schema, res jsonapi.Resource) error {
+// 	typ, null := jsonapi.GetAttrType(res.Get("type").(string))
+// 	err := s.AddAttr(res.GetToOne("set"), jsonapi.Attr{
+// 		Name:     res.Get("name").(string),
+// 		Type:     typ,
+// 		Nullable: null,
+// 	})
+
+// 	return err
+// }
+
+// func deactivateAttr(s *jsonapi.Schema, res jsonapi.Resource) {
+// 	s.RemoveAttr(res.GetToOne("set"), res.Get("Name").(string))
+// }
+
+// func activateRel(s *jsonapi.Schema, res jsonapi.Resource) error {
+// 	rel := jsonapi.Rel{
+// 		FromType: res.GetToOne("from-set"),
+// 		FromName: res.Get("from-name").(string),
+// 		ToOne:    res.Get("to-one").(bool),
+// 		ToType:   res.GetToOne("to-set"),
+// 		ToName:   res.Get("to-name").(string),
+// 		FromOne:  res.Get("from-one").(bool),
+// 	}
+// 	rel = rel.Normalize()
+
+// 	err := s.AddRel(res.GetToOne("from-set"), rel)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	err = s.AddRel(res.GetToOne("to-set"), rel.Invert())
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
+
+// func deactivateRel(s *jsonapi.Schema, res jsonapi.Resource) {
+// 	s.RemoveRel(res.Get("from-type").(string), res.Get("name").(string))
+// }
