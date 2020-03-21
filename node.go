@@ -49,7 +49,7 @@ type Node struct {
 
 	// Schema
 	schema *jsonapi.Schema
-	// funcs  map[string]Action
+	funcs  map[string]Action
 
 	// Channels
 	err      chan error
@@ -66,6 +66,10 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		if !n.connect() {
 			panic("cannot connect to necessary services")
 		}
+	}
+
+	if n.funcs == nil {
+		n.funcs = map[string]Action{}
 	}
 
 	var (
@@ -194,7 +198,11 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		}
 	}
 
-	execute := ActionDefault
+	execute := n.funcs[r.Method+" "+r.URL.ResType]
+	if execute == nil {
+		execute = ActionDefault
+	}
+
 	ops := []query.Op{}
 	// Prepare action
 	switch r.Method {
