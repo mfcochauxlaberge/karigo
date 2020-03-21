@@ -69,7 +69,17 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	if n.funcs == nil {
-		n.funcs = map[string]Action{}
+		n.funcs = map[string]Action{
+			"POST 0_sets":    ActionPostSet,
+			"POST 0_attrs":   ActionPostSet,
+			"POST 0_rels":    ActionPostSet,
+			"PATCH 0_sets":   ActionPatchSet,
+			"PATCH 0_attrs":  ActionPatchSet,
+			"PATCH 0_rels":   ActionPatchSet,
+			"DELETE 0_sets":  ActionDeleteSet,
+			"DELETE 0_attrs": ActionDeleteSet,
+			"DELETE 0_rels":  ActionDeleteSet,
+		}
 	}
 
 	var (
@@ -211,33 +221,8 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		if res.GetID() == "" {
 			res.SetID(uuid.New().String()[:8])
 		}
-		// TODO Do not hardcode the following conditions. It can
-		// be handled in a much better way.
-		switch res.GetType().Name {
-		case "0_sets":
-			res.SetID(res.Get("name").(string))
-			ops = query.NewOpCreateSet(res.GetID())
-		case "0_attrs":
-			ops = query.NewOpCreateAttr(
-				res.GetToOne("set"),
-				res.Get("name").(string),
-				res.Get("type").(string),
-				res.Get("null").(bool),
-			)
-			res.SetID(ops[0].Value.(string))
-		case "0_rels":
-			ops = query.NewOpCreateRel(
-				res.GetToOne("from-set"),
-				res.Get("from-name").(string),
-				res.GetToOne("to-set"),
-				res.Get("to-name").(string),
-				res.Get("to-one").(bool),
-				res.Get("from-one").(bool),
-			)
-			res.SetID(ops[0].Value.(string))
-		default:
-			ops = query.NewOpCreateRes(res)
-		}
+
+		ops = query.NewOpCreateRes(res)
 
 		found, _ := cp.tx.Resource(query.Res{
 			Set:    res.GetType().Name,
@@ -283,12 +268,14 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 
 	cp.Apply(ops)
 
+	// Execute
+	execute(cp)
+
 	if r.isSchemaChange() {
-		// Handle schema change
-		handleSchemaChange(n.schema, r, cp)
-	} else {
-		// Execute
-		execute(cp)
+		err = updateSchema(n.schema, cp.tx)
+		if err != nil {
+			panic(fmt.Errorf("could not update schema: %s", err))
+		}
 	}
 
 	for _, op := range cp.ops {
