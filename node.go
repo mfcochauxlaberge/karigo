@@ -69,7 +69,17 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 	}
 
 	if n.funcs == nil {
-		n.funcs = map[string]Action{}
+		n.funcs = map[string]Action{
+			"POST 0_sets":    ActionPostSet,
+			"POST 0_attrs":   ActionPostSet,
+			"POST 0_rels":    ActionPostSet,
+			"PATCH 0_sets":   ActionPatchSet,
+			"PATCH 0_attrs":  ActionPatchSet,
+			"PATCH 0_rels":   ActionPatchSet,
+			"DELETE 0_sets":  ActionDeleteSet,
+			"DELETE 0_attrs": ActionDeleteSet,
+			"DELETE 0_rels":  ActionDeleteSet,
+		}
 	}
 
 	var (
@@ -215,7 +225,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 		// be handled in a much better way.
 		switch res.GetType().Name {
 		case "0_sets":
-			res.SetID(res.Get("name").(string))
+			// res.SetID(res.Get("name").(string))
 			ops = query.NewOpCreateSet(res.GetID())
 		case "0_attrs":
 			ops = query.NewOpCreateAttr(
@@ -224,7 +234,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				res.Get("type").(string),
 				res.Get("null").(bool),
 			)
-			res.SetID(ops[0].Value.(string))
+			// res.SetID(ops[0].Value.(string))
 		case "0_rels":
 			ops = query.NewOpCreateRel(
 				res.GetToOne("from-set"),
@@ -234,7 +244,7 @@ func (n *Node) Handle(r *Request) *jsonapi.Document {
 				res.Get("to-one").(bool),
 				res.Get("from-one").(bool),
 			)
-			res.SetID(ops[0].Value.(string))
+			// res.SetID(ops[0].Value.(string))
 		default:
 			ops = query.NewOpCreateRes(res)
 		}
