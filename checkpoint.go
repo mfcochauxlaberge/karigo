@@ -10,8 +10,9 @@ import (
 
 // Checkpoint ...
 type Checkpoint struct {
-	Res jsonapi.Resource
-	Inc map[string]jsonapi.Resource
+	ResID string
+	Res   jsonapi.Resource
+	Inc   map[string]jsonapi.Resource
 
 	tx query.Tx
 
@@ -50,6 +51,12 @@ func (c *Checkpoint) Collection(qry query.Col) jsonapi.Collection {
 	return col
 }
 
+// OpsRes ...
+func (c *Checkpoint) OpsRes(typ, id string) jsonapi.Resource {
+	opsc := make([]query.Op)
+	return resourceOverOps{typ: typ, id: id, ops: c.ops}
+}
+
 // Apply ...
 func (c *Checkpoint) Apply(ops []query.Op) {
 	if c.err == nil {
@@ -86,3 +93,62 @@ func (c *Checkpoint) commit() error {
 func (c *Checkpoint) rollback() error {
 	return c.tx.Rollback()
 }
+
+// resourceOverOps ...
+type resourceOverOps struct {
+	typ string
+	id  string
+	ops []query.Op
+}
+
+func (r resourceOverOps) New() jsonapi.Resource {
+	return nil
+}
+
+func (r resourceOverOps) Copy() jsonapi.Resource {
+	return nil
+}
+
+func (r resourceOverOps) Attrs() map[string]jsonapi.Attr {
+	return nil
+}
+
+func (r resourceOverOps) Rels() map[string]jsonapi.Rel {
+	return nil
+}
+
+func (r resourceOverOps) Attr(key string) jsonapi.Attr {
+	return jsonapi.Attr{}
+}
+
+func (r resourceOverOps) Rel(key string) jsonapi.Rel {
+	return jsonapi.Rel{}
+}
+
+func (r resourceOverOps) GetID() string {
+	return ""
+}
+
+func (r resourceOverOps) GetType() jsonapi.Type {
+	return jsonapi.Type{}
+}
+
+func (r resourceOverOps) Get(key string) interface{} {
+	return nil
+}
+
+func (r resourceOverOps) GetToOne(key string) string {
+	return ""
+}
+
+func (r resourceOverOps) GetToMany(key string) []string {
+	return nil
+}
+
+func (r resourceOverOps) SetID(id string) {}
+
+func (r resourceOverOps) Set(key string, val interface{}) {}
+
+func (r resourceOverOps) SetToOne(key string, rel string) {}
+
+func (r resourceOverOps) SetToMany(key string, rels []string) {}
