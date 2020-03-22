@@ -12,7 +12,6 @@ import (
 type Checkpoint struct {
 	ResID string
 	Res   jsonapi.Resource
-	Inc   map[string]jsonapi.Resource
 
 	tx query.Tx
 
