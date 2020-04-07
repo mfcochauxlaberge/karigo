@@ -1,7 +1,5 @@
 package karigo
 
-import "github.com/mfcochauxlaberge/karigo/query"
-
 // Action ...
 type Action func(*Checkpoint)
 
@@ -10,30 +8,23 @@ func ActionDefault(cp *Checkpoint) {}
 
 // ActionPostSet ...
 func ActionPostSet(cp *Checkpoint) {
-	id := cp.Res.Get("name").(string)
-
-	// Overwrite ID before the operation gets applied.
-	cp.Apply([]query.Op{query.NewOpSet("0_sets", "_", "id", id)})
+	cp.SetID("$0", cp.Get("0_sets", "$0", "name").(string))
 }
 
 // ActionPostAttr ...
 func ActionPostAttr(cp *Checkpoint) {
-	set := cp.Res.GetToOne("set")
-	name := cp.Res.Get("name").(string)
-	id := set + "_" + name
+	set := cp.Get("0_sets", "$0", "set").(string)
+	name := cp.Get("0_sets", "$0", "name").(string)
 
-	// Overwrite ID before the operation gets applied.
-	cp.Apply([]query.Op{query.NewOpSet("0_attrs", "_", "id", id)})
+	cp.SetID("$0", set+"_"+name)
 }
 
 // ActionPostRel ...
 func ActionPostRel(cp *Checkpoint) {
-	set := cp.Res.GetToOne("set")
-	name := cp.Res.Get("name").(string)
-	id := set + "_" + name
+	set := cp.Get("0_sets", "$0", "set").(string)
+	name := cp.Get("0_sets", "$0", "from-name").(string)
 
-	// Overwrite ID before the operation gets applied.
-	cp.Apply([]query.Op{query.NewOpSet("0_attrs", "_", "id", id)})
+	cp.SetID("$0", set+"_"+name)
 }
 
 // ActionPatchSet ...
