@@ -19,6 +19,7 @@ func Execute() {
 	rootCmd.AddCommand(
 		cmdConfig,
 		cmdExec,
+		cmdNew,
 		cmdRun,
 		cmdVersion,
 	)
